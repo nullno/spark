@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  	<meta charset="UTF-8">
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="Pragma" content="no-cache" />
+	  <title>spark.js</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
+    <script src="./spark.js"></script>
+</head>
+<body>
+  <noscript>
+    <strong>很抱歉，如果不启用JavaScript，页面将无法正常工作。 请启用它以继续！</strong>
+  </noscript>
+<script>
+
+var M = new Spark({
+         // name:'TESTNX',
+         // title:'TEST NN APP',
+         // scene:'pc',//mobile,pc,mp
+         // router:'history',
+         // devTool:true,
+  })
+
+console.log(M)
+
+
+// 类名样式 使用Css模块
+var css1 = M.Css('padding: 5px 10px; line-height:30px;');
+var csshover = M.Css('color:green;background-color:rgba(0,0,0,0.5);');
+var titlecss= M.Css('color:#fff;');
+
+
+var List1=M.List({
+               style:'width:100%;height:100%;background-color:#fff;margin:0 auto;overflow:auto;animation: fadeInUp 1000ms both;',
+               
+               data:[{title:'外交部发布最新疫情高风险国家名单'},
+                     {title:'湖北:当季重要农产品销售取得积极进展'},
+                     {title:'贫困村里来了个“画家书记”'}],
+               item:function(item){
+                  return M.Box({
+                      tag:'li',
+                      style:'background-color:blue;width:100%;border-bottom:1px solid #000;color:red;font-size:15px;overflow:hidden;',
+                      //事件属性
+                                  click:{
+                                          down:function(_this){
+                                            
+                                             if(_this.styleObj['color']=='blue'){
+                                                  _this.style = 'color:pink;background-color:red;'
+                                             }else{
+                                                  _this.style = 'color:blue;background-color:yellow;'
+                                             }
+                                             // _this.remove()
+                                          }
+                                      },
+                       child:[M.Text(item.title,{
+                                  style:'width:50%;float:left; display:block;border:1px solid #fff;margin:5px;',//自身基本样式
+                                  shover:'color:yellowgreen;',//hoer样式
+                                  className:css1,//类名样式 使用Css模块，或者 classname STR
+                                  
+                                }),
+                             
+                       ],
+                  }) 
+               }
+})
+
+
+var title = M.Text('SPARK.JS',{
+                    tag:'h1',
+                    style:'display:block;width:100%;padding:10px 0; text-align:center;font-size:20px;transition:color 300ms ease,font 300ms ease;',
+                     className:titlecss,
+                     debounce:true,
+                     click:{
+                         down:function(_this){
+                   
+                             titlecss.style =(titlecss.styleObj['color']=='red')?'color:#fff;font-size:20px;':'color:red;font-size:50px;';
+                          
+                         }
+                     }
+            })
+
+var container1=M.Box({
+     style:'width:90%;height:300px;overflow:auto;background:black;margin:10px auto;padding:5px;',//默认样式
+     child:[
+          M.Text('widget:列表 OFF',{
+                    tag:'h5',
+                    style:'color:#fff;display:block;width:100%;text-align:left;line-height:30px;border-bottom:1px solid #fff;',
+                  //  debounce:true,//是否点击防抖
+                    click:{
+                         down:function(_this){
+               
+                          /*两种隐藏*/
+                          _this.styleObj['color']=='#fff'?container1.addNext(List1):container1.remove(List1); 
+                          // List1.style =(_this.styleObj['color']=='#fff')?'display:none;':'display:show;'
+                        
+
+                          _this.style =(_this.styleObj['color']=='#fff')?'color:#008000;border-bottom-color:#008000;':'color:#fff;border-bottom-color:#fff;';
+                         _this.text =(_this.styleObj['color']=='#fff')?'widget:列表 OFF':'widget:列表 ON'; 
+                       
+                          
+                         }
+                     }
+            }),
+          
+      ]
+})
+
+
+// 基本组件抽离，加入自定义组件模块
+/*
+Text:{
+      tag:[dom <string>],
+      text:<string>,
+      class:<string>,
+      style:style<CSSStyleDeclaration>,
+      on:{
+
+         click:<function>
+
+      } 
+     }
+     
+Box:{
+    tag:[dom <string>],
+    child:Widget[Arr]
+}
+List:{
+     tag:[dom <string>],
+     data:[<Json | Array>],
+     item:<function>
+}
+//不要
+Drag:{
+     position:{
+       x:<number>,
+       y:<number>
+     },
+     child:Widget<Arr> 
+}
+Input:{
+  
+}
+Select:{
+  
+}
+Fixed:{
+  
+},
+Position:{
+  
+}
+Scroll:{
+  
+},
+Flex:{
+
+  child:[]
+}
+*/
+
+
+
+
+
+var t1 = M.Text('nullno.com',{
+                    tag:'label',//default tag:span, h1,h2,p,div,em,i,label
+                    className:'setClass',
+                    // idName:'setId',
+                    style:'color:green;',//默认样式
+                    // shover:'csshover',
+                    debounce:true,
+                    init:function(){
+                      // console.log(this.$el)
+                    },
+                    watch:{
+                         style:function(oldv,newv){
+                               console.log('style changed');
+                            },
+                         text:function(oldv,newv){
+                               console.log(oldv,newv);
+                           } 
+                    },
+                    click:{
+                         down:function(_this){
+                           css1.style='font-weight:bold;'
+                          
+                           _this.className='setClass2'
+
+                           console.log('t1 down')
+                           return;
+                         },
+                         press:function(_this){
+                             // console.log('t1 press ok')
+                         },
+                     }
+            })
+
+var myImg =M.Image('http://s2.hao123img.com/resource/moe/widget/index/mascot/img/blink.ce41282.gif',{style:'width:5%;'})
+
+
+
+
+var box2 = M.Box({
+                style:'width:90%;height:300px;overflow:auto;background:black;margin:10px auto;',//默认样式
+                child:[t1],
+                click:{
+                     down:function(_this){
+
+                      _this.addNext(myImg);
+
+                      // console.log(List1.data);
+                      // var dd=[];
+                      //  for(var i=0;i<10;i++){
+                      //     dd.push({title:'湖北:--'+i});
+                      //  }
+
+                      //  List1.data=dd
+                        // myList2.data.concat(dd);
+                        // box2.remove()
+                        // console.log(myList2.data)
+                     }
+                }
+              })
+
+
+/* 层叠盒子 */
+
+var Stack1=M.Stack({
+   style:'width:90%;height:300px;background:black;margin:10px auto;',
+   child:[
+     M.Position({
+        style:'width:200px;height:200px;background:red;',
+        child:[M.Image('https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2433028472,2095499647&fm=26&gp=0.jpg',{style:'width:100%;'})]
+     }),
+     M.Position({
+        style:'width:200px;height:200px;left:50px;top:50px;',
+        child:[M.Stack({
+            style:'width:100px;height:100px;background:green;margin:10px auto;overflow:hidden;',
+            child:[M.Stack({
+                style:'width:50px;height:50px;background:pink;margin:20px auto;',
+              
+             })]
+
+        })
+            
+        ]
+     }),
+      
+   ]
+})
+
+
+
+var Flex=''
+
+var drag0 = M.Drag({
+     position:{
+       x:0.1,
+       y:0.1
+     },
+     child:[box2]
+})
+
+</script>
+
+<script>
+
+var HomePage = M.Page({
+      fullpage:true,
+      style:'width:100%;height:100%;position:absolute;background-color:rgba(57,59,59,0.98); background-size:cover;overflow:auto;text-align:center;',
+      child:[title,container1,box2,Stack1]
+})
+
+</script>
+</body>
+</html>

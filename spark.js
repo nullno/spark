@@ -1,0 +1,1414 @@
+/*
+  -----------------更方便创建具有基本样式和功能的视图组件---------------
+ 视图组件解析（组件转dom处理，样式处理）->适配处理
+
+                                      NnWidget
+                                          |
+          Event-----------Data-----------Dom-----------Style---------Adapter
+           |               |              |              |
+           |------>      dataBind     domHandler      cssHandler
+
+style:默认风格样式属性+自定义属性
+dom:html标签重新归类，baseWidget
+                        |
+    文字，图片，视频，音频，容器，拖动容器，画布，文字按钮，文字图标，列表，
+    横向排列，纵向排列,局部滚动容器，弹窗，swiper(需要引入swiper)
+     
+widget|->nxdom 
+      |    |-createClassName  
+      |->nxstyle
+      |->nxdata
+
+CSS Reset：Eric Meyer      
+*/
+(function(global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(document, window) : typeof define === 'function' && define.amd ? define(factory) : (global = global || self,
+    global.Spark = factory(document, window));
+}(this, function(D, W) {
+    'use strict';
+
+/* base libs */  
+  
+  /*Browser evn info*/
+  var inBrowser = typeof window !== 'undefined';
+  var UA = inBrowser && window.navigator.userAgent.toLowerCase();
+
+  var _OP = Object.prototype;
+
+  function addEventListener(a,b,c,d){
+          a && a.addEventListener(b, c, d || false);
+  } 
+  function removeEventListener(a,b,c,d){
+          a && a.removeEventListener(b, c, d || false);
+  } 
+  function _typeof(d){
+     return  _OP.toString.call(d);
+  }
+
+
+ /*Object.assign polyfill*/
+if (typeof Object.assign != 'function') {
+  Object.assign = function(target) {
+    'use strict';
+    if (target == null) {
+      throw new TypeError('Cannot convert undefined or null to object');
+    }
+ 
+    target = Object(target);
+    for (var index = 1; index < arguments.length; index++) {
+      var source = arguments[index];
+      if (source != null) {
+        for (var key in source) {
+          if (_OP.hasOwnProperty.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+    }
+    return target;
+  };
+}
+/**
+ * [arrProxy  ES6 arrary Proxy Polyfill]
+ * @AuthorHTL
+ * @DateTime  2020-08-21T12:08:57+0800
+ * @param     {[type]}                 arr     [description]
+ * @param     {[type]}                 handler [description]
+ * @return    {[type]}                         [description]
+ */
+  function arrProxy(arr,handler){
+    var newArrProto = [];
+    var method = ['push','pop','shift','unshift','splice','sort','reverse','concat'];
+    method.forEach(function (method) {
+        // 原生Array的原型方法
+        let original = Object.create(Array.prototype)[method];
+        // 将push，pop等方法重新封装并定义在对象newArrProto的属性上
+        // 这里需要注意的是封装好的方法是定义在newArrProto的属性上而不是其原型属性
+        // newArrProto.__proto__ 没有改变
+        newArrProto[method] = function mutator(n) {
+             handler(method,n);
+            // 调用对应的原生方法并返回结果（新数组长度）
+            return original.apply(this, arguments);
+        }
+
+    });
+    
+    arr.__proto__ = newArrProto;
+    return arr;
+
+  } 
+
+/* Util tools*/  
+/**
+ * [SparkUtil 工具包]
+ * @type {Object}
+ */
+var SparkUtil = {
+        /*包含字符串*/
+        includes: function(str1, str2) {
+            return str1.indexOf(str2)==-1?false:true;
+        },
+        /*去除空格*/
+        trimAll: function (str) {
+                 return str.replace(/\s*/g,'');
+        },
+         /*去除两端空格*/
+        trim: function (str) {
+                 return str.replace(/^\s*|\s*$/g,'');
+        },
+        /**
+      * [debounce 防抖函数]
+      * @AuthorHTL
+      */
+        debounce: function(fn, delay) {
+            var timer = null;
+            return function(e) {
+                e.stopPropagation();
+                var _this = this
+                  , args = arguments;
+                timer && clearTimeout(timer);
+                timer = setTimeout(function() {
+                    fn.apply(this, args);
+                }, delay);
+            }
+        },
+        /**
+      * [throttle 节流函数]
+      * @AuthorHTL
+      */
+        throttle: function(fn, delay) {
+            var lastTime = 0;
+            return function() {
+                var nowTime = +new Date();
+                if (nowTime - lastTime > delay) {
+                    fn.apply(this, arguments);
+                    lastTime = nowTime;
+                }
+
+            }
+
+        },
+        /**
+      * [urlParam 获取指定名称的 url 参数值]
+      * @AuthorHTL
+      * @DateTime  2020-03-29T16:11:00+0800
+      * @param     {[type]}                 name [description]
+      * @param     {[type]}                 url  [description]
+      * @return    {[type]}                      [description]
+      */
+        urlParam: function(name, url) {
+            var reg = new RegExp('(\\?|&)' + name + '=([^&#]*)');
+            var result = reg.exec(url ? url : location.href);
+            return result != null ? decodeURIComponent(result[2]) : null;
+        },
+        /**
+      * [deepCopyObj 对象深拷贝]
+      * @AuthorHTL
+      * @DateTime  2020-03-29T16:11:16+0800
+      * @param     {[type]}                 obj [description]
+      * @return    {[type]}                     [description]
+      */
+        deepCopyObj: function(obj) {
+            var result = Array.isArray(obj) ? [] : {};
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    if (typeof obj[key] === 'object' && obj[key] !== null) {
+                        result[key] = this.deepCopyObj(obj[key]);
+                    } else {
+                        result[key] = obj[key];
+                    }
+                }
+            }
+            return result;
+        },
+        /**
+     * [loadScript 动态加载js脚本]
+     * @AuthorHTL
+     * @DateTime  2020-03-29T16:11:29+0800
+     * @param     {[type]}                 jsurl    [description]
+     * @param     {Function}               callback [description]
+     * @return    {[type]}                          [description]
+     */
+        loadScript: function(jsurl, callback) {
+            var script = document.createElement('script')
+            script.type = "text/javascript";
+            if (script.readyState) {
+                //IE
+                script.onreadystatechange = function() {
+                    if (script.readyState == 'loaded' || script.readyState == 'complete') {
+                        script.onreadystatechange = null;
+                        callback();
+                    }
+                }
+                ;
+            } else {
+                //Others
+                script.onload = function() {
+                    callback();
+                }
+                ;
+            }
+            script.src = jsurl;
+            document.body.appendChild(script)
+        },
+        /*arr unique*/
+        unique:function (arr) {
+            if (!Array.isArray(arr)) {
+                console.log('type error!')
+                return
+            }
+            var res = [],
+                obj = {};
+            for (var i = 0; i < arr.length; i++) {
+                if (!obj[arr[i]]) {
+                    res.push(arr[i])
+                    obj[arr[i]] = 1;
+                } else {
+                    obj[arr[i]]++
+                }
+            }
+            return res;
+        },
+        /**
+     * [devTool 开发调试工具]
+     * @AuthorHTL
+     * @DateTime  2020-03-29T16:11:46+0800
+     * @return    {[type]}                 [description]
+     */
+        devTool: function(url) {
+            this.loadScript(url || 'https://cdn.bootcss.com/eruda/1.5.8/eruda.min.js', function() {
+                console.info('eruda dev tool init ok')
+                eruda.init()
+            })
+        },
+        /**
+      * [BrowserMatch description]
+      * @type {Object}
+      *
+      * @use    SparkUtil.env.isMobile
+      */
+        env: {
+            inBrowser: inBrowser,
+            UA: UA,
+            isMobile: UA && /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent),
+            isIE: UA && /msie|trident/.test(UA),
+            isIE9: UA && UA.indexOf('msie 9.0') > 0,
+            isEdge: UA && UA.indexOf('Edge/') > 0,
+            isAndroid: UA && UA.indexOf('android') > 0,
+            isIOS: UA && /iphone|ipad|ipod|ios/.test(UA),
+            isChrome: UA && /chrome\/\d+/.test(UA),
+            isFF: UA && UA.match(/firefox\/(\d+)/),
+            isWeixin: UA && UA.match(/MicroMessenger\/[0-9]/i),
+            isQQ:UA && UA.match(/QQ\/[0-9]/i)
+        },
+        /*获取图片宽高*/
+        getImgInfo:function(url,callback){
+                var img = new Image();
+                    img.src = url;
+                // 加载完成执行
+                img.onload = function(){
+                  callback({width:img.width,height:img.height})
+              
+                }
+        }, 
+        /*遍历  datas <Array> || <Number>*/
+        traverse:function(datas,callback){
+            if(_typeof(datas) === '[object Array]'){
+
+            }
+            if(_typeof(datas) === '[object Object]'){
+              
+            }
+            if(_typeof(datas) === '[object Number]'){
+              
+            }
+
+        }
+    };
+
+
+ 
+
+/**
+ * [UrlParamHandler 链接参数缓存处理器]
+ * @AuthorHTL
+ * @DateTime  2020-05-11T14:23:35+0800
+ * @return    {[type]}                 [description]
+ */
+ function UrlParamHandler(){
+     this.getUrlSearchParam = function(url){
+        return this.core(url || location.search);
+     }
+     this.getUrlHashParam=function(url){
+        return this.core(url || location.hash);
+     }
+ }
+
+ UrlParamHandler.prototype.core=function(u){
+         var tempObj = {};
+         if(u){
+             var _s = u.substr(0,1);
+             var temp_up =  u.replace(new RegExp('&&','g'),'&').replace(new RegExp('^\\' + _s + '*'),_s);
+             var temp_str = temp_up.replace(new RegExp('^\\' + _s + '*'),''),
+                 tempArr = [];
+                
+                 tempArr = temp_str.split('&');
+             
+               try{
+                     for(var i=0;i<tempArr.length;i++){
+                        var item = tempArr[i];
+                        var o = item.split('=');
+                        var key = item.match(/(\S*?)=/)[1],
+                            value = item.match(/=(\S*)/)[1];
+                         tempObj[key]=decodeURIComponent(value);
+                     }
+                  
+                     tempObj['origin']= temp_up;
+                 } catch(err){
+                     console.warn(err+' url参数中特殊符号可能未进行编码')
+                 }  
+            } 
+       
+    return tempObj;
+}
+
+//  /**
+//   * [WidgetNameHandler 创建组件类名]
+//   * @AuthorHTL
+//   * @DateTime  2020-08-21T12:08:08+0800
+//   */
+// function WidgetNameHandler(){
+
+//       this.widgetClassNames = [];
+
+//       this.create = function(widgetName){
+
+//           return this.core(widgetName);
+//       }
+
+//       this.check = function(){};
+
+// }
+// WidgetNameHandler.prototype.core = function(widgetName){
+
+//     var hashName = widgetName + '-' + (((1 + Math.random()) * 0x10000000) | 0).toString(16);
+//             var testHash = this.widgetClassNames.join(',');
+
+//             hashName = (-testHash.indexOf(hashName) == true) ? hashName : hashName + 'x2';
+//             this.widgetClassNames.push(hashName);
+//   return hashName;
+// }
+
+
+/**
+ * [SparkCoreHandler 核心功能]
+ * @AuthorHTL
+ * @DateTime  2020-08-21T12:14:58+0800
+ */
+function SparkCoreHandler(){
+   var _scope = this;
+    this.DefaultSetting = {
+                 name:'Spark',
+                 title:'Spark Web',
+                 scene:'pc',//mobile,pc,mp
+                 router:'history',
+                 devTool:false,
+                 gray:false
+         }
+  /**
+   * [widgetClassNames 组件名字缓存]
+   * @type {Array}
+   */
+  this.widgetClassNames = [];
+  /**
+ * [_scope.CSSCache 样式管理]
+ * @type {Object}
+ */
+   this.CSSCache = {};
+    /**
+ * [_scope.WidgetCache 组件缓存]
+ * @type {Object}
+ */
+   this.WidgetCache = {};
+    /**
+ * [_scope.PageCache 页面缓存]
+ * @type {Array}
+ */
+   this.PageCache = [];
+  /**
+   * [SparkEventCache 事件缓存]
+   * @type {Array}
+   */
+   this.EventCache=[];
+   
+   this.CSS = this.CSSManager();
+   this.HTML =  this.HTMLManager();
+
+   /**
+   * [WidgetWatchParams 监听属性管理]
+   * @type {Object}
+   */
+   this.WidgetWatchParams = {
+        data:function(oval, nval, obj){
+              if (JSON.stringify(oval)  === JSON.stringify(nval)){
+                       return nval;
+              }
+             var pushStop=true,el=obj.$el;
+              obj['data'] = arrProxy(obj['data'],function(method,newarr){
+                             console.log(method)
+                                switch(method){
+                                  case 'push':
+                                   // console.log(obj)
+                                   pushStop && obj.addNext(obj.item(newarr))
+                                  break;
+                                  case 'concat':
+                                  // console.log(newarr)
+                                  var tempChild=[];
+                                   for(var i=0;i<newarr.length;i++){
+                                    pushStop=false;
+                                    obj['data'].push(newarr[i]);
+                                     tempChild.push(obj.item(newarr[i]));
+                                     if(i==newarr.length-1){
+                                       pushStop=true;
+                                     }
+
+                                   }
+                                   obj.addNext(tempChild)  
+                                  break;
+                                   case 'splice':
+                                   // console.log('splice:'+newarr)
+
+                                   break;
+                                }
+                          });
+
+               if(el){
+                    //移除旧节点
+                  while(el.hasChildNodes()) {
+                        el.removeChild(el.firstChild);
+                   }
+                  obj.child.splice(0,oval.length)
+                   
+                  obj['data'].splice(0,oval.length)
+             
+                  obj['data'].concat(nval)
+               }
+
+             return nval;
+            
+        },
+        style: function(oval, nval, obj) {
+            var tempOld = oval;
+            if (typeof nval === 'string') {
+                nval = SparkUtil.trim(nval);
+                var tempNewVal = nval;
+                var newStyleObj={};
+                if (oval == nval)
+                    return nval;
+                try {
+                   
+
+                   newStyleObj =  Object.assign(_scope.CSS.strStyleToObj(tempOld), _scope.CSS.strStyleToObj(tempNewVal));
+
+                   obj.styleObj = newStyleObj;
+
+                   nval = _scope.CSS.objStyleToStr(newStyleObj);
+                   
+                   // console.log(newStyleObj);
+               
+                   _scope.CSS.modify(obj.name, '{' + nval + '}');
+
+                   return nval;
+                } catch (err) {
+                    console.error('style is an object:' + oval.name);
+                }
+            } else {
+                return nval;
+            }
+        },
+        className:function(oval, nval, obj){
+           var tempOld = oval;
+            if (typeof nval === 'string') {
+            if (oval === nval)
+                return nval;
+            /*变化监听*/
+            obj.watch && obj.watch['className'] && obj.watch['className'](tempOld, nval);
+            /*类名改变*/
+            var nodeList = document.getElementsByClassName(obj.name);
+             for (var i = 0; i < nodeList.length; i++) {
+                nodeList[i].className = obj.className?nodeList[i].className.replace(tempOld,nval):nodeList[i].className+' '+nval;
+
+             } 
+            }else{
+               return nval;
+           
+             }
+
+        },
+        text: function(oval, nval, obj) {
+            var tempOld = oval;
+            if (oval === nval)
+                return nval;
+            /*变化监听*/
+            obj.watch && obj.watch['text'] && obj.watch['text'](tempOld, nval);
+            /*数据改变*/
+            var nodeList = document.getElementsByClassName(obj.name);
+            for (var i = 0; i < nodeList.length; i++) {
+                nodeList[i].innerText = nval;
+            }
+            return nval;
+        },
+        child: function(oval, nval, obj) {
+        
+             // console.log(tempOld)
+            if (JSON.stringify(oval)  === JSON.stringify(nval))
+                return nval;
+            /*变化监听*/
+            obj.watch && obj.watch['child'] && obj.watch['child'](oval, nval);
+           
+            return nval;
+        }
+    };
+
+
+}
+/**
+ * [CreateWidgetName description]
+ * @AuthorHTL
+ * @DateTime  2020-08-21T14:51:25+0800
+ * @param     {[type]}                 widgetName [description]
+ */
+SparkCoreHandler.prototype.CreateWidgetName = function(widgetName){
+
+    var hashName = widgetName + '-' + (((1 + Math.random()) * 0x10000000) | 0).toString(16);
+            var testHash = this.widgetClassNames.join(',');
+
+            hashName = (-testHash.indexOf(hashName) == true) ? hashName : hashName + 'x2';
+            this.widgetClassNames.push(hashName);
+  return hashName;
+}
+
+/**
+ * [WidgetDefineProperty description]
+ * @AuthorHTL
+ * @DateTime  2020-08-21T13:56:40+0800
+ * @param     {[type]}                 obj       [description]
+ * @param     {[type]}                 propertys [description]
+ */
+SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
+    var _scope = this;
+        var lastV = {};
+        for (var i=0;i<propertys.length; i++) {
+            lastV[propertys[i]] = obj[propertys[i]];
+            (function(a) {
+                var tempVal = null;
+             
+                Object.defineProperty(obj, a, {
+                    get: function() {
+                        return tempVal;
+                    },
+                    set: function(newval) {
+                        tempVal = lastV[a] = _scope.WidgetWatchParams[a]([lastV[a]][0], newval, obj);
+                    }
+                })
+                obj[a] = lastV[a];
+            }
+            )(propertys[i])
+        }
+}
+
+
+
+    /**
+ * [NxDom 组件生成Dom]
+ * @AuthorHTL
+ * @DateTime  2020-04-01T05:24:20+0800
+ * * 路由，页面，文本，图片，视频，音频，容器，拖动容器，画布，文字按钮，文字图标，列表，
+    横向排列，纵向排列,局部滚动容器，弹窗，swiper(需要引入swiper)
+ */
+ SparkCoreHandler.prototype.HTMLManager = function() {
+        var _scope = this;
+        var _core = {
+            getAddress: function(widgets,pname) {
+                 if(!widgets)return [];
+                var addressArr = [];
+                for (var i=0;i<widgets.length;i++) {
+                    widgets[i]['parentName']=pname;
+                    addressArr.push(widgets[i]['name'])
+                }
+                return addressArr;
+            },
+            getClassName: function(param) {
+                var names = '';
+                /*names += (param && typeof param.style === 'string') ? ' ' + param.style['name'] : '';
+                  names += (param && typeof param.shover === 'object') ? ' ' + param.shover['name'] : '';
+                  names += (param && param.className ) ? ' ' + param.className : '';
+                */
+                names += (param && typeof param.className === 'object') ? ' ' + param.className['name']:
+                         (param && typeof param.className === 'string') ? ' ' + param.className : '';
+                return names;
+            },
+            getNxWidget:function(nxtype,newparams,domtag,defaultcss,defineProperty,defaultwatch){
+               var p = newparams; 
+            
+                 !p && (p = {});
+                var obj = {style:'',className:'',type:nxtype}
+                  , address = _scope.CreateWidgetName(nxtype)
+                  , className = address + _core.getClassName(p)
+                  , idName = p.idName?'id='+p.idName:'';
+                var tempStyleStr = defaultcss+(p.style?p.style:'');
+                    if(typeof p.className=='object'){
+                      tempStyleStr += p.className.style;
+                    }
+                var tempChild=[]; 
+                if(nxtype=='List'){
+                   var tempDataArr=p.data;
+                     /*jsonstr*/
+                        if(_typeof(p.data) === '[object String]'){
+                              try{
+                                 tempDataArr = JSON.parse(p.data)
+                              }
+                              catch(err){
+                                tempDataArr=[];
+                                console.error('data 中 JSON 格式出错')
+                              }
+                            }
+                       if(_typeof(tempDataArr) === '[object Array]' && tempDataArr.length>0 && typeof p.item === 'function'){
+                           
+                                  for(var i=0;i<tempDataArr.length;i++){
+                                     
+                                      tempChild.push(p.item(tempDataArr[i]));
+                                    
+                                  }
+                        }
+                }
+                      
+                        
+                Object.assign(obj, p);  
+                obj.name = address;
+                obj.tag =  p.tag || domtag;
+                obj.html = nxtype=='Image'?
+                            '<img '+idName+' class="' + className + '" src="'+p.imgurl+'" />'
+                            : '<'+obj.tag+' '+idName+' class="' + className + '">'+(nxtype=='Text'?p.text:'[[' + address + ']]')+'</'+obj.tag+'>';
+                obj.styleObj = _scope.CSS.strStyleToObj(tempStyleStr);
+                obj.style = _scope.CSS.objStyleToStr(obj.styleObj);
+
+                // console.log(p.child)
+                
+                obj.child = _core.getAddress(nxtype=='List'?tempChild:p.child,obj.name);
+               
+
+                _scope.WidgetCache[address] = obj;
+                /*数据变化监听*/
+                defineProperty && _core.defineProperty(address, defineProperty);
+              
+                if(nxtype=='Page'){
+                   _scope.PageCache.push(address);
+                   /*开始渲染*/
+                   console.time("Render");
+                   SparkRender();
+                   console.timeEnd("Render");
+                }
+
+              return _scope.WidgetCache[address]
+
+            },
+            defineProperty: function(address, arr) {
+                _scope.WidgetDefineProperty(address.indexOf('Css') != -1 ? _scope.CSSCache[address] : _scope.WidgetCache[address], arr);
+            },
+            defaultParams: {
+            }
+        }
+
+        return {
+            Css: function(p) {
+                !p && (p = '');
+                var obj = {type:'Css'}
+                  , address = _scope.CreateWidgetName('Css');
+
+                obj.name = address;
+                obj.styleObj = _scope.CSS.strStyleToObj(p);
+                obj.style = _scope.CSS.objStyleToStr(obj.styleObj);
+
+                _scope.CSSCache[address] = obj;
+                _core.defineProperty(address, ['style']);
+                return _scope.CSSCache[address]
+            },
+            Page: function(p) {
+              
+              return _core.getNxWidget('Page',
+                                    p,
+                                    'div',
+                                    'position:relative;',
+                                    ['style'],
+                                    false 
+                                    );
+            },
+            Text: function(str, p) {
+
+                !p && (p = {});
+                 p.text=str;
+
+                 return _core.getNxWidget('Text',
+                                    p,
+                                    'span',
+                                    '',
+                                    ['text','style','className'],
+                                    true 
+                                    );
+            },
+            Image: function(src,p) {
+                 !p && (p = {});
+                  p.imgurl=src;
+                  return _core.getNxWidget('Image',
+                                    p,
+                                    '',
+                                    'border:0;',
+                                    null,
+                                    false 
+                                    );
+            },
+            Box: function(p) {
+               
+
+                return _core.getNxWidget('Box',
+                                    p,
+                                    'div',
+                                    'background-color:#3D3F3F;',
+                                    ['style', 'child'],
+                                    false 
+                                    );
+            },
+            Stack:function(p) {
+               
+
+                return _core.getNxWidget('Stack',
+                                    p,
+                                    'div',
+                                    'position:relative;background-color:#3D3F3F;',
+                                    ['style', 'child'],
+                                    false 
+                                    );
+            },
+            List:function(p){
+               return _core.getNxWidget('List',
+                                    p,
+                                    'ul',
+                                    '',
+                                    ['style','data'],
+                                    false 
+                                    );
+            },
+            Drag: function(p) {
+                return _core.getNxWidget('Drag',
+                                    p,
+                                    'div',
+                                    '',
+                                    null,
+                                    false 
+                                    );
+            },
+            Position:function(p) {
+              return _core.getNxWidget('Position',
+                                    p,
+                                    'div',
+                                    'position:absolute;background-color:#3D3F3F;',
+                                    null,
+                                    false,
+                                    ['style', 'child'] 
+                                    );
+            },
+            // moreWiget...
+        }
+}
+
+   /**
+ * [NxStyle  样式解析注入 STYLE web版]
+ * @AuthorHTL
+ * @DateTime  2020-03-29T16:15:01+0800
+ */
+ SparkCoreHandler.prototype.CSSManager= function(){
+
+        var _core = {
+            insert: function(Attribute, AttributeVal, cssStr) {
+                var newStyle = D.createElement('style');
+                    newStyle.type = "text/css";
+                  newStyle.setAttribute(Attribute, AttributeVal);
+                  newStyle.innerText += (/modifycss/.test(Attribute) ? '.' + AttributeVal : '') + cssStr;
+                  D.head.insertBefore(newStyle, D.head.lastChild)
+            },
+            remove: function(dataTarget) {
+                var delTarget = D.querySelector(dataTarget);
+                if (delTarget) {
+                    D.head.removeChild(delTarget)
+                }
+             },
+
+        };
+      
+       return {
+              /*追加*/
+               add:function(id, cssStr) {
+                    cssStr = cssStr && SparkUtil.trim(cssStr);
+                    _core.remove("[data-style='" + id + "']")
+                    _core.insert('data-style', id, cssStr)
+                },
+               /*修改*/ 
+               modify: function(selector, cssStr) {
+                  cssStr = SparkUtil.trim(cssStr);
+                  /*
+                        try{
+                          if(!/^\.|#/.test(selector)){
+                             throw 'WARN: modify style selector must star" .|| #"}'
+                          }
+                          if(!/^\{.*\}$/.test(cssStr)){
+                            throw 'WARN: modify style cssstr must star"{" end "}"}'
+                           }
+                        }catch(error){
+                           console.warn(error)
+                        }*/
+                  _core.remove("[data-modifycss='" + selector + "']")
+                  _core.insert('data-modifycss', selector, cssStr)
+                },
+               /*样式字符串转对象*/
+               strStyleToObj:function(str){
+                    var tempObj={};
+                   if(typeof str !='string'){
+                     return tempObj;
+                    }
+                   
+                       var CssArr = str.replace(new RegExp('http:','ig'),'')
+                                               .replace(new RegExp('https:','ig'),'')
+                                               .replace(new RegExp('\"','ig'),'')
+                                               .replace(new RegExp('\'','ig'),'').split(';');
+                   for (var i=0;i<CssArr.length;i++) {
+                       if (CssArr[i]) {
+                        var p = CssArr[i].split(':');
+                         
+                        tempObj[SparkUtil.trim(p[0])] = SparkUtil.trim(p[1]);
+
+                        }
+                     }
+                   
+                   return tempObj; 
+               },
+                /*样式对象转字符串*/
+               objStyleToStr: function(obj){
+                  var t = JSON.stringify(obj);
+                  if(_typeof(obj) != '[object Object]' || t == "{}"){
+                         return '';
+                  }
+
+                  var CssStr = t.replace(new RegExp('\\","','ig'),';')
+                                 .replace(new RegExp('\\":"','ig'),':')
+                                 .replace(new RegExp('\"','ig'),'')
+                                 .replace(new RegExp('\{'),'')
+                                 .replace(new RegExp('\}'),';');
+
+                  return CssStr;
+                },
+                /*样式合并处理*/
+               strStyleHandle: function(laststr,nextstr,className){
+
+                 var  _insertIndex=laststr.indexOf(nextstr);
+            
+                   if(_insertIndex != -1){
+                      
+                 
+                    laststr = (laststr.substring(0,_insertIndex)+',.'+className)+
+                                 (laststr.substring(_insertIndex,laststr.length));
+                   }
+                     return laststr;
+               }
+          }
+
+ }
+  /**
+ * [getAddressData 通过地址获取组件所有信息]
+ * @AuthorHTL
+ * @DateTime  2020-04-01T05:25:07+0800
+ * @param     {[type]}                 address [description]
+ * @return    {[type]}                         [description]
+ */
+SparkCoreHandler.prototype.getAddressData = function(address) {
+        try {
+          
+            if (typeof address == 'string' && address.indexOf('Css') != -1) {
+                throw 'ERROR: Error useing Widget'
+            }
+
+        } catch (err) {
+            console.error(err);
+            return {}
+        }
+        return address && this.WidgetCache[address];
+ }
+ 
+   /*
+ * [ResetCss 重置css]
+ * @AuthorHTL
+ * @DateTime  2020-04-02T22:18:59+0800
+ */
+ SparkCoreHandler.prototype.ResetCss = function(cssStr) {
+      
+    var grayStr = this.DefaultSetting.gray==true?'html{ filter: grayscale(100%); -webkit-filter: grayscale(100%); -moz-filter: grayscale(100%); -ms-filter: grayscale(100%); -o-filter: grayscale(100%); filter: url("data:image/svg+xml;utf8,#grayscale"); filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1); -webkit-filter: grayscale(1);}':'';
+
+   return this.DefaultSetting.resetCss || 'html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;box-sizing:border-box;font-size:100%;vertical-align:baseline;background:transparent;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:”;content:none;}:focus{outline:0;}ins{text-decoration:none;}del{text-decoration:line-through;}table{border-collapse:collapse;border-spacing:0;}*{-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{width:5px;background-color:rgba(0,0,0,0);-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb{background-color:rgba(61,63,63,.5);background-clip:padding-box;min-height:20px;-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb:hover{background-color:rgba(61,63,63,1)}'+grayStr;
+  
+  }
+
+/* 初始化 style  */
+ SparkCoreHandler.prototype.makeStyleTree = function(_cssStr) {
+
+        this.ResetCss && this.CSS.add('resetCss', this.ResetCss());
+        _cssStr && this.CSS.add('MainCss', _cssStr);
+
+  }  
+/* 新增 style  */
+ SparkCoreHandler.prototype.makeNextStyleTree = function(_cssStr,address) {
+
+        _cssStr && this.CSS.add('NextCss-'+address, _cssStr);
+ } 
+
+  /**
+ * [addEvent 注册组件事件]
+ * @AuthorHTL
+ * @DateTime  2020-04-05T04:21:49+0800
+ */
+ SparkCoreHandler.prototype.addWidgetEvent  = function(target, node) {
+        node = this.getAddressData(node);
+         
+        if(!node.click){
+          return;
+        }
+        if (node.click['down']) {
+            addEventListener(target,'click',node.debounce ? SparkUtil.debounce(function() {
+                node.click['down'](node);
+            }, 100) : function(e){
+                 e.stopPropagation();
+                 
+                 node.click['down'](node);
+
+            },{capture:false,passive:true})
+        }
+        if (node.click['press']) {
+
+           addEventListener(target,SparkUtil.env.isMobile ? 'touchstart' : 'mousedown', function(e){
+                 e.stopPropagation();
+                 node.click['press'](node);
+            },{capture:true,passive:true});
+           
+        }
+        if (node.click['up']) {
+           addEventListener(target,SparkUtil.env.isMobile ? 'touchend' : 'mouseup', function(e){
+                 e.stopPropagation();
+                 
+                 node.click['up'](node);
+            },{capture:true,passive:true});
+          
+        }
+ }
+
+/**
+ * [createDomTree description]
+ * @AuthorHTL
+ * @DateTime  2020-08-21T13:50:05+0800
+ * @param     {[type]}                 _rootAdress [description]
+ * @param     {[type]}                 domTarget   [description]
+ * @param     {[type]}                 DF          [description]
+ * @param     {Function}               callback    [description]
+ * @return    {[type]}                             [description]
+ */
+SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,DF,callback){
+        var _scope = this;
+        var _core = {
+            df: document.createDocumentFragment(),
+            _html: null,
+            _css: '',
+            _eventQueue: [],//leave
+            _rootAdress: _rootAdress,
+            _lastAdress: null,
+            /*render them*/
+            render: function() {
+                var _this = this;
+                var domData=_scope.getAddressData(_this._rootAdress);
+                _this.readAdress(domData);
+              
+                if(typeof domTarget === 'object'){
+                   /*insert css*/
+                  _scope.makeStyleTree(_this._css);
+                  /*insert html*/
+                  var NxContainer = document.createElement('div');
+                  NxContainer.setAttribute('id', 'SparkApp-' + _scope.DefaultSetting.name);
+                  NxContainer.innerHTML = this._html;
+                  domTarget.insertBefore(NxContainer, domTarget.firstChild);
+                  /*default bind event && el && init*/
+                 var tempTimer= setTimeout(function(){
+                      _this.pushEvent.call(_this);
+                      _this.renderComplete.call(_this,_this._rootAdress);
+                      clearTimeout(tempTimer)
+                   });
+                 
+                }else{
+                   
+
+                     /*append css moveto pushcss()*/
+                       _scope.makeNextStyleTree(_this._css,_this._rootAdress);
+                 
+                     /*append html*/
+                     var tempDomTarget = domTarget;
+                      typeof tempDomTarget ==='string' && (tempDomTarget = document.getElementsByClassName(tempDomTarget))
+                            
+                        var tempDom = document.createElement("div");
+                            tempDom.innerHTML = _this._html;
+                          
+                        var nodeArr = tempDom.childNodes;
+           
+                         _this.tempPushEvent(domData,nodeArr[0]);
+                             
+
+                         DF.appendChild(nodeArr[0]);
+
+                        // tempDom.innerHTML = this._html;   
+
+
+                         callback(_this,tempDomTarget);  
+                         var t =  setTimeout(function(){
+                            _this.renderComplete.call(_this,_this._rootAdress);
+                            clearTimeout(t)
+                          })
+
+                      /*append bind event*/
+                        
+                }
+               
+                  
+                
+            },
+            /*add render complete function*/
+            renderComplete:function(address){
+                  var _this = this;
+                  var node = _scope.getAddressData(address);
+                  var nodeList = document.getElementsByClassName(address); 
+              
+                  node.$el=nodeList[0];  
+                  node.init && node.init();
+                  if(typeof domTarget === 'string'){
+                    !node.parentName &&(node.parentName=domTarget);
+                  }
+                  if(node.child && node.child.length>0){
+                      for(var i=0;i<node.child.length;i++){
+                         _this.renderComplete(node.child[i]);
+                      }
+                   }    
+            },
+            /*dom tree*/
+            pushHtml: function(parent, child, nowaddress) {
+                var _this = this;
+                _this._html = !_this._html ? (_this.RegExp(parent, child, nowaddress)) : (_this.RegExp(_this._html, child, _this._lastAdress));
+            },
+            /*css tree*/
+            pushCss: function(_node) {
+                var _this = this;
+                var pointer = 'cursor:pointer;';
+                var className = (typeof _node.style === 'object')?_node.style['name']:_node.name
+                  , cssStr = (typeof _node.style === 'object')?_node.style['style']:_node.style
+                  , hclassName = (typeof _node.shover === 'object')? _node.shover['name']: _node.name
+                  , hcssStr = (typeof _node.shover === 'object')?_node.shover['style']:_node.shover;
+                  /*去重处理*/
+                   cssStr ='{' + (_node.click ? pointer : '') +_scope.CSS.objStyleToStr(_scope.CSS.strStyleToObj(cssStr)) + '}';
+                   hcssStr = '{' + pointer +_scope.CSS.objStyleToStr(_scope.CSS.strStyleToObj(hcssStr)) + '}';
+                 
+                var c =  !SparkUtil.includes(_this._css, className) ? '.' + className + cssStr : '';
+                var h =  _node.shover && (!SparkUtil.includes(_this._css, '.' + hclassName + ':hover')) ? '.' + hclassName +':hover'+  hcssStr : '';
+                
+           
+                   if(SparkUtil.includes(_this._css,cssStr) || SparkUtil.includes(_this._css,hcssStr)){
+                    if(SparkUtil.includes(_this._css,cssStr) && !SparkUtil.includes(_this._css, className)){
+                     _this._css = _scope.CSS.strStyleHandle(_this._css,cssStr,className);
+                    }
+                    if(SparkUtil.includes(_this._css,hcssStr)){
+                    _this._css = _scope.CSS.strStyleHandle(_this._css,hcssStr,hclassName + ':hover');
+                    }
+                   }else{
+                    _this._css +=SparkUtil.trim(c+h);
+                  }
+
+            },
+           
+             /*append bind event*/
+            tempPushEvent:function (_node,target){
+                            _scope.addWidgetEvent(target, _node.name); 
+                            if(_node.child){
+                              for(var i=0;i<_node.child.length;i++){
+                                this.tempPushEvent(_scope.getAddressData(_node.child[i]),target.childNodes[i])
+                              }
+                            }
+                                  
+                         },
+            /*default add event*/
+            pushEvent: function() {
+
+                 var _this = this;
+       
+                 /*去重*/
+                    // _this._eventQueue = new Array(...new Set(_this._eventQueue)) 
+                    _this._eventQueue =  SparkUtil.unique(_this._eventQueue)
+                   
+                for (var i=0;i<_this._eventQueue.length;i++) {
+           
+                        (function(nodeName) {
+                            var nodeList = document.getElementsByClassName(nodeName);
+                         
+                            for (var i = 0; i < nodeList.length; i++) {
+                                   _scope.addWidgetEvent(nodeList[i], nodeName)
+                            }
+                        }
+                        )(_this._eventQueue[i])
+                }
+
+            },
+            RegExp: function(parent, child, address) {
+                return parent.replace(new RegExp('\\[\\[' + address + '\\]\\]'), child);
+            },
+            handelQueue: function(queue) {
+                var _this = this;
+                queue.forEach(function(address) {
+                    _this._lastAdress = address;
+                    _this.readAdress(_scope.getAddressData(address))
+                })
+            },
+            readAdress: function(_node) {
+                var _this = this;
+                var tempParentHtml = _node.html
+                  , tempChildHtml = ''
+                  , queue = []
+                  , i = 0;
+
+                if (!_node.child || _node.child.length == 0) {
+                    _this.pushHtml(tempParentHtml, tempChildHtml, _node.name);
+
+                }
+                _this.pushCss(_node);
+                if(_node.click && (typeof _node.click === 'object')){
+                   _this._eventQueue.push(_node.name)
+                }
+               
+
+                while (_node.child&&_node.child[i]) {
+                    var nw = _scope.getAddressData(_node.child[i]);
+                    nw.child && queue.push(nw.name);
+                    tempChildHtml += nw.html;
+                    _this.pushCss(nw);
+                    if(nw.click && (typeof nw.click === 'object')){
+                     _this._eventQueue.push(nw.name)
+                  }
+                    if (i === _node.child.length - 1) {
+                        _this.pushHtml(tempParentHtml, tempChildHtml, _node.name);
+                        // _this._html =!_this._html?(_this.RegExp(tempParentHtml,tempChildHtml,_node.name))
+                        //           :(_this.RegExp(_this._html,tempChildHtml,_this.lastNodeName));
+                        queue.length > 0 ? _this.handelQueue(queue) : null;
+
+                    }
+
+                    i++;
+                }
+
+            }
+        }
+       
+        try{
+           
+        _core.render();
+          
+        }catch(e){
+          console.error(e)
+        }
+}
+
+
+/**
+ * [urlParam url 参数缓存]
+ * @type {[type]}
+ */
+   var UrlParamManage = new UrlParamHandler();
+ 
+  /**
+   * [SparkCoreManage 核心功能]
+   * @type {SparkCoreHandler}
+   */
+   var SparkCoreManage = new SparkCoreHandler();
+
+
+
+
+/**
+ * [addNext widget向后添加]
+ * @AuthorHTL
+ * @DateTime  2020-04-06T21:42:58+0800
+ * @param     {[type]}                 node [description]
+ */
+
+_OP.addNext=function(node){
+
+     if(!this.child){
+      return;
+     }
+     console.time("addNext");
+     var isDie = function(node){
+         return !node.child || (node.name!=_this.name && (node.child && (node.child.join(',').indexOf(_this.name) === -1)));
+     }
+     var _tempArr=[],_this=this;
+     var df  = document.createDocumentFragment(); 
+     var addNextParams={
+           Notify:false,
+           Html:'',
+           Css:'',
+       };
+      var randerDf=function(a,t){
+   
+           for(var i=0;i<t.length;i++){
+  
+                  t[i].appendChild(df);
+                  if(i==t.length-1){
+                   SparkCoreManage.makeNextStyleTree(addNextParams.Css,a._rootAdress);
+                     // a.renderComplete.call(a,_this.name);
+                  }
+            }
+       }
+
+   
+       this.child.forEach(function(item){
+           _tempArr.push(item)
+       })
+  
+     if(_typeof(node) === '[object Array]'){
+        for(var i = 0; i<node.length;i++){
+
+          if(isDie(node[i])){
+             
+              SparkCoreManage.createDomTree(node[i].name,_this.name,df,function(a,t){
+                 addNextParams.Css+=a._css;
+                 if(i==node.length-1){
+                      randerDf(a,t);
+                  }
+              })
+              node[i].name && _tempArr.push(node[i].name);
+             
+              
+          }else{
+            console.warn('addNext '+node[i].name+' Maxsize ')
+          }
+        }
+      
+     }else if(_typeof(node) === '[object Object]' && isDie(node)){
+          
+             SparkCoreManage.createDomTree(node.name,this.name,df,function(a,t){
+               addNextParams.Css+=a._css;
+                randerDf(a,t);
+             })
+             node.name && _tempArr.push(node.name);
+          
+     }else{
+            console.warn('addNext '+node.name+' Maxsize ')
+     }
+      
+      this.child = _tempArr;
+      console.timeEnd("addNext");
+      return this;
+}
+
+_OP.remove = function(node){
+   var _this = node || this;
+        console.time("Remove");
+        /*移除数据*/
+       var parent = SparkCoreManage.getAddressData(_this.parentName);
+      if(parent.child){
+         parent.child.forEach(function(item,index){
+             if(item===_this.name){
+               parent.child.splice(index,1);
+               parent.data  && parent.data.splice(index,1);
+             }
+         })
+       }
+   /*移除节点*/
+     var _parentElement = _this.$el.parentNode;
+
+     if(_parentElement){
+        _parentElement.removeChild(_this.$el);
+      }
+     console.timeEnd("Remove");
+     return this;
+}
+
+
+
+    /**
+ * [SparkRouter 单页面路由功能]
+ * @AuthorHTL
+ * @DateTime  2020-03-30T23:42:32+0800
+ */
+    function SparkRouter() {
+    }
+
+
+
+    /**
+ * [Rander 所有节点渲染到页面上]
+ * @AuthorHTL
+ * @DateTime  2020-03-30T23:46:26+0800
+ */
+   function SparkRender() {
+        if (SparkCoreManage.PageCache.length == 0) {
+             console.warn('至少有存在一个Page页面')
+        } else if (SparkCoreManage.PageCache.length > 1) {
+              SparkRouter()
+        } else {
+               
+          SparkCoreManage.createDomTree(SparkCoreManage.PageCache[0],D.body)
+        }
+    }
+
+
+
+/*Spark core fn*/
+function Spark(params){
+
+         Object.assign(SparkCoreManage.DefaultSetting,params);
+         Object.assign(this,SparkCoreManage.HTML);
+        /*开启调试工具*/
+        if(SparkCoreManage.DefaultSetting.devTool===true && typeof SparkCoreManage.DefaultSetting.devTool === 'boolean'){
+           SparkUtil.devTool();
+        }
+        this.vcss = SparkCoreManage.CSSCache;
+        this.vdom = SparkCoreManage.WidgetCache;
+        this.vpage= SparkCoreManage.PageCache;
+
+        this.urlParams={
+          search: UrlParamManage.getUrlSearchParam(),
+          hash: UrlParamManage.getUrlHashParam()
+        };
+
+        this.env=SparkUtil.env;
+       
+ 
+}
+
+/*通用组件追加/删除*/
+/*组件向下添加*/
+Spark.prototype.addNext =function(a,b){
+  console.log(dd)
+}
+/*组件向上添加*/
+Spark.prototype.addPreve =function(a,b){
+  
+}    
+/*移除组件*/
+Spark.prototype.del =function(a,b){
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+
+
+
+    /**
+ * [SparkCore description]
+ * @AuthorHTL
+ * @DateTime  2020-03-30T00:38:47+0800
+ * @param     {[type]}                 params [description]
+ */
+  // function SparkCore(params) {
+ 
+  //       Object.assign(DefaultSetting,params);
+  //       /*开启调试工具*/
+  //       if(DefaultSetting.devTool===true && typeof DefaultSetting.devTool === 'boolean'){
+  //          SparkUtil.devTool();
+  //       }
+  //       // this.widget = HTML.parseWidget;
+  //       this.vcss = _scope.CSSCache;
+  //       this.vdom = _scope.WidgetCache;
+
+       
+  //       this.env=SparkUtil.env;
+  //       Object.assign(this,HTML.parseWidget);
+  //   }
+    
+    // SparkCore.prototype.render = SparkRender;
+
+    return Spark;
+}));
