@@ -14,37 +14,73 @@
      
     var bthcss = SparkApp.Css('position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
      
-     var btnAdd = SparkApp.Box({
+     var btnAdd1 = SparkApp.Box({
      	tag:'button',
      	style:'background-color:green;left:2px;',
      	className:bthcss,
-     	child:[SparkApp.Text('ADD NODE')],
+     	child:[SparkApp.Text('ADD append')],
      	on:{
      		click:function(_this){
                 SparkApp.append(wrap,[node1,node1,node1,node1])
-                SparkApp.prepend(wrap,node2)
-
-                // console.log(wrap)
      		}
      	}
+     })
+
+      var btnAdd2 = SparkApp.Box({
+        tag:'button',
+        style:'background-color:green;left:2px;bottom:45px;',
+        className:bthcss,
+        child:[SparkApp.Text('ADD prepend')],
+        on:{
+            click:function(_this){
+               
+                SparkApp.prepend(wrap,node2)
+            }
+        }
      })
       var btnDel = SparkApp.Box({
      	tag:'button',
      	style:'background-color:#666;right:2px;',
      	className:bthcss,
-     	child:[SparkApp.Text('DEL NODE')],
+     	child:[SparkApp.Text('DEL Target node')],
      	on:{
      		click:function(_this){
 
-               // var ddd =  SparkApp.remove(wrap,node2)
+               var ddd =  SparkApp.remove(wrap,node1)
             
                 // var ddd = SparkApp.remove(wrap,'lastChild')
                 // var ddd = SparkApp.remove(wrap,'lastChild')
-                var ddd = SparkApp.remove(wrap,0)
+                // var ddd = SparkApp.remove(wrap,0)
                   // console.log(ddd)
      		}
           }
      })
+
+      var btnDel2 = SparkApp.Box({
+        tag:'button',
+        style:'background-color:#666;right:2px;bottom:45px;',
+        className:bthcss,
+        child:[SparkApp.Text('DEL firstnode')],
+        on:{
+            click:function(_this){
+
+               var ddd =  SparkApp.remove(wrap,'firstChild')
+            }
+          }
+     })
+    var btnDel3 = SparkApp.Box({
+        tag:'button',
+        style:'background-color:#666;right:2px;bottom:88px;',
+        className:bthcss,
+        child:[SparkApp.Text('DEL lastnode')],
+        on:{
+            click:function(_this){
+
+               var ddd =  SparkApp.remove(wrap,'firstChild')
+            }
+          }
+     })
+
 
 		var node1 = SparkApp.Box({
 			style:'width:20px;height:20px;background:red;display:inline-block;margin:2px;',
@@ -66,7 +102,7 @@
 
    var  wrap = SparkApp.Box({
      style:'width:90%;height:500px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;',
-        child:[btnAdd,btnDel],
+        child:[btnAdd1,btnAdd2,btnDel,btnDel2,btnDel3],
         watch:{
             child:function(o,n){
              // console.log(o,n)
