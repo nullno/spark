@@ -348,6 +348,17 @@ var SparkUtil = {
             }
 
         },
+        /*数组中是否存在元素,并返回索引*/
+        isInArray:function(arr,compare){
+                    for(var i=0;i<arr.length;i++){
+                      if(((compare['a']?arr[i][compare['a']]:arr[i])==compare['b'])){
+                         return i;
+                      }
+                      if(i==arr.length-1){
+                         return -1;
+                      }
+                    }
+        }
 
     };
 
@@ -474,15 +485,6 @@ function SparkCoreHandler(){
                                                pushStop=true;
                                              }
                                          })
-                                 /*    for(var i=0;i<newarr.length;i++){
-                                      pushStop=false;
-                                      obj['data'].push(newarr[i]);
-                                       tempChild.push(obj.item(newarr[i]));
-                                       if(i==newarr.length-1){
-                                         pushStop=true;
-                                       }
-
-                                     }*/
                                      obj.addNext(tempChild)  
                                     break;
                                      case 'splice':
@@ -739,6 +741,33 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                
 
                 _scope.WidgetCache[address] = obj;
+               if(nxtype!='Image'){
+                  /*新增*/
+                  _scope.WidgetCache[address].append =function(newdoms){
+                           return SparkCoreManage.addDom(_scope.WidgetCache[address],newdoms,'append')
+
+                  }
+                  _scope.WidgetCache[address].prepend =function(newdoms){
+                            return SparkCoreManage.addDom(_scope.WidgetCache[address],newdoms,'prepend')
+                  }
+                }
+                /*删除*/
+                 _scope.WidgetCache[address].remove =function(){
+                          var tempWidget =_scope.WidgetCache[address];
+                               
+                            if(_typeof(tempWidget.parentName)==='[object Array]'){
+                                 var parentNames = tempWidget.parentName.slice(0);
+                                 SparkUtil.traverse(parentNames,function(item,index,end){
+                                    SparkCoreManage.remove(_scope.WidgetCache[item],tempWidget,end)
+                                 })
+                               
+                            }
+                            if(_typeof(tempWidget.parentName)==='[object String]') {
+                               SparkCoreManage.remove(_scope.WidgetCache[tempWidget.parentName],tempWidget)
+                            }
+
+                     // return SparkCoreManage.remove(target,deldom)
+                }
                 /*数据变化监听*/
                 defineProperty && _core.defineProperty(address, defineProperty);
               
@@ -775,7 +804,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 return _scope.CSSCache[address]
             },
             Page: function(p) {
-              
+  
               return _core.getNxWidget('Page',
                                     p,
                                     'div',
@@ -1184,16 +1213,19 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                 
                   // (!init && !node.parentName) && (node.parentName=domTarget.name);
                   
-                  if(node.parentName){
-                     
+                  if(!init && node.parentName){
                     if(typeof node.parentName === 'object'){
                        node.parentName.push(domTarget.name)
                     }
                     if(typeof node.parentName === 'string'){
-                      var tempParentName = node.parentName;
+                        var tempParentName = node.parentName;
                            node.parentName = [];
-                           node.parentName.push(tempParentName);       
-                    }  
+                        
+                            node.parentName = node.parentName.concat([tempParentName,domTarget.name])  
+                             
+                    } 
+               
+                   
                    node.parentName =  SparkUtil.unique(node.parentName)
 
                   }else if(!init && !node.parentName){
@@ -1401,35 +1433,71 @@ SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype){
 }
 
 SparkCoreHandler.prototype.remove = function(target,deldom){
-
+   
+       //三种删除方式
         console.log('-----remove-----')
- 
-        if(!target.child || deldom=='[object Undefined]'){
+        if(!target.child || deldom=='[object Undefined]' ){
           return target;
         }
+        //非目标子集
+      
+   
          var tempChild=target.child.slice(0);
-
-        if(_typeof(deldom)==='[object Object]'){
+ 
+        if(_typeof(deldom)==='[object Object]' && SparkUtil.isInArray(target.child,{b:deldom.name})!=-1){
                 
                SparkUtil.compareRemove(tempChild,{b:deldom.name})
-               if(_typeof(deldom.$el)==='[object HTMLCollection]'){
-                   SparkUtil.compareRemove(deldom.parentName,{b:target.name})
-                   for (var i = deldom.$el.length - 1; i >= 0; --i) {
-                         if(deldom.$el[i].parentNode == target.$el){
-                            target.$el.removeChild(deldom.$el[i])
-                         }
-                   }
-               }else if(deldom.$el){
-                  target.$el.removeChild(deldom.$el)
-               }
-       
+               
+              var delParentName =function(){
+                 SparkUtil.compareRemove(deldom.parentName,{b:target.name});
+                  if(deldom.parentName.length==0){
+                    delete deldom.parentName;
+                    delete deldom.$el;
+                  }  
+              }
+              var delFn = function(targetEl){ 
+                    if(_typeof(deldom.$el)==='[object HTMLCollection]'){
+          
+                       for (var i = deldom.$el.length - 1; i >= 0; --i) {
+
+                             if(deldom.$el[i].parentNode == targetEl){
+                                targetEl.removeChild(deldom.$el[i])
+                             }
+                       }
+                        delParentName();
+                
+                     }else if(deldom.$el){
+                          
+                          targetEl.removeChild(deldom.$el);
+                          delete deldom.parentName;
+                          delete deldom.$el;
+                     }
+                    
+               } 
+
+               if(_typeof(target.$el)==='[object HTMLCollection]'){
+                    SparkUtil.traverse(target.$el.length,function(index,end){
+                             delFn(target.$el[index])
+                    })
+
+                }else{
+                   delFn(target.$el)
+                }  
              target.child = tempChild;
         }
 
         if(_typeof(deldom)==='[object String]'){
          
            if(deldom == 'firstChild' || deldom == 'lastChild'){
-                    target.$el.removeChild(target.$el[deldom])
+               if(_typeof(target.$el)==='[object HTMLCollection]'){
+                    SparkUtil.traverse(target.$el.length,function(index,end){
+                    
+                           target.$el[index].removeChild(target.$el[index][deldom])
+                    })
+               }else{
+                 target.$el.removeChild(target.$el[deldom]);
+               }
+               target.child = tempChild.splice(deldom == 'firstChild'?0:tempChild.length-1,1)   
            }else{
                    console.warn('second<string>:firstChild || lastChild' )
            }
@@ -1437,10 +1505,16 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
         }
         
         if(_typeof(deldom)==='[object Number]'){
-          
-            target.$el.childNodes[deldom] && target.$el.removeChild(target.$el.childNodes[deldom])
-            
+            if(_typeof(target.$el)==='[object HTMLCollection]'){
+                SparkUtil.traverse(target.$el.length,function(index,end){
+                        target.$el[index].childNodes[deldom] && target.$el[index].removeChild(target.$el[index].childNodes[deldom])
+                       })
+            }else{
+                target.$el.childNodes[deldom] && target.$el.removeChild(target.$el.childNodes[deldom])
+            }
+            target.child = tempChild.splice(deldom,1)
         }
+
     return target;
 }
 /**
@@ -1456,106 +1530,6 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
    var SparkCoreManage = new SparkCoreHandler();
 
 
-
-
-/**
- * [addNext widget向后添加]
- * @AuthorHTL
- * @DateTime  2020-04-06T21:42:58+0800
- * @param     {[type]}                 node [description]
- */
-
-_OP.addNext=function(node){
-
-     if(!this.child){
-      return;
-     }
-     console.time("addNext");
-     var isDie = function(node){
-         return !node.child || (node.name!=_this.name && (node.child && (node.child.join(',').indexOf(_this.name) === -1)));
-     }
-     var _tempArr=[],_this=this;
-     var df  = document.createDocumentFragment(); 
-     var addNextParams={
-           Notify:false,
-           Html:'',
-           Css:'',
-       };
-      var randerDf=function(a,t){
-   
-    
-             SparkUtil.traverse(t,function(item,index,end){
-                      item.appendChild(df);
-                      if(end){
-                           SparkCoreManage.makeNextStyleTree(addNextParams.Css,a._rootAdress);
-                      }
-             })
-  
-       }
-
-   
-       this.child.forEach(function(item){
-           _tempArr.push(item)
-       })
-  
-     if(_typeof(node) === '[object Array]'){
-        for(var i = 0; i<node.length;i++){
-
-          if(isDie(node[i])){
-             
-              SparkCoreManage.createDomTree(node[i].name,_this.name,df,function(a,t){
-                 addNextParams.Css+=a._css;
-                 if(i==node.length-1){
-                      randerDf(a,t);
-                  }
-              })
-              node[i].name && _tempArr.push(node[i].name);
-             
-              
-          }else{
-            console.warn('addNext '+node[i].name+' Maxsize ')
-          }
-        }
-      
-     }else if(_typeof(node) === '[object Object]' && isDie(node)){
-          
-             SparkCoreManage.createDomTree(node.name,this.name,df,function(a,t){
-               addNextParams.Css+=a._css;
-                randerDf(a,t);
-             })
-             node.name && _tempArr.push(node.name);
-          
-     }else{
-            console.warn('addNext '+node.name+' Maxsize ')
-     }
-      
-      this.child = _tempArr;
-      console.timeEnd("addNext");
-      return this;
-}
-
-_OP.remove = function(node){
-   var _this = node || this;
-        console.time("Remove");
-        /*移除数据*/
-       var parent = SparkCoreManage.getAddressData(_this.parentName);
-      if(parent.child){
-         parent.child.forEach(function(item,index){
-             if(item===_this.name){
-               parent.child.splice(index,1);
-               parent.data  && parent.data.splice(index,1);
-             }
-         })
-       }
-   /*移除节点*/
-     var _parentElement = _this.$el.parentNode;
-
-     if(_parentElement){
-        _parentElement.removeChild(_this.$el);
-      }
-     console.timeEnd("Remove");
-     return this;
-}
 
 
 

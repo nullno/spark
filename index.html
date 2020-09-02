@@ -7,12 +7,15 @@
 <body>
 <script src="./spark.js"></script>
 <script>
+    /**
+     * 待添加功能 autoprefixer
+     */
 	var SparkApp = new Spark({});
 
       
       console.log(SparkApp)
      
-    var bthcss = SparkApp.Css('position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
+     var bthcss = SparkApp.Css('position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
      
      var btnAdd1 = SparkApp.Box({
      	tag:'button',
@@ -21,7 +24,8 @@
      	child:[SparkApp.Text('ADD append')],
      	on:{
      		click:function(_this){
-                SparkApp.append(wrap,[node1,node1,node1,node1])
+                SparkApp.append(wrap,[node1,node1])
+                btnAdd1.append(node1)
      		}
      	}
      })
@@ -35,6 +39,7 @@
             click:function(_this){
                
                 SparkApp.prepend(wrap,node2)
+                btnAdd2.prepend(node2)
             }
         }
      })
@@ -46,11 +51,13 @@
      	on:{
      		click:function(_this){
 
-               var ddd =  SparkApp.remove(wrap,node1)
-            
+               // var ddd =  SparkApp.remove(wrap,btnAdd1)
+                  
+                  node1.remove();
+
                 // var ddd = SparkApp.remove(wrap,'lastChild')
                 // var ddd = SparkApp.remove(wrap,'lastChild')
-                // var ddd = SparkApp.remove(wrap,0)
+                // var ddd = SparkApp.remove(wrap,2)
                   // console.log(ddd)
      		}
           }
@@ -65,6 +72,7 @@
             click:function(_this){
 
                var ddd =  SparkApp.remove(wrap,'firstChild')
+
             }
           }
      })
@@ -76,14 +84,14 @@
         on:{
             click:function(_this){
 
-               var ddd =  SparkApp.remove(wrap,'firstChild')
+               var ddd =  SparkApp.remove(wrap,'lastChild')
             }
           }
      })
 
 
 		var node1 = SparkApp.Box({
-			style:'width:20px;height:20px;background:red;display:inline-block;margin:2px;',
+			style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;',
 			on:{
 				click:function(_this){
                     SparkApp.prepend(_this,SparkApp.Text('hi'))
