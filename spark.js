@@ -899,12 +899,43 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
  SparkCoreHandler.prototype.CSSManager= function(){
 
         var _core = {
+            autoprefixerConfig:{
+              param:{
+                'transition':['-webkit-','-moz-','-ms-','-o-'],
+                'transform':['-webkit-','-moz-','-ms-','-o-'],
+                'animation':['-webkit-','-moz-','-ms-','-o-'],
+                'animation-name':['-webkit-','-moz-','-ms-','-o-'],
+                'user-select':['-webkit-','-moz-','-ms-','-o-'],
+                'border-radius':['-webkit-','-moz-','-ms-'],
+                'border-top-colors':['-moz-'],
+                'border-right-colors':['-moz-'],
+                'border-bottom-colors':['-moz-'],
+                'border-left-colors':['-moz-'],
+                'box-shadow':['-webkit-','-moz-'],
+                'backface-visibility':['-webkit-','-moz-','-ms-'],
+                'flex-direction':['-webkit-','-moz-','-ms-','-o-'],
+                'flex':['-prefix-box','-webkit-box-','-moz-box-','-webkit-','-ms-'],
+                'order':['box-order','-webkit-box-','-moz-box-','-webkit-'],
+                'justify-content':['-webkit-','-moz-','-ms-','-o-'],
+                'align-items':['-webkit-','-moz-','-ms-','-o-'],
+                'flex-wrap':['-webkit-','-moz-','-ms-','-o-'],
+                'flex-flow':['-webkit-','-moz-'],
+                'background-size':['-webkit-'],
+                'box-sizing':['-webkit-','-moz-']
+              },
+              value:{
+                'grid':['-ms-grid'],
+                'flex':['box','-webkit-box','-ms-flexbox','-moz-box','-webkit-flex'],
+                'linear-gradient':['-webkit-linear-gradient','-moz-linear-gradient','-ms-linear-gradient','-o-linear-gradient'],
+                'calc':['-webkit-calc'],
+              }
+            },
             insert: function(Attribute, AttributeVal, cssStr) {
                 var newStyle = D.createElement('style');
                     newStyle.type = "text/css";
                   newStyle.setAttribute(Attribute, AttributeVal);
                   newStyle.innerText += (/modifycss/.test(Attribute) ? '.' + AttributeVal : '') + cssStr;
-                  D.head.insertBefore(newStyle, D.head.lastChild)
+                  D.head.insertBefore(newStyle, D.head.lastChild);
             },
             remove: function(dataTarget) {
                 var delTarget = D.querySelector(dataTarget);
@@ -912,6 +943,37 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                     D.head.removeChild(delTarget)
                 }
              },
+            autoprefixer:function(CssItem,tempObj){
+      
+                         var p = CssItem.split(':');
+                         var param = SparkUtil.trim(p[0]),
+                             value = SparkUtil.trim(p[1]);
+                         var cssParam = this.autoprefixerConfig.param[param];
+                         if(cssParam){
+                           SparkUtil.traverse(cssParam,function(cssParamItem,index,end){
+                               tempObj[cssParamItem+param] = value;
+                           })
+                         }
+                         // var cssValue = this.autoprefixerConfig.value[value];
+                         // var cssValue = '',cssValueKey='';
+                         // for(var key in this.autoprefixerConfig.value){
+                         //  if(SparkUtil.includes(value,key)){
+                         //    cssValueKey = key;
+                         //    cssValue = this.autoprefixerConfig.value[key];
+                         //  }
+                         // }
+
+            
+                         
+                         // if(cssValue){
+                         //    SparkUtil.traverse(cssValue,function(cssValueItem,index,end){
+                         //      tempObj[param] = cssValueItem;
+                         //       // tempObj[param] = value.replace(new RegExp(cssValueKey,'ig'),cssValueItem);
+                         //    })
+                         //  }
+
+                         // str.replace(new RegExp('transition','ig'),'-webkit-transition');
+             }
 
         };
       
@@ -925,8 +987,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                /*修改*/ 
                modify: function(selector, cssStr) {
                   cssStr = SparkUtil.trim(cssStr);
-                  /*
-                        try{
+                  /* try{
                           if(!/^\.|#/.test(selector)){
                              throw 'WARN: modify style selector must star" .|| #"}'
                           }
@@ -946,23 +1007,19 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                        return tempObj;
                       }
                    
-                       var CssArr = SparkUtil.trim(str).replace(new RegExp('http:','ig'),'')
+                     var CssArr = SparkUtil.trim(str).replace(new RegExp('http:','ig'),'')
                                                .replace(new RegExp('https:','ig'),'')
                                                .replace(new RegExp('\"','ig'),'')
                                                .replace(new RegExp('\'','ig'),'').split(';');
                    
                     SparkUtil.traverse(CssArr,function(CssItem,index,end){
-                      if (CssItem) {
+                      if(CssItem) {
+                        var tempCssItem = CssItem;
                         var p = CssItem.split(':');
                         tempObj[SparkUtil.trim(p[0])] = SparkUtil.trim(p[1]);
+                        _core.autoprefixer(tempCssItem,tempObj)
                       }
                     })
-              /*     for (var i=0;i<CssArr.length;i++) {
-                       if (CssArr[i]) {
-                        var p = CssArr[i].split(':');
-                        tempObj[SparkUtil.trim(p[0])] = SparkUtil.trim(p[1]);
-                        }
-                     }*/
                    
                    return tempObj; 
                },
@@ -985,16 +1042,14 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                strStyleHandle: function(laststr,nextstr,className){
 
                  var  _insertIndex=laststr.indexOf(nextstr);
-            
                    if(_insertIndex != -1){
-                      
-                 
                     laststr = (laststr.substring(0,_insertIndex)+',.'+className)+
                                  (laststr.substring(_insertIndex,laststr.length));
                    }
 
                      return laststr;
-               }
+               },
+               
           }
 
  }
@@ -1019,6 +1074,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
         return address && this.WidgetCache[address];
  }
  
+
    /*
  * [ResetCss 重置css]
  * @AuthorHTL
@@ -1028,15 +1084,15 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
       
     var grayStr = this.DefaultSetting.gray==true?'html{ filter: grayscale(100%); -webkit-filter: grayscale(100%); -moz-filter: grayscale(100%); -ms-filter: grayscale(100%); -o-filter: grayscale(100%); filter: url("data:image/svg+xml;utf8,#grayscale"); filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1); -webkit-filter: grayscale(1);}':'';
 
-   return this.DefaultSetting.resetCss || 'html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;box-sizing:border-box;font-size:100%;vertical-align:baseline;background:transparent;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:”;content:none;}:focus{outline:0;}ins{text-decoration:none;}del{text-decoration:line-through;}table{border-collapse:collapse;border-spacing:0;}*{-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{width:5px;background-color:rgba(0,0,0,0);-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb{background-color:rgba(61,63,63,.5);background-clip:padding-box;min-height:20px;-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb:hover{background-color:rgba(61,63,63,1)}'+grayStr;
+   return this.DefaultSetting.resetCss || 'html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;box-sizing:border-box;font-size:100%;vertical-align:baseline;background:transparent;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:"";content:none;}:focus{outline:0;}ins{text-decoration:none;}del{text-decoration:line-through;}table{border-collapse:collapse;border-spacing:0;}*{-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{width:5px;background-color:rgba(0,0,0,0);-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb{background-color:rgba(61,63,63,.5);background-clip:padding-box;min-height:20px;-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb:hover{background-color:rgba(61,63,63,1)}'+grayStr;
   
   }
 
 /* 初始化 style  */
  SparkCoreHandler.prototype.makeStyleTree = function(_cssStr) {
-
-        this.ResetCss && this.CSS.add('resetCss', this.ResetCss());
-        _cssStr && this.CSS.add('MainCss', _cssStr);
+        var cssStr = this.ResetCss()+_cssStr;
+        // this.ResetCss && this.CSS.add('resetCss', this.ResetCss());
+        cssStr && this.CSS.add('MainCss', cssStr);
 
   }  
 /* 新增 style  */
@@ -1392,7 +1448,7 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
  */
 SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype){
 
-     console.log('-----'+addtype+'-----')
+     // console.log('-----'+addtype+'-----')
        if(!target.child || !newdoms){
           return target;
         }
@@ -1435,7 +1491,7 @@ SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype){
 SparkCoreHandler.prototype.remove = function(target,deldom){
    
        //三种删除方式
-        console.log('-----remove-----')
+        // console.log('-----remove-----')
         if(!target.child || deldom=='[object Undefined]' ){
           return target;
         }

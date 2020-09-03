@@ -8,7 +8,7 @@
 <script src="./spark.js"></script>
 <script>
     /**
-     * 待添加功能 autoprefixer
+     * 待添加功能 autoprefixer  热更新
      */
 	var SparkApp = new Spark({});
 
@@ -24,8 +24,8 @@
      	child:[SparkApp.Text('ADD append')],
      	on:{
      		click:function(_this){
-                SparkApp.append(wrap,[node1,node1])
-                btnAdd1.append(node1)
+                SparkApp.append(wrap,[node1,node1]);
+                SparkApp.append(wrap2,[node1,node2]);
      		}
      	}
      })
@@ -39,7 +39,8 @@
             click:function(_this){
                
                 SparkApp.prepend(wrap,node2)
-                btnAdd2.prepend(node2)
+                 SparkApp.prepend(wrap2,[node2]);
+                
             }
         }
      })
@@ -71,7 +72,8 @@
         on:{
             click:function(_this){
 
-               var ddd =  SparkApp.remove(wrap,'firstChild')
+               SparkApp.remove(wrap,'firstChild')
+    
 
             }
           }
@@ -84,18 +86,19 @@
         on:{
             click:function(_this){
 
-               var ddd =  SparkApp.remove(wrap,'lastChild')
+              SparkApp.remove(wrap,'lastChild')
+          
             }
           }
      })
 
 
 		var node1 = SparkApp.Box({
-			style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;',
+			style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;transition:width 1s;',
 			on:{
 				click:function(_this){
                     SparkApp.prepend(_this,SparkApp.Text('hi'))
-					console.log('node1')
+			
 				}
 			}
 		})
@@ -103,13 +106,13 @@
 			style:'width:20px;height:20px;background:yellow;display:inline-block;margin:2px;',
 			on:{
 				click:function(){
-					console.log('node2')
+				
 				}
 			}
 		})
 
    var  wrap = SparkApp.Box({
-     style:'width:90%;height:500px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;',
+     style:'width:90%;height:500px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;transition : transform 1s;',
         child:[btnAdd1,btnAdd2,btnDel,btnDel2,btnDel3],
         watch:{
             child:function(o,n){
@@ -118,11 +121,20 @@
         }
     })
 
+  var  wrap2 = SparkApp.Box({
+     style:'width:90%;height:500px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;transition : transform 1s;',
+        child:[],
+        watch:{
+            child:function(o,n){
+             // console.log(o,n)
+            }
+        }
+    })
 
 
      SparkApp.Page({
      	style:'width:100%;min-height:100vh;background-color:#272822;overflow:auto;padding-bottom:50px;',
-     	child:[wrap,node1]
+     	child:[wrap,wrap2]
      })
 </script>	
 </body>
