@@ -632,23 +632,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                     obj[a] = lastV[a];
                 })(propertyItem)
            })
-        /*for (var i=0;i<propertys.length; i++) {
-            lastV[propertys[i]] = obj[propertys[i]];
-            (function(a) {
-                var tempVal = null;
-             
-                Object.defineProperty(obj, a, {
-                    get: function() {
-                        return tempVal;
-                    },
-                    set: function(newval) {
-                        tempVal = lastV[a] = _scope.WidgetWatchParams[a]([lastV[a]][0], newval, obj);
-                    }
-                })
-                obj[a] = lastV[a];
-            }
-            )(propertys[i])
-        }*/
+        
 }
 
 
@@ -731,7 +715,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 obj.tag =  p.tag || domtag;
                 obj.html = nxtype=='Image'?
                             '<img '+idName+' class="' + className + '" src="'+p.imgurl+'" />'
-                            : '<'+obj.tag+' '+idName+' class="' + className + '">'+(nxtype=='Text'?p.text:'[[' + address + ']]')+'</'+obj.tag+'>';
+                            : '<'+obj.tag+' '+idName+' class="' + className + '">'+(nxtype=='Text'?p.text+'[[' + address + ']]':'[[' + address + ']]')+'</'+obj.tag+'>';
                 obj.styleObj = _scope.CSS.strStyleToObj(tempStyleStr);
                 obj.style = _scope.CSS.objStyleToStr(obj.styleObj);
 
@@ -744,28 +728,33 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                if(nxtype!='Image'){
                   /*新增*/
                   _scope.WidgetCache[address].append =function(newdoms){
-                           return SparkCoreManage.addDom(_scope.WidgetCache[address],newdoms,'append')
+                     
+                            return SparkCoreManage.addDom(this,newdoms,'append')
 
                   }
                   _scope.WidgetCache[address].prepend =function(newdoms){
-                            return SparkCoreManage.addDom(_scope.WidgetCache[address],newdoms,'prepend')
+                            return SparkCoreManage.addDom(this,newdoms,'prepend')
                   }
+                  _scope.WidgetCache[address].removeChild= function(deldom){
+
+                           return SparkCoreManage.remove(this,deldom)
+                   }
                 }
                 /*删除*/
                  _scope.WidgetCache[address].remove =function(){
-                          var tempWidget =_scope.WidgetCache[address];
+                          var tempWidget = this;
                                
                             if(_typeof(tempWidget.parentName)==='[object Array]'){
                                  var parentNames = tempWidget.parentName.slice(0);
-                                 SparkUtil.traverse(parentNames,function(item,index,end){
-                                    SparkCoreManage.remove(_scope.WidgetCache[item],tempWidget,end)
+                                 SparkUtil.traverse(parentNames,function(item,index){
+                                    SparkCoreManage.remove(_scope.WidgetCache[item],tempWidget)
                                  })
                                
                             }
                             if(_typeof(tempWidget.parentName)==='[object String]') {
                                SparkCoreManage.remove(_scope.WidgetCache[tempWidget.parentName],tempWidget)
                             }
-
+                
                      // return SparkCoreManage.remove(target,deldom)
                 }
                 /*数据变化监听*/

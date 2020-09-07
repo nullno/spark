@@ -14,6 +14,29 @@
 
       
       console.log(SparkApp)
+
+     var title1 =  SparkApp.Text('添加删除操作：',{
+        child:[activeText=SparkApp.Text('---',{
+         style:'color:red;',
+         watch:{
+                  text(ov,nv){
+                    console.log('ov:'+ov,'nv:'+nv)
+                  }
+         } 
+         })],
+        tag:'h1',style:'width:90%;margin:0 auto;'}); 
+     
+     var boxComCss = SparkApp.Css('position:absolute;width:50%;height:100%;text-align:left;padding:5px;background:#666;z-index:0;top:0;');
+     var useCode = SparkApp.Text('READY....',{
+          tag:'pre',
+          className:boxComCss,
+          style:'left:0;'
+         
+     })
+     var targetContainer = SparkApp.Box({
+         className:boxComCss,
+         style:'right:0;'
+     })
      
      var bthcss = SparkApp.Css('position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
      
@@ -24,8 +47,11 @@
      	child:[SparkApp.Text('ADD append')],
      	on:{
      		click:function(_this){
-                SparkApp.append(wrap,[node1,node1]);
-                SparkApp.append(wrap2,[node1,node2]);
+                 activeText.text='append';
+                 useCode.text='后置追加元素：\n\n方法1:targetContainer.append([node1,node1]);\n方法2：SparkApp.append(targetContainer,[node1,node1]);';
+                 targetContainer.append([node1,node1]);  
+
+               
      		}
      	}
      })
@@ -37,28 +63,29 @@
         child:[SparkApp.Text('ADD prepend')],
         on:{
             click:function(_this){
-               
-                SparkApp.prepend(wrap,node2)
-                 SparkApp.prepend(wrap2,[node2]);
+                 activeText.text='prepend';
+                 useCode.text='前置添加元素：\n\n方法1:targetContainer.prepend(node2);\n方法2：SparkApp.prepend(targetContainer,node2);';
+                 targetContainer.prepend(node2);  
+             
                 
             }
         }
      })
-      var btnDel = SparkApp.Box({
+      var btnDel1 = SparkApp.Box({
      	tag:'button',
      	style:'background-color:#666;right:2px;',
      	className:bthcss,
      	child:[SparkApp.Text('DEL Target node')],
      	on:{
      		click:function(_this){
-
-               // var ddd =  SparkApp.remove(wrap,btnAdd1)
                   
-                  node1.remove();
-
-                // var ddd = SparkApp.remove(wrap,'lastChild')
-                // var ddd = SparkApp.remove(wrap,'lastChild')
-                // var ddd = SparkApp.remove(wrap,2)
+                   activeText.text='remove widget';
+                   useCode.text='删除指定元素：\n\n方法1:node1.remove();\n方法2：SparkApp.remove(targetContainer,node1);';
+                   node1.remove();
+               
+                // var ddd = SparkApp.remove(targetContainer,'firstChild')
+                // var ddd = SparkApp.remove(targetContainer,'lastChild')
+                // var ddd = SparkApp.remove(targetContainer,2)
                   // console.log(ddd)
      		}
           }
@@ -68,32 +95,22 @@
         tag:'button',
         style:'background-color:#666;right:2px;bottom:45px;',
         className:bthcss,
-        child:[SparkApp.Text('DEL firstnode')],
+        child:[SparkApp.Text('DEL index=0')],
         on:{
             click:function(_this){
-
-               SparkApp.remove(wrap,'firstChild')
-    
+                    activeText.text='remove WidgetIndex';
+                    useCode.text="删除索引元素：\n\n方式1：targetContainer.remove(<Widget> | <Index> |<firstChild,lastChild>)\n\n方式2：\n删除指定索引：SparkApp.remove(targetContainer,2);\n删除第一个:SparkApp.remove(targetContainer,'firstChild')\n删除最后一个：SparkApp.remove(targetContainer,'lastChild');";
+                     
+                     targetContainer.removeChild(0)
+                    // SparkApp.remove(targetContainer,2);
 
             }
           }
      })
-    var btnDel3 = SparkApp.Box({
-        tag:'button',
-        style:'background-color:#666;right:2px;bottom:88px;',
-        className:bthcss,
-        child:[SparkApp.Text('DEL lastnode')],
-        on:{
-            click:function(_this){
-
-              SparkApp.remove(wrap,'lastChild')
-          
-            }
-          }
-     })
+   
 
 
-		var node1 = SparkApp.Box({
+     var node1 = SparkApp.Box({
 			style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;transition:width 1s;',
 			on:{
 				click:function(_this){
@@ -110,31 +127,22 @@
 				}
 			}
 		})
-
+   
    var  wrap = SparkApp.Box({
      style:'width:90%;height:500px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;transition : transform 1s;',
-        child:[btnAdd1,btnAdd2,btnDel,btnDel2,btnDel3],
+        child:[useCode,targetContainer,btnAdd1,btnAdd2,btnDel1,btnDel2],
         watch:{
             child:function(o,n){
-             // console.log(o,n)
+             console.log('update')
             }
         }
     })
 
-  var  wrap2 = SparkApp.Box({
-     style:'width:90%;height:500px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;transition : transform 1s;',
-        child:[],
-        watch:{
-            child:function(o,n){
-             // console.log(o,n)
-            }
-        }
-    })
 
 
      SparkApp.Page({
-     	style:'width:100%;min-height:100vh;background-color:#272822;overflow:auto;padding-bottom:50px;',
-     	child:[wrap,wrap2]
+     	style:'width:100%;min-height:100vh;background-color:#272822;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
+     	child:[title1,wrap]
      })
 </script>	
 </body>
