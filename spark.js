@@ -657,10 +657,6 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                    widgetItem['parentName']=pname;
                    addressArr.push(widgetItem['name'])
                 })
-                // for (var i=0;i<widgets.length;i++) {
-                //     widgets[i]['parentName']=pname;
-                //     addressArr.push(widgets[i]['name'])
-                // }
                 return addressArr;
             },
             getClassName: function(param) {
@@ -730,44 +726,84 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 _scope.WidgetCache[address] = obj;
 
                if(nxtype=='List'){
-                     _scope.WidgetCache[address].push=function(newdata){
-
-                        console.log(this)
-                       
+                     _scope.WidgetCache[address].push=function(newdata){    
                         var tempChild = this.item(newdata,this.data.length-1);
                          this.data.push(newdata);
-                         this.child.push(_core.getAddress(tempChild));
                          this.append(tempChild);
+                     }
+                     _scope.WidgetCache[address].unshift=function(newdata){    
+                        var tempChild = this.item(newdata,this.data.length-1);
+                         this.data.unshift(newdata);
+                         this.prepend(tempChild);
                      }
                }
                if(nxtype!='Image'){
                   /*新增*/
-                  _scope.WidgetCache[address].append =function(newdoms){
-                     
-                            return SparkCoreManage.addDom(this,newdoms,'append')
+                  _scope.WidgetCache[address].append =function(newdoms,set){
+
+                            return SparkCoreManage.addDom(this,newdoms,'append',set)
 
                   }
-                  _scope.WidgetCache[address].prepend =function(newdoms){
-                            return SparkCoreManage.addDom(this,newdoms,'prepend')
-                  }
-                  _scope.WidgetCache[address].removeChild= function(deldom){
+                  _scope.WidgetCache[address].prepend =function(newdoms,set){
 
-                           return SparkCoreManage.remove(this,deldom)
+                            return SparkCoreManage.addDom(this,newdoms,'prepend',set)
+                  }
+                  _scope.WidgetCache[address].removeChild= function(deldom,set){
+                      var _this = this;
+                           if(set && set.ani){
+                                 var tempWidget =null;
+                               
+                                if (_typeof(deldom)==='[object Object]'){
+                                    tempWidget = deldom;
+                                }
+                                if (_typeof(deldom)==='[object Number]' || _typeof(deldom)==='[object String]'){
+                                    var index = (deldom=='firstChild')?0:((deldom=='lastChild')?(this.child.length-1):deldom);
+                                    tempWidget = _scope.getAddressData(this.child[index]);
+                                }
+                                    
+                                    tempWidget && (tempWidget.style='animation:'+set.ani);
+                                     var removeTimer=setTimeout(function(){
+                                                    clearTimeout(removeTimer);
+                                                    SparkCoreManage.remove(_this,deldom);
+                                                    tempWidget.style='animation:none;';
+                                        },set.time)
+                             }else{
+                            
+                                    SparkCoreManage.remove(this,deldom)
+                              }
                    }
                 }
                 /*删除*/
-                 _scope.WidgetCache[address].remove =function(){
+                 _scope.WidgetCache[address].remove =function(set){
                           var tempWidget = this;
                                
                             if(_typeof(tempWidget.parentName)==='[object Array]'){
                                  var parentNames = tempWidget.parentName.slice(0);
                                  SparkUtil.traverse(parentNames,function(item,index){
-                                    SparkCoreManage.remove(_scope.WidgetCache[item],tempWidget)
+                                  if(set && set.ani){
+                                    tempWidget.style='animation:'+set.ani;
+                                    var removeTimer=setTimeout(function(){
+                                       clearTimeout(removeTimer);
+                                       SparkCoreManage.remove(_scope.WidgetCache[item],tempWidget);
+                                       tempWidget.style='animation:none;';
+                                     },set.time)
+                                  }else{
+                                     SparkCoreManage.remove(_scope.WidgetCache[item],tempWidget)
+                                  }
                                  })
                                
                             }
                             if(_typeof(tempWidget.parentName)==='[object String]') {
-                               SparkCoreManage.remove(_scope.WidgetCache[tempWidget.parentName],tempWidget)
+                               if(set && set.ani){
+                                    tempWidget.style='animation:'+set.ani;
+                                    var removeTimer=setTimeout(function(){
+                                              clearTimeout(removeTimer);
+                                              SparkCoreManage.remove(_scope.WidgetCache[tempWidget.parentName],tempWidget);
+                                              tempWidget.style='animation:none;';
+                                       },set.time)
+                                }else{
+                                      SparkCoreManage.remove(_scope.WidgetCache[tempWidget.parentName],tempWidget)
+                                }
                             }
                 
                      // return SparkCoreManage.remove(target,deldom)
@@ -944,7 +980,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
             remove: function(dataTarget) {
                 var delTarget = D.querySelector(dataTarget);
                 if (delTarget) {
-                    D.head.removeChild(delTarget)
+                    D.head.removeChild(delTarget);
                 }
              },
             autoprefixer:function(CssItem,tempObj){
@@ -1231,36 +1267,9 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                          _this.initPushEvent.call(_this,true);
                          _this.renderComplete.call(_this,_this._rootAdress);
                          
-                     });  
-                      /*  var tempDomTarget = domTarget;
-                    
-                        typeof tempDomTarget ==='string' && (tempDomTarget = document.getElementsByClassName(tempDomTarget));
-                            
-                        var tempDom = document.createElement("div");
-                            tempDom.innerHTML = _this._html;
-                          
-                        var nodeArr = tempDom.childNodes;
-           
-                         _this.tempPushEvent(domData,nodeArr[0]);
-                             
-
-                         DF.appendChild(nodeArr[0]);
-
-                        // tempDom.innerHTML = this._html;   
-
-
-                         // callback(_this,tempDomTarget);  
-                         var t =  setTimeout(function(){
-                            _this.renderComplete.call(_this,_this._rootAdress);
-                            clearTimeout(t)
-                          })*/
-
-                      /*append bind event*/
-                        
+                     });      
                 }
-               
                   
-                
             },
             /*add render complete function*/
             renderComplete:function(address){
@@ -1450,7 +1459,7 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
  * @param     {[type]}                 newdoms [description]
  * @param     {[type]}                 addtype [description]
  */
-SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype){
+SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype,set){
 
      // console.log('-----'+addtype+'-----')
        if(!target.child || !newdoms){
@@ -1469,8 +1478,11 @@ SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype){
        }
 
        SparkUtil.traverse(nodeArr,function(item,index,end){
-
-      
+            
+             if(set && set.ani){
+               item.style = 'animation:'+set.ani;
+             }
+            
             if(addtype=='append'){
                     tempChild.push(item.name)
             }
@@ -1557,7 +1569,9 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
                }else{
                  target.$el.removeChild(target.$el[deldom]);
                }
-               target.child = tempChild.splice(deldom == 'firstChild'?0:tempChild.length-1,1)   
+               tempChild.splice(deldom == 'firstChild'?0:tempChild.length-1,1);
+               target.child = tempChild;
+                console.log(target.child)  
            }else{
                    console.warn('second<string>:firstChild || lastChild' )
            }
@@ -1572,7 +1586,8 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
             }else{
                 target.$el.childNodes[deldom] && target.$el.removeChild(target.$el.childNodes[deldom])
             }
-            target.child = tempChild.splice(deldom,1)
+            tempChild.splice(deldom,1);
+            target.child = tempChild;
         }
 
     return target;
