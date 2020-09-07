@@ -463,15 +463,18 @@ function SparkCoreHandler(){
      */
      this.WidgetWatchParams = {
           data:function(oval, nval, obj){
+             /*deling....*/
+                 return;
                 if (JSON.stringify(oval)  === JSON.stringify(nval)){
                          return nval;
                 }
                var pushStop=true,el=obj.$el;
+
                 obj['data'] = arrProxy(obj['data'],function(method,newarr){
                                console.log(method)
                                   switch(method){
                                     case 'push':
-                                     // console.log(obj)
+                                     console.log(obj)
                                      pushStop && obj.addNext(obj.item(newarr))
                                     break;
                                     case 'concat':
@@ -699,7 +702,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                        if(_typeof(tempDataArr) === '[object Array]' && tempDataArr.length>0 && typeof p.item === 'function'){
                                   
                                     SparkUtil.traverse(tempDataArr,function(tempDataItem,index,end){
-                                       tempChild.push(p.item(tempDataItem));
+                                       tempChild.push(p.item(tempDataItem,index));
                                     })
                                   /*for(var i=0;i<tempDataArr.length;i++){
                                      
@@ -725,6 +728,18 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                
 
                 _scope.WidgetCache[address] = obj;
+
+               if(nxtype=='List'){
+                     _scope.WidgetCache[address].push=function(newdata){
+
+                        console.log(this)
+                       
+                        var tempChild = this.item(newdata,this.data.length-1);
+                         this.data.push(newdata);
+                         this.child.push(_core.getAddress(tempChild));
+                         this.append(tempChild);
+                     }
+               }
                if(nxtype!='Image'){
                   /*新增*/
                   _scope.WidgetCache[address].append =function(newdoms){
@@ -772,10 +787,10 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
 
             },
             defineProperty: function(address, arr) {
+
                 _scope.WidgetDefineProperty(address.indexOf('Css') != -1 ? _scope.CSSCache[address] : _scope.WidgetCache[address], arr);
             },
-            defaultParams: {
-            }
+            defaultParams: {}
         }
 
         return {
@@ -844,7 +859,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     p,
                                     'div',
                                     'position:relative;background-color:#3D3F3F;',
-                                    ['style', 'child'],
+                                    ['style','child'],
                                     false 
                                     );
             },
@@ -853,7 +868,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     p,
                                     'ul',
                                     '',
-                                    ['style','data'],
+                                    ['style','child'],
                                     false 
                                     );
             },
@@ -1105,7 +1120,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                 node.on['click'](node);
             }, 100) : function(e){
                  e.stopPropagation();
-                 node.on['click'](node);
+                 node.on['click'].call(node);
 
             },{capture:false,passive:true})
         }
@@ -1113,7 +1128,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
 
            addEventListener(target,SparkUtil.env.isMobile ? 'touchstart' : 'mousedown', function(e){
                  e.stopPropagation();
-                 node.on['press'](node);
+                 node.on['press'].call(node);
             },{capture:true,passive:true});
            
         }
@@ -1121,7 +1136,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
            addEventListener(target,SparkUtil.env.isMobile ? 'touchend' : 'mouseup', function(e){
                  e.stopPropagation();
                  
-                 node.on['up'](node);
+                 node.on['up'].call(node);
             },{capture:true,passive:true});
           
         }
@@ -1658,46 +1673,6 @@ Spark.prototype.remove =function(target,deldom){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-   
-
-
-
-
-
-
-    /**
- * [SparkCore description]
- * @AuthorHTL
- * @DateTime  2020-03-30T00:38:47+0800
- * @param     {[type]}                 params [description]
- */
-  // function SparkCore(params) {
- 
-  //       Object.assign(DefaultSetting,params);
-  //       /*开启调试工具*/
-  //       if(DefaultSetting.devTool===true && typeof DefaultSetting.devTool === 'boolean'){
-  //          SparkUtil.devTool();
-  //       }
-  //       // this.widget = HTML.parseWidget;
-  //       this.vcss = _scope.CSSCache;
-  //       this.vdom = _scope.WidgetCache;
-
-       
-  //       this.env=SparkUtil.env;
-  //       Object.assign(this,HTML.parseWidget);
-  //   }
-    
-    // SparkCore.prototype.render = SparkRender;
 
     return Spark;
 }));
