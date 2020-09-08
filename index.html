@@ -34,13 +34,26 @@
           style:'left:0;'
          
      })
+
+     var node1 = SparkApp.Box({
+			style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;',
+			on:{
+				click:function(){
+                    this.prepend(SparkApp.Text('node1'))
+			
+				}
+			}
+		})
+	var img1 = SparkApp.Image('https://dgss0.bdstatic.com/5bVWsj_p_tVS5dKfpU_Y_D3/res/r/image/2020-09-07/e699ddddc7d501918ec8b7639496d1d6.png',{style:'width:100px;'});
      var targetContainer = SparkApp.Box({
          className:boxComCss,
-         style:'right:0;'
+         style:'right:0;',
+         child:[node1,img1]
      })
      
      var bthcss = SparkApp.Css('position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
-     var wrapcss=SparkApp.Css('width:90%;height:500px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;');
+     var wrapcss=SparkApp.Css('width:90%;height:300px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;');
+    
      var btnAdd1 = SparkApp.Box({
      	tag:'button',
      	style:'background-color:green;left:2px;',
@@ -80,6 +93,41 @@
             }
         }
      })
+      
+      /*after()*/
+       var btnAfter = SparkApp.Box({
+     	tag:'button',
+     	style:'background-color:green;left:100px;',
+     	className:bthcss,
+     	child:[SparkApp.Text('ADD after')],
+     	on:{
+     		click:function(_this){
+                 img1.after([SparkApp.Box({
+                                            style:'min-width:20px;height:20px;background:pink;display:inline-block;margin:2px;color:blue;padding:0 5px;line-height:20px;overflow:hidden;animation: bounceInLeft 0.5s both;',
+                                            on:{
+                                                click:function(){
+                                                  this.prepend(SparkApp.Text('node3'))
+                                                }
+                                            }
+                                        })],
+                 {ani:'zoomIn 500ms both'});  
+     		 }
+     	  }
+       })
+       /*before()*/
+       var btnBefore = SparkApp.Box({
+     	tag:'button',
+     	style:'background-color:green;left:100px;bottom:45px;',
+     	className:bthcss,
+     	child:[SparkApp.Text('ADD before')],
+     	on:{
+     		click:function(_this){
+                 img1.before([node1,node1],{ani:'slideInLeft 500ms both'});  
+     		 }
+     	  }
+       })
+
+
       var btnDel1 = SparkApp.Box({
      	tag:'button',
      	style:'background-color:#666;right:2px;',
@@ -116,21 +164,12 @@
    
 
 
-     var node1 = SparkApp.Box({
-			style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;',
-			on:{
-				click:function(){
-                    this.prepend(SparkApp.Text('node1'))
-			
-				}
-			}
-		})
-		// var node2 = 
+     
 
    var  wrap = SparkApp.Box({
         className:wrapcss,
         style:'overflow:hidden;',
-        child:[useCode,targetContainer,btnAdd1,btnAdd2,btnDel1,btnDel2],
+        child:[useCode,targetContainer,btnAdd1,btnAdd2,btnAfter,btnBefore,btnDel1,btnDel2],
         watch:{
             child:function(o,n){
              console.log('update')

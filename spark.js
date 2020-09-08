@@ -737,8 +737,10 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                          this.prepend(tempChild);
                      }
                }
+
+               /*添加子集元素*/
                if(nxtype!='Image'){
-                  /*新增*/
+            
                   _scope.WidgetCache[address].append =function(newdoms,set){
 
                             return SparkCoreManage.addDom(this,newdoms,'append',set)
@@ -748,6 +750,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
 
                             return SparkCoreManage.addDom(this,newdoms,'prepend',set)
                   }
+                 
+
                   _scope.WidgetCache[address].removeChild= function(deldom,set){
                       var _this = this;
                            if(set && set.ani){
@@ -773,6 +777,16 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                               }
                    }
                 }
+
+                 /*指定元素插入*/
+                   _scope.WidgetCache[address].after =function(newdoms,set){
+
+                            return SparkCoreManage.addDom(this,newdoms,'after',set)
+                   }
+                   _scope.WidgetCache[address].before =function(newdoms,set){
+                            return SparkCoreManage.addDom(this,newdoms,'after',set)    
+                    
+                   }
                 /*删除*/
                  _scope.WidgetCache[address].remove =function(set){
                           var tempWidget = this;
@@ -873,7 +887,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     p,
                                     '',
                                     'border:0;',
-                                    null,
+                                    ['style'],
                                     false 
                                     );
             },
@@ -1205,24 +1219,24 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
 
                 //初始化渲染body
                 if(init){
-                   /*insert css*/
-                  _scope.makeStyleTree(_this._css);
-                  /*insert html*/
-                  var NxContainer = document.createElement('div');
-                  NxContainer.setAttribute('id', 'SparkApp-' + _scope.DefaultSetting.name);
-                  NxContainer.innerHTML = this._html;
-                  domTarget.insertBefore(NxContainer, domTarget.firstChild);
-                  /*default bind event && el && init*/
-                  var tempTimer= setTimeout(function(){
-                      clearTimeout(tempTimer)
-                      _this.initPushEvent.call(_this);
-                      _this.renderComplete.call(_this,_this._rootAdress);
-              
-                   });
+                           /*insert css*/
+                          _scope.makeStyleTree(_this._css);
+                          /*insert html*/
+                          var NxContainer = document.createElement('div');
+                          NxContainer.setAttribute('id', 'SparkApp-' + _scope.DefaultSetting.name);
+                          NxContainer.innerHTML = this._html;
+                          domTarget.insertBefore(NxContainer, domTarget.firstChild);
+                          /*default bind event && el && init*/
+                          var tempTimer= setTimeout(function(){
+                              clearTimeout(tempTimer)
+                              _this.initPushEvent.call(_this);
+                              _this.renderComplete.call(_this,_this._rootAdress);
+                      
+                           });
                  
                 }else{
                    //后期渲染部分节点
-                   
+                
                      /*append css moveto pushcss()*/
                        _scope.makeNextStyleTree(_this._css,_this._rootAdress);
                  
@@ -1231,12 +1245,55 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                         var tempDom = document.createElement("div");
                             tempDom.innerHTML = _this._html;
                             
-                       // console.log( _this.df)
-                     
+                      
+
+                            if(addtype=='after'){
+                              var abTarget= domTarget;
+                                  if(_typeof(domTarget.parentName)==='[object String]') {
+                                        domTarget = _scope.getAddressData(domTarget.parentName) 
+                                  }else{
+                                    console.warn('after failed!')
+                                    return;
+                                  }
+                                
+                                 if(_typeof(domTarget.$el)==='[object HTMLCollection]'){
+                                         SparkUtil.traverse(domTarget.$el.length,function(index,end){
+                                     
+                                              var tempDom = document.createElement("div");
+                                                  tempDom.innerHTML = _this._html;
+                                               var parentNode = abTarget.$el[index].parentNode;
+
+                                                if(parentNode.lastChild == abTarget.$el[index]){
+                                                    parentNode.appendChild(tempDom.firstChild);
+                                                 }else{
+                                                    parentNode.insertBefore(tempDom.firstChild,abTarget.$el[index].nextSibling)                          
+                                                 }
+                                                _scope.addWidgetEvent(abTarget.$el[index].nextSibling, _this._rootAdress)
+                                          })
+                                 }else{
+                                     var parentNode = abTarget.$el.parentNode;
+                                       if(parentNode.lastChild == abTarget.$el){
+                                          parentNode.appendChild(tempDom.firstChild);
+                                       }else{
+                                          parentNode.insertBefore(tempDom.firstChild,abTarget.$el.nextSibling)                          
+                                       }
+                                      _scope.addWidgetEvent(abTarget.$el.nextSibling, _this._rootAdress)
+                                 }
+                               
+                             } 
+                             
+                             if(addtype=='before'){
+
+                             }
+
+                             if(addtype == 'append' || addtype == 'prepend'){
+                               _this.append_prepend(domTarget.$el,tempDom,addtype) 
+                             }
+                          /* 
                              if(addtype == 'append'){
                                if(_typeof(domTarget.$el)==='[object HTMLCollection]'){
                                     SparkUtil.traverse(domTarget.$el.length,function(index,end){
-                                     
+                                  
                                       var tempDom = document.createElement("div");
                                           tempDom.innerHTML = _this._html;
                                       domTarget.$el[index].appendChild(tempDom.firstChild)
@@ -1248,19 +1305,19 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                                }  
                              }
                              if(addtype == 'prepend'){
-                                  if(_typeof(domTarget.$el)==='[object HTMLCollection]'){
-                                     SparkUtil.traverse(domTarget.$el.length,function(index,end){
-                                       var tempDom = document.createElement("div");
-                                          tempDom.innerHTML = _this._html;
-                                      domTarget.$el[index].insertBefore(tempDom.firstChild,domTarget.$el[index].firstChild)
-                                      _scope.addWidgetEvent(domTarget.$el[index].firstChild, _this._rootAdress)
-                                  })
-                                  }else{
-                                  domTarget.$el.insertBefore(tempDom.firstChild,domTarget.$el.firstChild)
-                                  _scope.addWidgetEvent(domTarget.$el.firstChild, _this._rootAdress)
-                                } 
+                                if(_typeof(domTarget.$el)==='[object HTMLCollection]'){
+                                   SparkUtil.traverse(domTarget.$el.length,function(index,end){
+                                     var tempDom = document.createElement("div");
+                                        tempDom.innerHTML = _this._html;
+                                    domTarget.$el[index].insertBefore(tempDom.firstChild,domTarget.$el[index].firstChild)
+                                    _scope.addWidgetEvent(domTarget.$el[index].firstChild, _this._rootAdress)
+                                })
+                                }else{
+                                domTarget.$el.insertBefore(tempDom.firstChild,domTarget.$el.firstChild)
+                                _scope.addWidgetEvent(domTarget.$el.firstChild, _this._rootAdress)
+                              } 
                              }
-                          
+                          */
                      /*append bind event*/
                       var tempTimer= setTimeout(function(){
                          clearTimeout(tempTimer)
@@ -1271,6 +1328,36 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                 }
                   
             },
+            /*add dom */
+            append_prepend:function(el,newel,type){
+                   var _this = this;
+                    if(_typeof(el)==='[object HTMLCollection]'){
+                                    SparkUtil.traverse(el.length,function(index,end){
+                                      var tempDom = document.createElement("div");
+                                          tempDom.innerHTML = _this._html;
+                                        if(type == 'append'){
+                                             el[index].appendChild(tempDom.firstChild);
+                                            _scope.addWidgetEvent(el[index].lastChild, _this._rootAdress);
+                                        }
+                                        if(type == 'prepend'){
+                                           el[index].insertBefore(tempDom.firstChild,el[index].firstChild)
+                                           el[index].appendChild(tempDom.firstChild)
+                                           _scope.addWidgetEvent(el[index].firstChild, _this._rootAdress)
+                                        }
+                                  })
+                      }else{
+                         if(type == 'append'){
+                          el.appendChild(newel.firstChild)                          
+                          _scope.addWidgetEvent(el.lastChild, _this._rootAdress) 
+                         }
+                        if(type == 'prepend'){
+                            el.insertBefore(newel.firstChild,el.firstChild)
+                            _scope.addWidgetEvent(el.firstChild, _this._rootAdress)
+                        }
+                      }  
+
+            },
+
             /*add render complete function*/
             renderComplete:function(address){
                   var _this = this;
@@ -1344,20 +1431,7 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
 
             },
            
-             /*append bind event*/
-            newPushEvent:function (_node,target){
-                           var _this = this;
-                            _scope.addWidgetEvent(target, _node.name); 
-                            if(_node.child){
-                                 SparkUtil.traverse(_node.child,function(nodeItem,index,end){
-                                   this.tempPushEvent(_scope.getAddressData(nodeItem),target.childNodes[index])
-                                 })
-                             /* for(var i=0;i<_node.child.length;i++){
-                                this.tempPushEvent(_scope.getAddressData(_node.child[i]),target.childNodes[i])
-                              }*/
-                            }
-                                  
-                         },
+          
             /*default add event*/
             initPushEvent: function(ignoreRootAdress) {
 
@@ -1377,17 +1451,6 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                                                 _scope.addWidgetEvent(nodeList[index], nodeName) 
                                            })
                                       }     
-                                        //  if(init){}else{
-                                        //    if(addtype == 'append'){
-                                        //     console.log(nodeList.length)
-                                        //      _scope.addWidgetEvent(nodeList[nodeList.length-1], nodeName) 
-                                        //    }
-                                        //    if(addtype == 'prepend'){
-                                        //      _scope.addWidgetEvent(nodeList[0], nodeName) 
-                                        //    }
-                                        // }
-                                   
-                                      // (function(nodeName) {  })(eventItem)
                          })
 
             },
@@ -1460,12 +1523,25 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
  * @param     {[type]}                 addtype [description]
  */
 SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype,set){
-
+   var _scope = this;
      // console.log('-----'+addtype+'-----')
+      var abTarget = target;
+       if(addtype=='after' || addtype=='before'){
+            if(_typeof(target.parentName)==='[object String]') {
+                target = _scope.getAddressData(target.parentName) 
+            }else{
+              return target;
+            }
+           
+              // console.log(abTarget,target)
+              // return;
+        } 
+     
        if(!target.child || !newdoms){
           return target;
         }
        var nodeArr = [];
+
        var tempChild=target.child.slice(0);
  
        //多个
@@ -1479,9 +1555,9 @@ SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype,set){
 
        SparkUtil.traverse(nodeArr,function(item,index,end){
             
-             if(set && set.ani){
+            if(set && set.ani){
                item.style = 'animation:'+set.ani;
-             }
+            }
             
             if(addtype=='append'){
                     tempChild.push(item.name)
@@ -1489,12 +1565,22 @@ SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype,set){
             if(addtype=='prepend'){
                     tempChild.unshift(item.name) 
             }
+            if(addtype=='after'){
+                   var tIndex = SparkUtil.isInArray(tempChild,{b:abTarget.name});
+                   tempChild.splice(tIndex+1,0,item.name)
+            }
+            if(addtype=='before'){
+                 var tIndex = SparkUtil.isInArray(tempChild,{b:abTarget.name});
+                   tempChild.splice(tIndex,0,item.name)
 
-            SparkCoreManage.createDomTree(item.name,target,false,addtype)
+            }
+             
+
+            SparkCoreManage.createDomTree(item.name,(addtype=='after' || addtype=='before')?abTarget:target,false,addtype)
 
             if(end){
                  // SparkCoreManage.createDomTree(target.name,target.$el,false)
-              target.child =   tempChild;
+                 target.child =   tempChild;
             }
            // console.log(end,index,item)
 
