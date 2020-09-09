@@ -738,9 +738,10 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                      }
                       _scope.WidgetCache[address].splice=function(index,howmany,newdata){ 
                           var _this = this;
-                           
-                          // index = index>this.data.length-1?this.data.length-1:index;
+                             
 
+                          index = index>_thisChildLen?_thisChildLen:index;
+                             
                           if(newdata){
                             var tempWidget =[];
                              //多个
@@ -751,12 +752,14 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                              }else{
                               tempWidget = this.item(newdata,this.data.length-1);
                              }
-                             if(index>this.data.length-1){
+                             var  _thisChildLen=this.data.length-1;
+                             if(index>_thisChildLen){
                               this.data = this.data.concat(newdata);
-                              SparkCoreManage.getAddressData(this.child[this.data.length-1]).after(tempWidget);
+                              SparkCoreManage.getAddressData(this.child[_thisChildLen]).after(tempWidget);
                              }else{
-                              /*----------待修改-----------------------------*/
-                                this.data.splice(index,howmany,newdata);
+                        
+                                this.data.splice.apply(this.data,[index, howmany].concat(newdata))
+
                                 SparkCoreManage.getAddressData(this.child[index]).before(tempWidget);
                              }
                             

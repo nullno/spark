@@ -16,7 +16,7 @@
       
       console.log(SparkApp)
 
-     var title1 =  SparkApp.Text('元素操作：',{
+     var title1 =  SparkApp.Text('状态：',{
         child:[activeText=SparkApp.Text('READY....',{
          style:'color:red;',
          watch:{
@@ -189,14 +189,10 @@
     var listStyle = SparkApp.Css('margin:5px;padding:5px;background-color:#666;animation: fadeInLeft 500ms both;');
     
   
+  /* 数据动态监听 */
     var  List = SparkApp.List({
           data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
           style:'width:100%;margin:0px auto;padding:5px;overflow:hidden;',
-          watch:{
-            data(o,a){
-               console.log(o,a)
-            },
-          },
           item(item,index){
             return SparkApp.Box({
                 tag:'li',
@@ -206,17 +202,17 @@
                 hideAni:{ani:'bounceOutRight 500ms both',time:500},
                 child:[SparkApp.Text(item.a+index+'---'),SparkApp.Text(item.b)],
                 init(){
-
                     if(index== 1){
                         this.style='background-color:red;'
                     }
+                    // console.log(this)
                 },
                 on:{
                     click(){
                      
                         listStyle.style='background-color:#666;'
                         this.style='background-color:red;'
-                   
+                        // this.remove()
                         console.log(item)
                     }
                 }
@@ -263,7 +259,7 @@
                         on:{
                             click(){
                              //add
-                              List.splice(1,0,[{a:'item',b:'hello spark3'},{a:'item',b:'hello spark4'}])
+                              List.splice(5,0,[{a:'item',b:'hello spark3'},{a:'item',b:'hello spark4'}])
                           
                             
                             }
@@ -275,7 +271,7 @@
                         style:'background-color:#666;right:2px;bottom:0;',
                         on:{
                             click(){
-                             List.splice(1,2);
+                             List.splice(2,1);
 
                             }
                         }
