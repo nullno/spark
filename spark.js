@@ -358,7 +358,10 @@ var SparkUtil = {
                          return -1;
                       }
                     }
-        }
+        },
+        /*splice 插入数组*/
+
+
 
     };
 
@@ -726,50 +729,17 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 _scope.WidgetCache[address] = obj;
 
                if(nxtype=='List'){
-                     _scope.WidgetCache[address].push=function(newdata){    
-                        var tempChild = this.item(newdata,this.data.length-1);
-                         this.data.push(newdata);
-                         this.append(tempChild);
-                     }
-                     _scope.WidgetCache[address].unshift=function(newdata){    
-                        var tempChild = this.item(newdata,this.data.length-1);
-                         this.data.unshift(newdata);
-                         this.prepend(tempChild);
-                     }
-                      _scope.WidgetCache[address].splice=function(index,howmany,newdata){ 
-                          var _this = this;
-                             
 
-                          index = index>_thisChildLen?_thisChildLen:index;
-                             
-                          if(newdata){
-                            var tempWidget =[];
-                             //多个
-                             if(_typeof(newdata)==='[object Array]'){
-                                  SparkUtil.traverse(newdata,function(item,index,end){
-                                     tempWidget.push(_this.item(item,_this.data.length-1))
-                                  })
-                             }else{
-                              tempWidget = this.item(newdata,this.data.length-1);
-                             }
-                             var  _thisChildLen=this.data.length-1;
-                             if(index>_thisChildLen){
-                              this.data = this.data.concat(newdata);
-                              SparkCoreManage.getAddressData(this.child[_thisChildLen]).after(tempWidget);
-                             }else{
-                        
-                                this.data.splice.apply(this.data,[index, howmany].concat(newdata))
-
-                                SparkCoreManage.getAddressData(this.child[index]).before(tempWidget);
-                             }
-                            
-                          }else{
+                  _scope.WidgetCache[address].clear=function(){
+                         this.delete(0,this.data.length);
+                   }
+                   _scope.WidgetCache[address].delete =function(index,howmany){
                             var tempChild = this.child.slice(0);
                             var delAdress = tempChild.splice(index,howmany);
-                            this.data.splice(index,howmany);
-                               var tempWidget =[];
+                                 this.data.splice(index,howmany);
+                               
                                SparkUtil.traverse(delAdress,function(item,index,end){
-                                var delTarget=SparkCoreManage.getAddressData(item);
+                                  var delTarget=SparkCoreManage.getAddressData(item);
                                    if(delTarget.hideAni && delTarget.hideAni.ani){
                                         delTarget.style='animation:'+delTarget.hideAni.ani;
                                         var removeTimer=setTimeout(function(){
@@ -782,11 +752,79 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     
                                })
                                
-                            tempChild = tempWidget = null;
-                          }
+                            tempChild = null;
+                     }
 
+                      
+                     _scope.WidgetCache[address].insertFirst=function(newdata){    
+                           var _this = this,
+                               tempWidget =[],
+                               newdatas =[];
+                             //多个
+                             if(_typeof(newdata)==='[object Array]'){
+                                  SparkUtil.traverse(newdata,function(item,index,end){
+                                     tempWidget.push(_this.item(item,_this.data.length-1));
+                                     newdatas.push(item);
+                                  })
+                             }else{
+                                  tempWidget = this.item(newdata,this.data.length-1);
+                                  newdatas.push(newdata);
+                             }
+                             // this.data.unshift(newdata);
+                             this.data.splice.apply(this.data,[0, 0].concat(newdatas))
+                             this.prepend(tempWidget);
+                             tempWidget = newdatas = null;
+                     }
+                     _scope.WidgetCache[address].insertLast=function(newdata){
+                           var _this = this,     
+                               tempWidget =[],
+                               newdatas =[];
+                             //多个
+                             if(_typeof(newdata)==='[object Array]'){
+                                  SparkUtil.traverse(newdata,function(item,index,end){
+                                     tempWidget.push(_this.item(item,_this.data.length-1));
+                                     newdatas.push(item);
+                                  })
+                             }else{
+                                    tempWidget = this.item(newdata,this.data.length-1);
+                                    newdatas.push(newdata);
+                             }
+                             this.data = this.data.concat(newdatas);
+                             this.append(tempWidget);
+                             tempWidget = newdatas = null;
+                     }
+
+
+                    _scope.WidgetCache[address].insert=function(index,howmany,newdata){ 
                         
-                       
+                            if(!newdata){
+                                  console.warn('no data');return;
+                            }
+                            var _this = this,
+                                tempWidget =[],
+                                newdatas =[],
+                                _thisMaxIndex=this.child.length>0?this.child.length-1:0;
+                             //多个
+                             if(_typeof(newdata)==='[object Array]'){
+                                  SparkUtil.traverse(newdata,function(item,index,end){
+                                     tempWidget.push(_this.item(item,_thisMaxIndex));
+                                     newdatas.push(item);
+                                  })
+                             }else{
+                              tempWidget = this.item(newdata,_thisMaxIndex);
+                              newdatas.push(newdata);
+                             }
+                             
+                        
+                             if(index>=_thisMaxIndex){
+                                _thisMaxIndex==0?_this.insertFirst(newdatas):_this.insertLast(newdatas);
+                            
+                             }else{
+                                this.data.splice.apply(this.data,[index, howmany].concat(newdatas));
+                                SparkCoreManage.getAddressData(this.child[index]).before(tempWidget);
+                             }
+                            
+                            tempWidget = newdatas = null;
                      
                      }
                }
@@ -885,7 +923,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                    SparkRender();
                    console.timeEnd("Render");
                 }
-
+              
+              obj = 0; 
               return _scope.WidgetCache[address]
 
             },
@@ -908,7 +947,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
 
                 _scope.CSSCache[address] = obj;
                 _core.defineProperty(address, ['style']);
-                return _scope.CSSCache[address]
+                obj = 0;
+                return _scope.CSSCache[address];
             },
             Page: function(p) {
   
@@ -1061,6 +1101,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                tempObj[cssParamItem+param] = value;
                            })
                          }
+                         /*
                          // var cssValue = this.autoprefixerConfig.value[value];
                          // var cssValue = '',cssValueKey='';
                          // for(var key in this.autoprefixerConfig.value){
@@ -1069,17 +1110,16 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                          //    cssValue = this.autoprefixerConfig.value[key];
                          //  }
                          // }
-
-            
                          
                          // if(cssValue){
                          //    SparkUtil.traverse(cssValue,function(cssValueItem,index,end){
                          //      tempObj[param] = cssValueItem;
-                         //       // tempObj[param] = value.replace(new RegExp(cssValueKey,'ig'),cssValueItem);
+                         //       tempObj[param] = value.replace(new RegExp(cssValueKey,'ig'),cssValueItem);
                          //    })
                          //  }
 
                          // str.replace(new RegExp('transition','ig'),'-webkit-transition');
+                         */
              }
 
         };
@@ -1258,12 +1298,16 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
 SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,addtype,callback){
         var _scope = this;
         var _core = {
-            df: document.createDocumentFragment(),
+             // df: document.createDocumentFragment(),
             _html: null,
             _css: '',
             _eventQueue: [],//leave
             _rootAdress: _rootAdress,
             _lastAdress: null,
+            _clear:function(){
+                 this._eventQueue = [];
+                 this._html = null;
+            },
             /*render them*/
             render: function() {
                 var _this = this;
@@ -1284,8 +1328,9 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                               clearTimeout(tempTimer)
                               _this.initPushEvent.call(_this);
                               _this.renderComplete.call(_this,_this._rootAdress);
-                      
+                               _this._clear();
                            });
+
                  
                 }else{
                    //后期渲染部分节点
@@ -1314,66 +1359,13 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                              if(addtype == 'append' || addtype == 'prepend'){
                                _this.append_prepend(domTarget.$el,tempDom,addtype) 
                              }
-                       /*      if(addtype=='before'){
-                      
-                                
-                                 if(_typeof(domTarget.$el)==='[object HTMLCollection]'){
-                                         SparkUtil.traverse(domTarget.$el.length,function(index,end){
-                                     
-                                              var tempDom = document.createElement("div");
-                                                  tempDom.innerHTML = _this._html;
-                                               var parentNode = abTarget.$el[index].parentNode;
-
-                                                
-                                                parentNode.insertBefore(tempDom.firstChild,abTarget.$el[index])                          
-                                                
-                                                _scope.addWidgetEvent(abTarget.$el[index].previousElementSibling, _this._rootAdress)
-                                          })
-                                 }else{
-                                     var parentNode = abTarget.$el.parentNode;
-                                    
-                                       parentNode.insertBefore(tempDom.firstChild,abTarget.$el)                          
-                                   
-                                      _scope.addWidgetEvent(abTarget.$el.previousElementSibling, _this._rootAdress)
-                                 }
-                       
-                             }*/
-
-                          /* 
-                             if(addtype == 'append'){
-                               if(_typeof(domTarget.$el)==='[object HTMLCollection]'){
-                                    SparkUtil.traverse(domTarget.$el.length,function(index,end){
-                                  
-                                      var tempDom = document.createElement("div");
-                                          tempDom.innerHTML = _this._html;
-                                      domTarget.$el[index].appendChild(tempDom.firstChild)
-                                      _scope.addWidgetEvent(domTarget.$el[index].lastChild, _this._rootAdress)
-                                  })
-                               }else{
-                                 domTarget.$el.appendChild(tempDom.firstChild)                          
-                                 _scope.addWidgetEvent(domTarget.$el.lastChild, _this._rootAdress) 
-                               }  
-                             }
-                             if(addtype == 'prepend'){
-                                if(_typeof(domTarget.$el)==='[object HTMLCollection]'){
-                                   SparkUtil.traverse(domTarget.$el.length,function(index,end){
-                                     var tempDom = document.createElement("div");
-                                        tempDom.innerHTML = _this._html;
-                                    domTarget.$el[index].insertBefore(tempDom.firstChild,domTarget.$el[index].firstChild)
-                                    _scope.addWidgetEvent(domTarget.$el[index].firstChild, _this._rootAdress)
-                                })
-                                }else{
-                                domTarget.$el.insertBefore(tempDom.firstChild,domTarget.$el.firstChild)
-                                _scope.addWidgetEvent(domTarget.$el.firstChild, _this._rootAdress)
-                              } 
-                             }
-                          */
+                     
                      /*append bind event*/
                       var tempTimer= setTimeout(function(){
                          clearTimeout(tempTimer)
                          _this.initPushEvent.call(_this,true);//子节点事件
                          _this.renderComplete.call(_this,_this._rootAdress);
-                         
+                         _this._clear();
                      });      
                 }
                   
@@ -1675,7 +1667,7 @@ SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype,set){
 
        })
 
-
+       nodeArr = tempChild = 0;
        return target;
 }
 
@@ -1689,10 +1681,12 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
         //非目标子集
       
    
-         var tempChild=target.child.slice(0);
+         var tempChild=target.child.slice(0),
+             blongIndex = SparkUtil.isInArray(target.child,{b:deldom.name});
  
-        if(_typeof(deldom)==='[object Object]' && SparkUtil.isInArray(target.child,{b:deldom.name})!=-1){
-                
+        if(_typeof(deldom)==='[object Object]' && blongIndex!=-1){
+               
+
                SparkUtil.compareRemove(tempChild,{b:deldom.name})
                
               var delParentName =function(){
@@ -1703,10 +1697,13 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
                   }  
               }
               var delFn = function(targetEl){ 
+                    /*List Data 处理*/
+                    if(target.type==='List'){
+                          target.data.splice(blongIndex,1);  
+                      }
                     if(_typeof(deldom.$el)==='[object HTMLCollection]'){
-          
-                       for (var i = deldom.$el.length - 1; i >= 0; --i) {
 
+                       for (var i = deldom.$el.length - 1; i >= 0; --i) {
                              if(deldom.$el[i].parentNode == targetEl){
                                 targetEl.removeChild(deldom.$el[i])
                              }
@@ -1714,10 +1711,10 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
                         delParentName();
                 
                      }else if(deldom.$el){
-                          
+                         
                           targetEl.removeChild(deldom.$el);
                           delete deldom.parentName;
-                          delete deldom.$el;
+                          delete deldom.$el;  
                      }
                     
                } 
@@ -1728,8 +1725,10 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
                     })
 
                 }else{
+                          
                    delFn(target.$el)
                 }  
+
              target.child = tempChild;
         }
 
@@ -1764,8 +1763,10 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
             
 
             target.child = tempChild;
-        }
 
+        }
+   
+     tempChild = 0;
     return target;
 }
 /**

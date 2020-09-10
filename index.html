@@ -193,7 +193,7 @@
     var  List = SparkApp.List({
           data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
           style:'width:100%;margin:0px auto;padding:5px;overflow:hidden;',
-          item(item,index){
+          item:function(item,index){
             return SparkApp.Box({
                 tag:'li',
                 style:'margin:5px;padding:5px;background-color:#666;',
@@ -203,7 +203,9 @@
                 child:[SparkApp.Text(item.a+index+'---'),SparkApp.Text(item.b)],
                 init(){
                     if(index== 1){
-                        this.style='background-color:red;'
+                        this.style='background-color:red;';
+                        // this.remove()
+
                     }
                     // console.log(this)
                 },
@@ -212,7 +214,7 @@
                      
                         listStyle.style='background-color:#666;'
                         this.style='background-color:red;'
-                        // this.remove()
+                        this.remove({ani:'bounceOutRight 500ms both',time:500})
                         console.log(item)
                     }
                 }
@@ -233,8 +235,8 @@
                     style:'background-color:green;left:2px;bottom:0;',
                     on:{
                         click(){
-                            useCode.text="尾部插入:\n\nList.push({a:'item',b:'hello spark2'})";
-                            List.push({a:'item',b:'hello spark2'});
+                            useCode.text="尾部插入:\n\nList.insertLast([{a:'item',b:'hello spark2'}])";
+                            List.insertLast([{a:'item',b:'hello spark2'+Math.random(0,100)*10},{a:'item',b:'hello spark2'+Math.random(0,100)*10}]);
                             // console.log(List)
                         }
                     }
@@ -245,8 +247,8 @@
                         style:'background-color:green;left:2px;bottom:45px;',
                         on:{
                             click(){
-                                useCode.text="头部插入:\n\nList.unshift({a:'item',b:'hello spark2'})";
-                                List.unshift({a:'item',b:'hello spark1'})
+                                useCode.text="头部插入:\n\nList.insertFirst({a:'item',b:'hello spark2'})";
+                                List.insertFirst({a:'item',b:'hello spark1'+Math.random(0,100)*10})
 
                                 // console.log(List)
                             }
@@ -258,20 +260,22 @@
                         style:'background-color:green;left:85px;bottom:0;',
                         on:{
                             click(){
-                             //add
-                              List.splice(5,0,[{a:'item',b:'hello spark3'},{a:'item',b:'hello spark4'}])
-                          
-                            
+                             
+                              useCode.text="指定位置插入:\n\n List.insert(5,0,<data>)";
+                              List.insert(5,0,[{a:'item',b:'hello spark'+Math.random(0,100)*10},{a:'item',b:'hello spark'+Math.random(0,100)*10}])
+                               
                             }
                         }
                       }),
-                       SparkApp.Text('删除数据',{
+                       SparkApp.Text('删除列表',{
                         tag:'button',
                         className:bthcss,
                         style:'background-color:#666;right:2px;bottom:0;',
                         on:{
                             click(){
-                             List.splice(2,1);
+                                useCode.text="删除选中范围列表:\n\nList.delete(0,3);\n\n清空列表:\n\nList.clear();"; 
+                             // List.delete(0,3);
+                               List.clear();
 
                             }
                         }
