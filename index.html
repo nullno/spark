@@ -9,7 +9,7 @@
 <script src="./spark.js"></script>
 <script>
     /**
-     * 待添加功能 :热更新/数据模块
+     * demo20200902  元素尺寸
      */
 	var SparkApp = new Spark({});
 
@@ -31,12 +31,19 @@
      var useCode = SparkApp.Text('READY....',{
           tag:'pre',
           className:boxComCss,
-          style:'left:0;'
-         
+          style:'left:0;',
+          on:{
+            click:function(){
+                 useCode.text='显示隐藏：\n\nimg1.show=!img1.show';
+                img1.show=!img1.show
+            }
+          }
      })
 
      var node1 = SparkApp.Box({
 			style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;',
+            showAni:{ani:'zoomIn 500ms both'},
+            hideAni:{ani:'bounceOut 500ms both',time:500},
 			on:{
 				click:function(){
                     this.prepend(SparkApp.Text('node1'))
@@ -44,7 +51,15 @@
 				}
 			}
 		})
-	var img1 = SparkApp.Image('https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3836963292,3556801655&fm=26&gp=0.jpg',{style:'width:100px;'});
+	var img1 = SparkApp.Image('https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3836963292,3556801655&fm=26&gp=0.jpg',
+        {
+            style:'width:100px;display:inline-block;',
+            idName:'tupian',
+            showAni:{ani:'zoomIn 500ms both'},
+            hideAni:{ani:'bounceOut 500ms both',time:500},
+            show:true,//默认true;
+         });
+
      var targetContainer = SparkApp.Box({
          className:boxComCss,
          style:'right:0;',
@@ -63,7 +78,7 @@
      		click:function(_this){
                  activeText.text='append';
                  useCode.text='后置追加元素：\n\n方法1:targetContainer.append([node1,node1]);\n方法2：SparkApp.append(targetContainer,[node1,node1]);';
-                 targetContainer.append([node1,node1],{ani:'slideInRight 500ms both'});  
+                 targetContainer.append([node1,node1]);  
 
                
      		}
@@ -81,6 +96,8 @@
                  useCode.text='前置添加元素：\n\n方法1:targetContainer.prepend(node2);\n方法2：SparkApp.prepend(targetContainer,node2);';
                  targetContainer.prepend(SparkApp.Box({
                                             style:'min-width:20px;height:20px;background:yellow;display:inline-block;margin:2px;color:blue;padding:0 5px;line-height:20px;overflow:hidden;animation: bounceInLeft 0.5s both;',
+                                            showAni:{ani:'bounceInLeft 0.5s both'},
+                                            hideAni:{ani:'bounceOut 500ms both',time:500},
                                             on:{
                                                 click:function(){
                                                   this.prepend(SparkApp.Text('node2'))
@@ -106,14 +123,15 @@
                  useCode.text='指定元素后插入：\n\nimg1.after(<w>,{ani:<ani string>})';
 
                  img1.after([SparkApp.Box({
-                                            style:'min-width:20px;height:20px;background:pink;display:inline-block;margin:2px;color:blue;padding:0 5px;line-height:20px;overflow:hidden;animation: bounceInLeft 0.5s both;',
+                                            style:'min-width:20px;height:20px;background:pink;display:inline-block;margin:2px;color:blue;padding:0 5px;line-height:20px;overflow:hidden;',
+                                            showAni:{ani:'zoomIn 500ms both'},
+                                            hideAni:{ani:'bounceOut 500ms both',time:500},
                                             on:{
                                                 click:function(){
                                                   this.prepend(SparkApp.Text('node3'))
                                                 }
                                             }
-                                        })],
-                 {ani:'zoomIn 500ms both'});  
+                                        })]);  
      		 }
      	  }
        })
@@ -128,7 +146,7 @@
                  activeText.text='before';
                  useCode.text='指定元素前插入：\n\nimg1.before(<w>,{ani:<ani string>})';
 
-                 img1.before(node1,{ani:'zoomIn 500ms both'});  
+                 img1.before(node1);  
      		 }
      	  }
        })
@@ -143,9 +161,9 @@
      		click:function(_this){
                   
                    activeText.text='remove widget';
-                   useCode.text='删除指定元素：\n\n方法1:node1.remove();\n方法2：SparkApp.remove(targetContainer,node1);';
+                   useCode.text='删除指定元素：\n\n方法1:node1.remove(ani);\n方法2：SparkApp.remove(targetContainer,node1);';
                    // node1.style='animation: bounceOut 500ms both';
-                   node1.remove({ani:'bounceOut 500ms both',time:500});
+                   node1.remove();
 
      		}
           }
@@ -161,7 +179,7 @@
                     activeText.text='remove WidgetIndex';
                     useCode.text="删除索引元素：\n\n方式1：targetContainer.remove(<Widget> | <Index> |<firstChild,lastChild>)\n\n方式2：\n删除指定索引：SparkApp.remove(targetContainer,2);\n删除第一个:SparkApp.remove(targetContainer,'firstChild')\n删除最后一个：SparkApp.remove(targetContainer,'lastChild');";
                 
-                     targetContainer.removeChild(0,{ani:'bounceOut 500ms both',time:500})
+                     targetContainer.removeChild(0)
                   
 
             }
@@ -186,10 +204,10 @@
     var title2 =  SparkApp.Text('列表渲染：',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
     
-    var listStyle = SparkApp.Css('margin:5px;padding:5px;background-color:#666;animation: fadeInLeft 500ms both;');
+    var listStyle = SparkApp.Css('margin:5px;padding:5px;background-color:#666;');//animation: fadeInLeft 500ms both;
     
   
-  /* 数据动态监听 */
+  /*  */
     var  List = SparkApp.List({
           data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
           style:'width:100%;margin:0px auto;padding:5px;overflow:hidden;',
@@ -198,9 +216,12 @@
                 tag:'li',
                 style:'margin:5px;padding:5px;background-color:#666;',
                 className:listStyle,
-                showAni:{ani:'fadeInLeft 500ms both'},
-                hideAni:{ani:'bounceOutRight 500ms both',time:500},
-                child:[SparkApp.Text(item.a+index+'---'),SparkApp.Text(item.b)],
+                showAni:{ani:'fadeInLeft 500ms  both'},
+                hideAni:{ani:'bounceOutRight 500ms both',time:222},
+                child:[SparkApp.Text(item.a+index+'---',{
+                    on:{click(){alert(item.b)}}
+                    }),
+                SparkApp.Text(item.b)],
                 init(){
                     if(index== 1){
                         this.style='background-color:red;';
@@ -261,8 +282,23 @@
                         on:{
                             click(){
                              
-                              useCode.text="指定位置插入:\n\n List.insert(5,0,<data>)";
-                              List.insert(5,0,[{a:'item',b:'hello spark'+Math.random(0,100)*10},{a:'item',b:'hello spark'+Math.random(0,100)*10}])
+                              useCode.text="指定位置插入:\n\n List.insert(5,<data>)";
+                            
+                              List.insert(1,[{a:'itemkkkkkk',b:'hello spark'+Math.random(0,100)*10}]);
+                               
+                            }
+                        }
+                      }),
+                        SparkApp.Text('更新数据1',{
+                        tag:'button',
+                        className:bthcss,
+                        style:'background-color:green;left:85px;bottom:45px;',
+                        on:{
+                            click(){
+                             
+                              useCode.text="链式调用删除替换:\n\n List.delete(1,1).insert(1,<data>)";
+                            
+                              List.delete(1,1).insert(1,[{a:'itemkkkkkk',b:'hello spark'+Math.random(0,100)*10}]);
                                
                             }
                         }
@@ -274,7 +310,7 @@
                         on:{
                             click(){
                                 useCode.text="删除选中范围列表:\n\nList.delete(0,3);\n\n清空列表:\n\nList.clear();"; 
-                             // List.delete(0,3);
+                               // List.delete(0,2);
                                List.clear();
 
                             }
@@ -286,7 +322,13 @@
 
      SparkApp.Page({
      	style:'width:100%;min-height:100vh;background-color:#272822;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
-     	child:[title1,wrap,title2,wrap2]
+     	child:[title1,wrap,title2,wrap2],
+        on:{
+            click:function(){
+                 useCode.text=  activeText.text = 'spark demo'; 
+            }
+        },
+       
      })
 </script>	
 </body>
