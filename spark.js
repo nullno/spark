@@ -1678,7 +1678,7 @@ SparkCoreHandler.prototype.SparkRender = function() {
  */
 SparkCoreHandler.prototype.clearWidget = function(_Widget){
     var _scope = this;
-    if(!_typeof(_Widget.$el,'HTMLCollection')&&_Widget.$el.length!=0){
+    if(!_typeof(_Widget.$el,'HTMLCollection') || (_typeof(_Widget.$el,'HTMLCollection') && _Widget.$el.length === 0)){
          delete  this.WidgetCache[_Widget.name];
     }
     if(_Widget.child.length>0){
