@@ -9,7 +9,7 @@
 <script src="./spark.js"></script>
 <script>
     /**
-     * demo20200902  元素尺寸
+     * demo202009019 [拖动容器]  
      */
 	var SparkApp = new Spark({});
 
@@ -210,7 +210,7 @@
   /*  */
     var  List = SparkApp.List({
           data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
-          style:'width:100%;margin:0px auto;padding:5px;overflow:hidden;',
+          style:'width:100%;margin:0px auto;padding:5px;padding-bottom:100px;overflow:hidden;',
           item:function(item,index){
             return SparkApp.Box({
                 tag:'li',
@@ -218,21 +218,30 @@
                 className:listStyle,
                 showAni:{ani:'fadeInLeft 500ms  both'},
                 hideAni:{ani:'bounceOutRight 500ms both',time:222},
-                child:[SparkApp.Text(item.a+index+'---',{
-                    on:{click(){alert(item.b)}}
-                    }),
-                SparkApp.Text(item.b)],
+                child:[
+                      SparkApp.Box({
+                        style:'min-width:20px;height:20px;background:blue;line-height:20px;float:left;',
+                        child:[SparkApp.Text(index,{listIndex:true})]
+                      }),
+                      SparkApp.Text(index,{listIndex:true}),
+                      SparkApp.Text('---'+item.a+'---',{
+                        on:{click(){alert(item.b)}}
+                        }),
+                     (item.c)?SparkApp.Text(item.c.f):SparkApp.Text(item.b),
+          
+                    
+                     ],
                 init(){
-                    if(index== 1){
-                        this.style='background-color:red;';
-                        // this.remove()
 
+                    if(this.listIndex== 1){
+                        this.style='background-color:red;';
+                    }else{
+                        this.style='background-color:#666;';
                     }
-                    // console.log(this)
+                 
                 },
                 on:{
                     click(){
-                     
                         listStyle.style='background-color:#666;'
                         this.style='background-color:red;'
                         this.remove({ani:'bounceOutRight 500ms both',time:500})
@@ -284,7 +293,7 @@
                              
                               useCode.text="指定位置插入:\n\n List.insert(5,<data>)";
                             
-                              List.insert(1,[{a:'itemkkkkkk',b:'hello spark'+Math.random(0,100)*10}]);
+                              List.insert(1,[{a:'item',b:'hello spark331'+Math.random(0,100)*10},{a:'item',b:'hello spark1'+Math.random(0,100)*10}]);
                                
                             }
                         }
@@ -297,8 +306,9 @@
                             click(){
                              
                               useCode.text="链式调用删除替换:\n\n List.delete(1,1).insert(1,<data>)";
-                            
-                              List.delete(1,1).insert(1,[{a:'itemkkkkkk',b:'hello spark'+Math.random(0,100)*10}]);
+                              
+                              List.update(List.data.length-1,{a:'hellllllll',c:{f:'666666'}})
+                              // List.delete(1,1).insert(1,[{a:'itemkkkkkk',b:'hello spark'+Math.random(0,100)*10}]);
                                
                             }
                         }
@@ -310,7 +320,7 @@
                         on:{
                             click(){
                                 useCode.text="删除选中范围列表:\n\nList.delete(0,3);\n\n清空列表:\n\nList.clear();"; 
-                               // List.delete(0,2);
+                               // List.delete(0,1);
                                List.clear();
 
                             }
@@ -320,9 +330,18 @@
        });
 
 
+     var title3 =  SparkApp.Text('拖动容器：',{
+        tag:'h1',style:'width:90%;margin:0 auto;'}); 
+      /*内容实时更新*/  
+     var  wrap3 = SparkApp.Box({
+           className:wrapcss,  
+           style:'min-height:300px;height:auto;',
+           child:[]
+       })
+
      SparkApp.Page({
      	style:'width:100%;min-height:100vh;background-color:#272822;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
-     	child:[title1,wrap,title2,wrap2],
+     	child:[title1,wrap,title2,wrap2,title3,wrap3],
         on:{
             click:function(){
                  useCode.text=  activeText.text = 'spark demo'; 
