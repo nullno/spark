@@ -1713,10 +1713,13 @@ SparkCoreHandler.prototype.updateListIndex = function(_ListWidget){
     }
 
     SparkUtil.traverse(_ListWidget.child,function(item,index,end){
+
       var _thisWidget=_scope.getAddressData(item);
-          _thisWidget.listIndex=index;
-          _thisWidget.init && _thisWidget.init();
-          _core(_thisWidget,index)
+           if(_thisWidget){
+              _thisWidget.listIndex && (_thisWidget.listIndex=index);
+              _thisWidget.init && _thisWidget.init();
+              _core(_thisWidget,index)
+          }
     })
 
 
@@ -1906,7 +1909,11 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
     
     //如果是列表变化更新索引
       if(target.type==='List'){
-           _scope.updateListIndex(target)
+       var timer = setTimeout(function(){
+             clearTimeout(timer)
+            _scope.updateListIndex(target)
+        },100)
+         
       }
      tempChild = null;
 
