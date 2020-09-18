@@ -1902,9 +1902,12 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
             target.child = tempChild;
 
 
-
         }
-   
+    
+    //如果是列表变化更新索引
+      if(target.type==='List'){
+           _scope.updateListIndex(target)
+      }
      tempChild = null;
 
     return target;
