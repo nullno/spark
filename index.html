@@ -232,7 +232,7 @@
                     
                      ],
                 init(){
-
+                 
                     if(this.listIndex== 1){
                         this.style='background-color:red;';
                     }else{
@@ -330,18 +330,42 @@
        });
 
 
-     var title3 =  SparkApp.Text('拖动容器：',{
+       var title3 =  SparkApp.Text('层叠容器：',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
-      /*拖动容器*/  
+
+
+       var Stack1 = SparkApp.Stack({
+           style:'width:50%;height:300px;background:#fff;',
+           child:[
+                  SparkApp.Position({
+                   style:'width:100px;height:100px;background:blue;'
+                  }),
+                   SparkApp.Position({
+                       style:'width:100px;height:100px;background:pink;left:20px;top:20px;'
+                   })
+            ]
+       })
+      /*层叠容器：*/  
      var  wrap3 = SparkApp.Box({
            className:wrapcss,  
            style:'min-height:300px;height:auto;',
-           child:[]
+           child:[Stack1]
        })
+
+   var backTop1  = SparkApp.Fixed({
+              style:'min-width:20px;height:50px;line-height:50px;border-radius:10px 0 0 0; background:yellowgreen;right:0;bottom:0;',
+              child:[SparkApp.Text('回到顶部')],
+              on:{
+                click:function(){
+                  SparkApp.scrollTop(0,500);
+                }
+              }
+       })
+
 
      SparkApp.Page({
      	style:'width:100%;min-height:100vh;background-color:#272822;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
-     	child:[title1,wrap,title2,wrap2,title3,wrap3],
+     	child:[title1,wrap,title2,wrap2,title3,wrap3,backTop1],
         on:{
             click:function(){
                  useCode.text=  activeText.text = 'spark demo'; 

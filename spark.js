@@ -106,6 +106,26 @@ if (typeof Object.assign != 'function') {
  * @type {Object}
  */
 var SparkUtil = {
+        /*screen*/
+        screen:{
+          width:function(){
+               return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+           },
+          height:function(){ return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+           },
+          scrollTop:function(){
+            return document.documentElement.scrollTop || document.body.scrollTop;
+          },
+          scrollHeight:function(){
+            return document.documentElement.scrollHeight || document.body.scrollHeight;
+          },
+          resize:function(callback){
+                 window.onresize=function(){
+                      callback({width:SparkUtil.screen.width(),height:SparkUtil.screen.height()})
+                 }
+                 window.onresize();
+          }
+        },
         /*包含字符串*/
         includes: function(str1, str2) {
             return str1.indexOf(str2)==-1?false:true;
@@ -625,124 +645,41 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
  SparkCoreHandler.prototype.HTMLManager = function() {
         var _scope = this;
         var _core = {
-            getAddress: function(widgets,pname) {
+            getAddress: function(widgets,parentName) {
                  if(!widgets)return [];
                 var addressArr = [];
                 SparkUtil.traverse(widgets,function(widgetItem,index,end){
-                   widgetItem['parentName']=pname;
+                   widgetItem['parentName']=parentName;
                    addressArr.push(widgetItem['name'])
                 })
                 return addressArr;
             },
             getClassName: function(param) {
                 var names = '';
-                /*names += (param && typeof param.style === 'string') ? ' ' + param.style['name'] : '';
-                  names += (param && typeof param.shover === 'object') ? ' ' + param.shover['name'] : '';
-                  names += (param && param.className ) ? ' ' + param.className : '';
-                */
-                names += (param && typeof param.className === 'object') ? param.className['name']+' ':
-                         (param && typeof param.className === 'string') ? param.className+' ': '';
+                    names += (param && typeof param.className === 'object') ? param.className['name']+' ':
+                             (param && typeof param.className === 'string') ? param.className+'':'';
                 return names;
             },
-            getNxWidget:function(nxtype,newparams,domtag,defaultcss,defineProperty,defaultwatch){
-               var p = newparams; 
-            
-                 !p && (p = {});
-                var obj = {show:true,style:'',className:'',type:nxtype}
-                  , address = _scope.CreateWidgetName(nxtype)
-                  , className = _core.getClassName(p)+address
-                  , idName = p.idName?'id='+p.idName:'';
-                   var tempStyleStr = '';
-                    if(typeof p.className=='object'){
-                      tempStyleStr += p.className.style;
-                    }
-                     tempStyleStr+=defaultcss+(p.style?p.style:'');
-                  
-                     if(typeof p.showAni=='object'){
-                        tempStyleStr +='animation:'+p.showAni.ani+';';
-                     }
-                var _tempChild=[]; 
-                if(nxtype=='List'){
-                   var tempDataArr=p.data;
-                     /*jsonstr*/
-                        if(_typeof(p.data,'String')){
-                              try{
-                                 tempDataArr = JSON.parse(p.data)
-                              }
-                              catch(err){
-                                tempDataArr=[];
-                                console.error('data 中 JSON 格式出错')
-                              }
-                            }
-                       if(_typeof(tempDataArr,'Array')&& tempDataArr.length>0 && typeof p.item === 'function'){
-                                  
-                                    SparkUtil.traverse(tempDataArr,function(tempDataItem,index,end){
-                                        var _widget = p.item(tempDataItem,index);
-                                            _widget.listIndex=index;
-                                            _tempChild.push(_widget);
-                                    })
-    
-                        }
-                }
-                      
-                  
-                Object.assign(obj, p);  
-                obj.name = address;
-                obj.tag =  p.tag || domtag;
-                obj.html = nxtype=='Image'?
-                            '<img '+idName+' class="' + className + '" src="'+p.imgurl+'" />'
-                            : '<'+obj.tag+' '+idName+' class="' + className + '">'+(nxtype=='Text'?p.text+'[[' + address + ']]':'[[' + address + ']]')+'</'+obj.tag+'>';
-                obj.styleObj = _scope.CSS.strStyleToObj(tempStyleStr);
-
-                obj.style = _scope.CSS.objStyleToStr(obj.styleObj);
-                
-                obj.child = _core.getAddress(nxtype=='List'?_tempChild:p.child,obj.name);
-     
-                _scope.WidgetCache[address] = obj;
-
-               if(nxtype=='List'){
-                  
-                  _scope.WidgetCache[address].clear=function(){
-                         this.delete(0,this.data.length);
-                         return this;
-                   }
-                  _scope.WidgetCache[address].delete =function(index,howmany,noani){
+            getDomEvent:function(type){
+                   var DomEvent = {
+                        clear:function(){
+                   
+                            this.delete(0,this.data.length);
+                            return this;
+                        },
+                        delete:function(index,howmany,noani){
                             var tempChild = this.child.slice(0);
                             var delAdress = tempChild.splice(index,howmany);
                             var _this =this;
                                SparkUtil.traverse(delAdress,function(item,index,end){
                                       var delTarget=SparkCoreManage.getAddressData(item);
-                                          
-                                          // var removeTimer=setTimeout(function(){
-                                          //      clearTimeout(removeTimer); 
                                                   delTarget.remove('',noani);
                                                   tempChild = delAdress = null;
-                                            // })
-                                 /* if(delTarget.hideAni && delTarget.hideAni.ani && !noani){
-                                        delTarget.style='animation:'+delTarget.hideAni.ani;
-                                        var removeTimer=setTimeout(function(){
-                                           clearTimeout(removeTimer);
-                                             delTarget.remove();
-                                           
-                                           if(end){
-                                              tempChild = delAdress = null;
-                                            }
-                                         },delTarget.hideAni.time)
-                                     }else{
-                                      var removeTimer=setTimeout(function(){
-                                         clearTimeout(removeTimer);
-                                         delTarget.remove();
-                                        tempChild = delAdress = null;
-                                      })
-                                    }*/
-                                    
                                })
                           return this;
 
-                     }
-
-                      
-                  _scope.WidgetCache[address].insertFirst=function(newdata,noani){
+                        },
+                        insertFirst:function(newdata,noani){
                            if(_typeof(newdata,'Undefined') || _typeof(newdata,'Null')){
                                   console.warn('no data');return;
                             }
@@ -766,8 +703,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                              this.prepend(tempWidget);
                              tempWidget = newdatas = null;
                              return this;
-                     }
-                  _scope.WidgetCache[address].insertLast=function(newdata,noani){
+                     },
+                     insertLast:function(newdata,noani){
                              if(_typeof(newdata,'Undefined') || _typeof(newdata,'Null')){
                                   console.warn('no data');return;
                             }
@@ -793,8 +730,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                              this.append(tempWidget);
                              tempWidget = newdatas = null;
                              return this;
-                     }
-                  _scope.WidgetCache[address].insert=function(index,newdata,noani){
+                     },
+                     insert:function(index,newdata,noani){
                         
                             if(_typeof(newdata,'Undefined') || _typeof(newdata,'Null')){
                                   console.warn('no data');return;
@@ -830,9 +767,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                             tempWidget = newdatas = null;
 
                             return this;
-                     }
-
-                  _scope.WidgetCache[address].update=function(index,newdata){
+                     },
+                     update:function(index,newdata){
                         if(_typeof(newdata,'Undefined') || _typeof(newdata,'Null') || index>this.data.length-1){
                                   console.warn('no data or not found');return;
                             }
@@ -851,25 +787,15 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                     
                      return this;
 
-                  }   
-
-               }
-
-               /*添加子集元素*/
-               if(nxtype!='Image'){
-            
-                  _scope.WidgetCache[address].append =function(newdoms,set){
-
+                   },
+                    append:function(newdoms,set){
                             return SparkCoreManage.addDom(this,newdoms,'append',set)
-
-                  }
-                  _scope.WidgetCache[address].prepend =function(newdoms,set){
+                    },
+                    prepend:function(newdoms,set){
 
                             return SparkCoreManage.addDom(this,newdoms,'prepend',set)
-                  }
-                 
-
-                  _scope.WidgetCache[address].removeChild= function(deldom,set){
+                    },
+                    removeChild:function(deldom,set){
                                  var _this = this,
                                      tempWidget =null;
                                
@@ -895,21 +821,15 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                    }
                            
                          return this;
-                       }
-
-                }
-
-                 /*指定元素插入*/
-                   _scope.WidgetCache[address].after =function(newdoms,set){
+                       },
+                       after:function(newdoms,set){
 
                             return SparkCoreManage.addDom(this,newdoms,'after',set)
-                   }
-                   _scope.WidgetCache[address].before =function(newdoms,set){
+                       },
+                       before:function(newdoms,set){
                             return SparkCoreManage.addDom(this,newdoms,'before',set)    
-                    
-                   }
-                /*删除*/
-                 _scope.WidgetCache[address].remove =function(set,noani){
+                       },
+                       remove:function(set,noani){
                           var tempWidget = this;
                           var aniSet = set ||  this.hideAni; 
 
@@ -944,29 +864,141 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                 }
                             }
                 
-                     // return this;
-                }
-                /*数据变化监听*/
-                defineProperty && _core.defineProperty(address, defineProperty);
-              
-                if(nxtype=='Page'){
-                   _scope.PageCache.push(address);
-                   /*开始渲染*/
-                   console.time("Render");
-                   _scope.SparkRender();
-                   console.timeEnd("Render");
-                }
-              
-              obj = null; 
-              return _scope.WidgetCache[address]
+                      // return this;
+                    }   
 
+
+                   };
+
+                   return DomEvent[type];
             },
-            defineProperty: function(address, arr) {
+            getKeyValue:function(type){
+                 var keyFn={
+                      html:function(){
+                          var idName = this.idName?'id='+this.idName:'';
+                          var className = _core.getClassName(this)+this.name;
 
+                          return  this.type=='Image'?
+                            '<img '+idName+' class="'+className+'" src="'+this.imgurl+'" />'
+                            : '<'+this.tag+' '+idName+' class="'+className+'">'+
+                            (this.type=='Text'?this.text+'[['+this.name+']]':'[['+this.name+']]')+'</'+this.tag+'>';
+                      },
+                      style:function(){
+                               var tempStyleStr = '';
+                                 if(typeof this.className=='object'){
+                                  tempStyleStr += this.className.style;
+                                 }
+                                 tempStyleStr+=this.defaultcss+(this.style?this.style:'');
+                              
+                                 if(typeof this.showAni=='object'){
+                                    tempStyleStr +='animation:'+this.showAni.ani+';';
+                                 }
+                                
+                             delete this.defaultcss;
+                             return  tempStyleStr;
+
+                      },
+                      child:function(){
+                        
+                           var _tempChild=[]; 
+                           var _this = this;
+                            if(this.type=='List'){
+                               var tempDataArr=this.data;
+                                 /*jsonstr*/
+                                    if(_typeof(this.data,'String')){
+                                          try{
+                                             tempDataArr = JSON.parse(this.data)
+                                          }
+                                          catch(err){
+                                            tempDataArr=[];
+                                            console.error('data 中 JSON 格式出错')
+                                          }
+                                        }
+                                   if(_typeof(tempDataArr,'Array')&& tempDataArr.length>0 && typeof this.item === 'function'){
+                                              
+                                                SparkUtil.traverse(tempDataArr,function(tempDataItem,index,end){
+                                                    var _widget = _this.item(tempDataItem,index);
+                                                        _widget.listIndex=index;
+                                                        _tempChild.push(_widget);
+                                                })
+                
+                                       }
+                                }
+
+                          return _core.getAddress(this.type=='List'?_tempChild:this.child,this.name);
+                      }
+                 }
+
+                 return keyFn[type].call(this);
+            },
+            setDefineProperty: function(address, arr) {
                 _scope.WidgetDefineProperty(address.indexOf('Css') != -1 ? _scope.CSSCache[address] : _scope.WidgetCache[address], arr);
             },
-            defaultParams: {}
-        }
+            getNxWidget:function(nxtype,newparams,domtag,defaultcss,defineProperty){
+               
+                var p = !newparams?{}:newparams;
+                var NEW_WIDGET = {
+                                 name:_scope.CreateWidgetName(nxtype),
+                                 show:true,
+                                 style:'',
+                                 className:'',
+                                 type:nxtype,
+                                 defaultcss:defaultcss,
+                                 tag:p.tag || domtag
+                                };
+             
+                Object.assign(NEW_WIDGET, p); 
+
+                NEW_WIDGET.styleObj = _scope.CSS.strStyleToObj(_core.getKeyValue.call(NEW_WIDGET,'style'));
+
+                NEW_WIDGET.style = _scope.CSS.objStyleToStr(NEW_WIDGET.styleObj);
+
+                NEW_WIDGET.html = _core.getKeyValue.call(NEW_WIDGET,'html');
+
+                NEW_WIDGET.child =  _core.getKeyValue.call(NEW_WIDGET,'child');
+
+               if(NEW_WIDGET.type === 'List'){
+                  NEW_WIDGET.clear = _core.getDomEvent.call(NEW_WIDGET,'clear');
+                  NEW_WIDGET.delete = _core.getDomEvent.call(NEW_WIDGET,'delete');
+                  NEW_WIDGET.insertFirst = _core.getDomEvent.call(NEW_WIDGET,'insertFirst');
+                  NEW_WIDGET.insertLast = _core.getDomEvent.call(NEW_WIDGET,'insertLast');
+                  NEW_WIDGET.insert = _core.getDomEvent.call(NEW_WIDGET,'insert');
+                  NEW_WIDGET.update = _core.getDomEvent.call(NEW_WIDGET,'update');
+               }
+
+               /*添加子集元素*/
+               if(NEW_WIDGET.type != 'Image'){
+                   NEW_WIDGET.append = _core.getDomEvent.call(NEW_WIDGET,'append');
+                   NEW_WIDGET.prepend = _core.getDomEvent.call(NEW_WIDGET,'prepend');
+                   NEW_WIDGET.removeChild = _core.getDomEvent.call(NEW_WIDGET,'removeChild');
+
+                }
+
+                 /*指定元素插入*/
+                  NEW_WIDGET.after = _core.getDomEvent.call(NEW_WIDGET,'after');
+                  NEW_WIDGET.before = _core.getDomEvent.call(NEW_WIDGET,'before');
+                 /*删除元素*/
+                  NEW_WIDGET.remove = _core.getDomEvent.call(NEW_WIDGET,'remove');
+                 
+                 _scope.WidgetCache[NEW_WIDGET.name] = NEW_WIDGET;
+
+                 /*数据变化监听*/
+                 defineProperty && _core.setDefineProperty(NEW_WIDGET.name, defineProperty);
+              
+                  if(nxtype=='Page'){
+                     _scope.PageCache.push(NEW_WIDGET.name);
+                     /*开始渲染*/
+                     console.time("Render");
+                     _scope.SparkRender();
+                     console.timeEnd("Render");
+                  }
+
+                
+
+              return NEW_WIDGET;
+
+            }
+        };
 
         return {
             Css: function(p) {
@@ -979,7 +1011,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 obj.style = _scope.CSS.objStyleToStr(obj.styleObj);
 
                 _scope.CSSCache[address] = obj;
-                _core.defineProperty(address, ['style']);
+                _core.setDefineProperty(address, ['style']);
                 obj = 0;
                 return _scope.CSSCache[address];
             },
@@ -990,7 +1022,6 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     'div',
                                     'position:relative;',
                                     ['style','child','className','show'],
-                                    false 
                                     );
             },
             Text: function(str, p) {
@@ -1003,7 +1034,6 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     'span',
                                     '',
                                     ['text','style','className','show'],
-                                    true 
                                     );
             },
             Image: function(src,p) {
@@ -1014,47 +1044,42 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     '',
                                     'border:0;',
                                     ['style','className','show'],
-                                    false 
                                     );
             },
             Box: function(p) {
                
-
                 return _core.getNxWidget('Box',
                                     p,
                                     'div',
                                     'background-color:#3D3F3F;',
                                     ['style','child','className','show'],
-                                    false 
                                     );
             },
-            Stack:function(p) {
-               
 
-                return _core.getNxWidget('Stack',
-                                    p,
-                                    'div',
-                                    'position:relative;background-color:#3D3F3F;',
-                                    ['style','child','show'],
-                                    false 
-                                    );
-            },
             List:function(p){
                return _core.getNxWidget('List',
                                     p,
                                     'ul',
                                     '',
                                     ['style','child','show'],
-                                    false 
                                     );
             },
-            Drag: function(p) {
+            Drag:function(p) {
                 return _core.getNxWidget('Drag',
                                     p,
                                     'div',
                                     '',
                                     null,
-                                    false 
+                                    ['style','show'],
+                                    );
+            },
+            Stack:function(p) {
+               
+                return _core.getNxWidget('Stack',
+                                    p,
+                                    'div',
+                                    'position:relative;background-color:#3D3F3F;',
+                                    ['style','show'],
                                     );
             },
             Position:function(p) {
@@ -1062,12 +1087,18 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     p,
                                     'div',
                                     'position:absolute;background-color:#3D3F3F;',
-                                    null,
-                                    false,
-                                    ['style', 'child'] 
+                                    ['style','show'] 
                                     );
             },
-            // moreWiget...
+            Fixed:function(p) {
+              return _core.getNxWidget('Fixed',
+                                    p,
+                                    'div',
+                                    'position:fixed;background-color:#3D3F3F;',
+                                    ['style','show'] 
+                                    );
+            },
+            //moreWiget...
         }
 }
 
@@ -1134,7 +1165,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                tempObj[cssParamItem+param] = value;
                            })
                          }
-                         /*
+                         /* xcss值兼容匹配
                            var cssValue = this.autoprefixerConfig.value[value];
                            var cssValue = '',cssValueKey='';
                            for(var key in this.autoprefixerConfig.value){
@@ -1143,14 +1174,12 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                               cssValue = this.autoprefixerConfig.value[key];
                             }
                            }
-                         
                            if(cssValue){
                               SparkUtil.traverse(cssValue,function(cssValueItem,index,end){
                                 tempObj[param] = cssValueItem;
                                  tempObj[param] = value.replace(new RegExp(cssValueKey,'ig'),cssValueItem);
                               })
                             }
-
                            str.replace(new RegExp('transition','ig'),'-webkit-transition');
                          */
              }
@@ -1441,7 +1470,7 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
              /*add dom way 2 */
             after_before:function(el,abTarget,newel,type){
                         var _this = this;
-                         if(_typeof(el,'HTMLCollection')){
+                        if(_typeof(el,'HTMLCollection')){
                               SparkUtil.traverse(domTarget.$el.length,function(index,end){
                           
                                    var tempDom = document.createElement("div");
@@ -1462,7 +1491,7 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                                      }
 
                                })
-                        }else{
+                         }else{
                                      var parentNode = abTarget.parentNode;
 
                                     if(type == 'after'){
@@ -1478,10 +1507,9 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                                         parentNode.insertBefore(newel.firstChild,abTarget);                          
                                         _scope.addWidgetEvent(abTarget.previousElementSibling, _this._rootAdress);
                                      }
-                      }
+                          }
                                
             },
-
             /*add render complete function*/
             renderComplete:function(address){
                   var _this = this;
@@ -1560,9 +1588,7 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                     _this._css +=SparkUtil.trim(c+h);
                   }
 
-            },
-           
-          
+            },     
             /*default add event*/
             initPushEvent: function(noIgnoreRootAdress) {
 
@@ -1633,11 +1659,9 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
 
             }
         };
-       
+
         try{
-           
            _core.render();
-          
         }catch(e){
           console.error(e)
         }
@@ -1687,7 +1711,6 @@ SparkCoreHandler.prototype.clearWidget = function(_Widget){
        })
         
     }
-    //正在coding。。。。。。。
 }
 
 /**
@@ -1716,7 +1739,7 @@ SparkCoreHandler.prototype.updateListIndex = function(_ListWidget){
 
       var _thisWidget=_scope.getAddressData(item);
            if(_thisWidget){
-              _thisWidget.listIndex && (_thisWidget.listIndex=index);
+              _thisWidget.listIndex=index;
               _thisWidget.init && _thisWidget.init();
               _core(_thisWidget,index)
           }
@@ -1953,6 +1976,7 @@ function Spark(params){
         };
 
         this.env=SparkUtil.env;
+        this.screen = SparkUtil.screen
        
  
 }
@@ -1984,6 +2008,56 @@ Spark.prototype.prepend =function(target,newdoms){
 Spark.prototype.remove =function(target,deldom){
   
   return SparkCoreManage.remove(target,deldom)
+}
+/*回到顶部*/
+Spark.prototype.scrollTop = function(val,time){
+    
+    var scrollTop = this.screen.scrollTop();
+    val = (val === 'bottom')?this.screen.scrollHeight()-this.screen.height():val;
+    val = (val === 'top')?0:val;
+  
+    if(scrollTop==val)return;     
+    var up  = scrollTop>val?true:false;
+    var speed = parseInt(((Math.abs(scrollTop-val))/time)*100)+1;
+    var TempSpeed =speed;
+    var Timer = null;
+    var stime = 0;
+    var run = function(){
+       Timer = setTimeout(function(){
+              
+                up?scrollTop-=speed:scrollTop+=speed;
+             
+                stime = 30;
+                speed = speed>parseInt(TempSpeed*0.2)?speed-speed/4:speed;
+              
+               if(up){
+                 if(scrollTop>val){
+                   run()
+                 }
+                 if(scrollTop<=val){
+                   clearTimeout(Timer);
+                   scrollTop = val;
+                 }
+               }else{
+
+                   if(val>scrollTop){
+                    run()
+                   }
+                  if(scrollTop>=val){
+                    clearTimeout(Timer);
+                     scrollTop = val;
+                  }
+                  
+               }
+
+               document.body.scrollTop = document.documentElement.scrollTop = scrollTop;
+                
+          },stime)
+     }
+    
+    run();
+ 
+       
 }
 
 
