@@ -2013,8 +2013,10 @@ Spark.prototype.remove =function(target,deldom){
 Spark.prototype.scrollTop = function(val,time){
     
     var scrollTop = this.screen.scrollTop();
+    time= time?time:500;
     val = (val === 'bottom')?this.screen.scrollHeight()-this.screen.height():val;
     val = (val === 'top')?0:val;
+
   
     if(scrollTop==val)return;     
     var up  = scrollTop>val?true:false;
