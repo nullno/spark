@@ -377,7 +377,6 @@ var SparkUtil = {
                       }
                     }
         },
-        /*splice 插入数组*/
 
 
 
@@ -494,7 +493,7 @@ function SparkCoreHandler(){
             
                  var aniSet = obj.hideAni;
 
-                    if(!nval && aniSet && aniSet.ani){
+                     if(!nval && aniSet && aniSet.ani){
                             obj.style='animation:'+aniSet.ani;
                             var removeTimer=setTimeout(function(){
                                      clearTimeout(removeTimer);
@@ -502,11 +501,9 @@ function SparkCoreHandler(){
                                               
                               },aniSet.time);
                       }else{
-                          obj.style='animation:'+obj.showAni.ani+';';
                           obj.style='r_d_n';
-                     }
+                       }
                      
-           // obj.style=nval?'r_d_n':'display:none;';
               return nval;
           },
           style: function(oval, nval, obj) {
@@ -1041,7 +1038,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                   p.imgurl=src;
                   return _core.getNxWidget('Image',
                                     p,
-                                    '',
+                                    'img',
                                     'border:0;',
                                     ['style','className','show'],
                                     );
@@ -1065,16 +1062,18 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     );
             },
             Drag:function(p) {
+                !p && (p = {});
+                var event = {press:function(){},move:function(){},up:function(){}};
+                p.on=p.on?Object.assign(event,p.on):event;
+                p.position={x:0,y:0};
                 return _core.getNxWidget('Drag',
                                     p,
                                     'div',
-                                    '',
-                                    null,
+                                    'position:fixed;background-color:#3D3F3F;',
                                     ['style','show'],
                                     );
             },
             Stack:function(p) {
-               
                 return _core.getNxWidget('Stack',
                                     p,
                                     'div',
@@ -1310,18 +1309,73 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
         _cssStr && this.CSS.add('NextCss-'+address, _cssStr);
  } 
 
+/**
+ * [specialWidgetEvent 特殊组件事件]
+ * @AuthorHTL
+ * @DateTime  2020-09-21T15:23:23+0800
+ * @return    {[type]}                 [description]
+ */
+ SparkCoreHandler.prototype.specialWidgetEvent = function(type){
+      
+      var spfn = {
+                 'Drag':{
+                     status:0,
+                     container:document.body,
+                     _this:null,
+                     start: function(ev,target){
+                          spfn.Drag._this = this;
+                          var touch = ev.targetTouches && ev.targetTouches[0];
+                          
+                          var screen = touch || ev;
+                          this.position.startX=screen.clientX - target.offsetLeft
+                          this.position.startY=screen.clientY - target.offsetTop
+                          spfn.Drag.status=1;
+                          this.on['press'].call(this);
+                          addEventListener(spfn.Drag.container,SparkUtil.env.isMobile ? 'touchmove' : 'mousemove',spfn.Drag.move)
+                         
+                     },
+                     move:function(e,target){
+                       var ev = e || window.event;
+                       var _this = spfn.Drag._this;
+                      if(spfn.Drag.status){
+                        var touch = ev.targetTouches && ev.targetTouches[0];
+                        var screen = touch || ev;
+                        
+                          _this.position.x=screen.clientX - _this.position.startX;
+                          _this.position.y=screen.clientY - _this.position.startY;
+                     
+                          _this.style='left:'+_this.position.x+'px;top:'+_this.position.y+'px;';
+ 
+                          _this.on['move'].call(_this);
+                      }    
+                     },
+                     end:function(target){
+                       var _this = spfn.Drag._this;
+                           spfn.Drag.status=0;
+                           _this.on['up'].call(_this);
+                          removeEventListener(spfn.Drag.container,spfn.Drag.move)
+                     }  
+                 }
+                  
+                }
+
+      return spfn[type];
+
+ }
+
   /**
- * [addEvent 注册组件事件]
+ * [addEvent 注册基本组件事件]
  * @AuthorHTL
  * @DateTime  2020-04-05T04:21:49+0800
  */
  SparkCoreHandler.prototype.addWidgetEvent  = function(target, node) {
         node = this.getAddressData(node);
+        if(!node.on)return;
 
-        if(!node.on){
-          return;
-        }
-        if (node.on['click']) {
+        var spfn = this.specialWidgetEvent(node.type);
+        
+
+        if(node.on['click']){
             addEventListener(target,'click',node.debounce ? SparkUtil.debounce(function() {
                 node.on['click'](node);
             }, 100) : function(e){
@@ -1330,22 +1384,42 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
 
             },{capture:false,passive:true})
         }
-        if (node.on['down']) {
+        if(node.on['press']){
 
            addEventListener(target,SparkUtil.env.isMobile ? 'touchstart' : 'mousedown', function(e){
                  e.stopPropagation();
-                 node.on['press'].call(node);
+                 if(node.type == 'Drag' && spfn){
+                    var ev = e || window.event;
+                    spfn.start.call(node,ev,target)
+                 }else{
+                    node.on['press'].call(node);
+                 }
             },{capture:true,passive:true});
            
         }
-        if (node.on['up']) {
+        if(node.on['move'] && node.type != 'Drag'){
+         
+           addEventListener(target,SparkUtil.env.isMobile ? 'touchmove' : 'mousemove', function(e){
+                   e.stopPropagation();
+                   node.on['move'].call(node);
+              
+            },{capture:true,passive:true});
+           
+        }
+        if(node.on['up']){
            addEventListener(target,SparkUtil.env.isMobile ? 'touchend' : 'mouseup', function(e){
                  e.stopPropagation();
-                 
-                 node.on['up'].call(node);
+                if(node.type == 'Drag' && spfn){
+                    var ev = e || window.event;
+                    spfn.end.call(node,ev,target)
+                 }else{
+                    node.on['up'].call(node);
+                 }
+
             },{capture:true,passive:true});
           
         }
+  
  }
 
 /**
@@ -1517,7 +1591,7 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                   var nodeList = document.getElementsByClassName(address); 
                     
                   node.$el=nodeList.length>1?nodeList:nodeList[0];  
-                  node.init && node.init();
+                  
                   
                   // set hide
                   if(node.show!=undefined && !node.show){
@@ -1542,14 +1616,38 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                   }else if(!init && !node.parentName){
                       node.parentName=domTarget.name
                   }  
+                  
+                  //drag type
+                  if(node.type==='Drag'){
+                      node.position={
+                                     x:parseInt(node.styleObj['left']),
+                                     y:parseInt(node.styleObj['top']),
+                                     startX:parseInt(node.styleObj['left']),
+                                     startY:parseInt(node.styleObj['top']),
+                                   }
+                  }
 
+                  //default fn
+                  node.width=function(val){
+                       if(val){
+                          node.style='width:'+val+';'
+                       }else{
+                         return parseInt(node.styleObj['width'] || node.$el.offsetWidth)
+                       }
+                  };
+                  node.height=function(val){
+                        if(val){
+                          node.style='height:'+val+';'
+                       }else{
+                         return parseInt(node.styleObj['height'] || node.$el.offsetHeight)
+                       }
+                  };
+                   
+                  node.init && node.init();
                   if(node.child && node.child.length>0){
                      SparkUtil.traverse(node.child,function(nodeItem,index,end){
                        _this.renderComplete(nodeItem);
                      })
-                      // for(var i=0;i<node.child.length;i++){
-                      //    _this.renderComplete(node.child[i]);
-                      // }
                    }    
             },
             /*dom tree*/
@@ -1784,6 +1882,11 @@ SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype,set){
            nodeArr.push(newdoms);
        }
        SparkUtil.traverse(nodeArr,function(item,index,end){
+            
+            if(!_scope.getAddressData(item.name)){
+              //remove 后可以复用
+              _scope.WidgetCache[item.name] = item;
+            }
             var aniSet = set || item.showAni;
             if(aniSet && aniSet.ani){
                item.style = 'animation:'+aniSet.ani+';';
@@ -2014,10 +2117,10 @@ Spark.prototype.scrollTop = function(val,time){
     
     var scrollTop = this.screen.scrollTop();
     time= time?time:500;
+    val = val?val:0;
     val = (val === 'bottom')?this.screen.scrollHeight()-this.screen.height():val;
     val = (val === 'top')?0:val;
 
-  
     if(scrollTop==val)return;     
     var up  = scrollTop>val?true:false;
     var speed = parseInt(((Math.abs(scrollTop-val))/time)*100)+1;
@@ -2029,7 +2132,7 @@ Spark.prototype.scrollTop = function(val,time){
               
                 up?scrollTop-=speed:scrollTop+=speed;
              
-                stime = 30;
+                stime = 20;
                 speed = speed>parseInt(TempSpeed*0.2)?speed-speed/4:speed;
               
                if(up){
@@ -2056,10 +2159,7 @@ Spark.prototype.scrollTop = function(val,time){
                 
           },stime)
      }
-    
-    run();
- 
-       
+    run(); 
 }
 
 

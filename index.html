@@ -9,7 +9,7 @@
 <script src="./spark.js"></script>
 <script>
     /**
-     * demo202009019 [拖动容器]  
+     * demo202009021 [拖动容器,slide]  
      */
 	var SparkApp = new Spark({});
 
@@ -78,6 +78,7 @@
      		click:function(_this){
                  activeText.text='append';
                  useCode.text='后置追加元素：\n\n方法1:targetContainer.append([node1,node1]);\n方法2：SparkApp.append(targetContainer,[node1,node1]);';
+                 console.log(node1)
                  targetContainer.append([node1,node1]);  
 
                
@@ -112,7 +113,7 @@
      })
       
       /*after()*/
-       var btnAfter = SparkApp.Box({
+    var btnAfter = SparkApp.Box({
      	tag:'button',
      	style:'background-color:green;left:100px;',
      	className:bthcss,
@@ -206,8 +207,7 @@
     
     var listStyle = SparkApp.Css('margin:5px;padding:5px;background-color:#666;');//animation: fadeInLeft 500ms both;
     
-  
-  /*  */
+
     var  List = SparkApp.List({
           data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
           style:'width:100%;margin:0px auto;padding:5px;padding-bottom:100px;overflow:hidden;',
@@ -305,11 +305,10 @@
                         on:{
                             click(){
                              
-                              useCode.text="链式调用删除替换:\n\n List.delete(1,1).insert(1,<data>)";
+                              useCode.text="更新数据:\n\n List.update(index,<newdata>)";
                               
                               List.update(List.data.length-1,{a:'hellllllll',c:{f:'666666'}})
-                              // List.delete(1,1).insert(1,[{a:'itemkkkkkk',b:'hello spark'+Math.random(0,100)*10}]);
-                               
+                     
                             }
                         }
                       }),
@@ -333,46 +332,75 @@
        var title3 =  SparkApp.Text('层叠容器：',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
 
-
        var Stack1 = SparkApp.Stack({
            style:'width:50%;height:300px;background:#fff;',
            child:[
                   SparkApp.Position({
                    style:'width:100px;height:100px;background:blue;'
                   }),
-                   SparkApp.Position({
+                  SparkApp.Position({
                        style:'width:100px;height:100px;background:pink;left:20px;top:20px;'
                    })
             ]
        })
-      /*层叠容器：*/  
-     var  wrap3 = SparkApp.Box({
-           className:wrapcss,  
-           style:'min-height:300px;height:auto;',
-           child:[Stack1]
-       })
+        /*层叠容器：*/  
+       var  wrap3 = SparkApp.Box({
+             className:wrapcss,  
+             style:'min-height:300px;height:auto;',
+             child:[Stack1]
+         })
 
-   var backTop1  = SparkApp.Fixed({
-              style:'min-width:20px;height:50px;line-height:50px;border-radius:10px 0 0 0; background:yellowgreen;right:0;bottom:0;',
-              child:[SparkApp.Text('回到顶部')],
+       /*可拖动容器*/
+       var Drag1 = SparkApp.Drag({
+              style:'width:100px;height:100px;background:#FF4B08;border-radius:100px;left:100px;top:0;',
+              bounded:'',//约束
+              init:function(){
+                 
+              },
+              on:{
+                press:function(){
+                    console.log(this.position)
+                },
+                move:function(){
+                    console.log(this.position)
+                },
+                up:function(){
+                     console.log(this)
+                }
+              }
+       })
+      
+
+
+      var backTop1  = SparkApp.Fixed({
+              style:'width:50px;height:50px;border-radius:50px;padding:9px; background:yellowgreen;right:20px;bottom:20px;',
+              child:[SparkApp.Text('回到<br>顶部')],
               on:{
                 click:function(){
-                  SparkApp.scrollTop(0,400);
+                  SparkApp.scrollTop(0,500);
                 }
               }
        })
 
 
-     SparkApp.Page({
-     	style:'width:100%;min-height:100vh;background-color:#272822;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
-     	child:[title1,wrap,title2,wrap2,title3,wrap3,backTop1],
-        on:{
+    var page = SparkApp.Page({
+     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#272822;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
+      showAni:{ani:'fadeIn 500ms  both'},
+     	// child:[title1,wrap,title2,wrap2,title3,wrap3,backTop1,Drag1],
+      child:[Drag1]
+       /* on:{
             click:function(){
                  useCode.text=  activeText.text = 'spark demo'; 
             }
-        },
+        },*/
        
      })
+
+   SparkApp.screen.resize(function(screen){
+        page.style='width:'+screen.width+'px;min-height:'+screen.height+'px;'
+
+   })
+
 </script>	
 </body>
 </html>
