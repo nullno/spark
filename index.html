@@ -78,7 +78,6 @@
      		click:function(_this){
                  activeText.text='append';
                  useCode.text='后置追加元素：\n\n方法1:targetContainer.append([node1,node1]);\n方法2：SparkApp.append(targetContainer,[node1,node1]);';
-                 console.log(node1)
                  targetContainer.append([node1,node1]);  
 
                
@@ -329,51 +328,53 @@
        });
 
 
-       var title3 =  SparkApp.Text('层叠容器：',{
+       var title3 =  SparkApp.Text('层叠容器/可拖动容器:',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
 
        var Stack1 = SparkApp.Stack({
-           style:'width:50%;height:300px;background:#fff;',
+           style:'width:50%;height:300px;background:#fff;overflow:hidden;',
            child:[
                   SparkApp.Position({
                    style:'width:100px;height:100px;background:blue;'
                   }),
                   SparkApp.Position({
-                       style:'width:100px;height:100px;background:pink;left:20px;top:20px;'
-                   })
+                       style:'width:100px;height:100px;background:pink;left:20px;top:20px;',
+                       child:[SparkApp.Text('不可越过边界')],
+                       on:{
+                        click(){
+
+                           shape1.bounded.out =!shape1.bounded.out;
+                           this.getChild(0).text=shape1.bounded.out?'不可越过边界':'可越过边界';
+                        },
+                       }
+                   }),
+                  shape1 = SparkApp.Drag({
+                     style:'width:100px;height:100px;background:#9300FF;border-radius:100px;',
+                     //约束条件
+                      bounded:{
+                          // y:true,//Y轴禁止拖动
+                          // x:true,//X轴禁止拖动
+                          parent:true,//父盒子约束,默认body
+                          out:true//禁止溢出边界
+
+                      },
+                  }) 
             ]
        })
-        /*层叠容器：*/  
+
+
+        /*层叠容器/可拖动容器：*/  
        var  wrap3 = SparkApp.Box({
              className:wrapcss,  
              style:'min-height:300px;height:auto;',
              child:[Stack1]
          })
 
+
        /*可拖动容器*/
-       var Drag1 = SparkApp.Drag({
-              style:'width:100px;height:100px;background:#FF4B08;border-radius:100px;left:100px;top:0;',
-              bounded:'',//约束
-              init:function(){
-                 
-              },
-              on:{
-                press:function(){
-                    console.log(this.position)
-                },
-                move:function(){
-                    console.log(this.position)
-                },
-                up:function(){
-                     console.log(this)
-                }
-              }
-       })
-      
-
-
-      var backTop1  = SparkApp.Fixed({
+       var scrollTop1 = SparkApp.Fixed({
               style:'width:50px;height:50px;border-radius:50px;padding:9px; background:yellowgreen;right:20px;bottom:20px;',
+              
               child:[SparkApp.Text('回到<br>顶部')],
               on:{
                 click:function(){
@@ -386,8 +387,7 @@
     var page = SparkApp.Page({
      	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#272822;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
       showAni:{ani:'fadeIn 500ms  both'},
-     	// child:[title1,wrap,title2,wrap2,title3,wrap3,backTop1,Drag1],
-      child:[Drag1]
+     	child:[title1,wrap,title2,wrap2,title3,wrap3,scrollTop1],
        /* on:{
             click:function(){
                  useCode.text=  activeText.text = 'spark demo'; 
@@ -397,7 +397,7 @@
      })
 
    SparkApp.screen.resize(function(screen){
-        page.style='width:'+screen.width+'px;min-height:'+screen.height+'px;'
+        page.style='min-height:'+screen.height+'px;'
 
    })
 
