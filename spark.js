@@ -366,10 +366,12 @@ var SparkUtil = {
             }
 
         },
-        /*数组中是否存在元素,并返回索引*/
+        /*数组中是否存在元素,并返回索引
+         compare:{a:原数组key,b:值}
+        */
         isInArray:function(arr,compare){
                     for(var i=0;i<arr.length;i++){
-                      if(((compare['a']?arr[i][compare['a']]:arr[i])==compare['b'])){
+                       if(((compare['a']?arr[i][compare['a']]:arr[i])==compare['b'])){
                          return i;
                       }
                       if(i==arr.length-1){
@@ -377,6 +379,18 @@ var SparkUtil = {
                       }
                     }
         },
+        /*数组中是否存在包含字符元素,并返回索引 模糊查找*/
+        isInArrayIncludes:function(arr,compare){
+              for(var i=0;i<arr.length;i++){
+                      if(SparkUtil.includes((compare['a']?arr[i][compare['a']]:arr[i]),compare['b'])){
+                     
+                         return i;
+                      }
+                      if(i==arr.length-1){
+                         return -1;
+                      }
+                    }
+        }
 
 
 
@@ -884,18 +898,19 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                             (this.type=='Text'?this.text+'[['+this.name+']]':'[['+this.name+']]')+'</'+this.tag+'>';
                       },
                       style:function(){
+
                                var tempStyleStr = '';
-                                 if(typeof this.className=='object'){
+                                 if(_typeof(this.className,'Object')){
                                   tempStyleStr += this.className.style;
                                  }
                                  tempStyleStr+=this.defaultcss+(this.style?this.style:'');
                               
-                                 if(typeof this.showAni=='object'){
+                                 if(_typeof(this.showAni,'Object')){
                                     tempStyleStr +='animation:'+this.showAni.ani+';';
                                  }
                                  if(this.type==='Drag'){
                                   if(this.bounded && this.bounded.parent){
-                                   tempStyleStr+='position:absolute;';
+                                    tempStyleStr+='position:absolute;';
                                   }
                                  }
                                 
@@ -906,32 +921,35 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                       },
                       child:function(){
                         
-                           var _tempChild=[]; 
+                           var _tempChild=[]; //过滤一下子集组件
                            var _this = this;
                             if(this.type=='List'){
                                var tempDataArr=this.data;
                                  /*jsonstr*/
                                     if(_typeof(this.data,'String')){
-                                          try{
-                                             tempDataArr = JSON.parse(this.data)
-                                          }
+                                          try{tempDataArr = JSON.parse(this.data);}
                                           catch(err){
                                             tempDataArr=[];
                                             console.error('data 中 JSON 格式出错')
                                           }
                                         }
-                                   if(_typeof(tempDataArr,'Array')&& tempDataArr.length>0 && typeof this.item === 'function'){
-                                              
+                                    if(_typeof(tempDataArr,'Array') && tempDataArr.length>0 && _typeof(this.item,'Function')){
                                                 SparkUtil.traverse(tempDataArr,function(tempDataItem,index,end){
                                                     var _widget = _this.item(tempDataItem,index);
                                                         _widget.listIndex=index;
                                                         _tempChild.push(_widget);
                                                 })
-                
                                        }
-                                }
+                            }else{
+                                 SparkUtil.traverse(this.child,function(widget,index,end){
+                                              if(_typeof(widget,'Object')  && widget.name){
+                                                 _tempChild.push(widget);
+                                              }
+                                   })
+                            }
 
-                          return _core.getAddress(this.type=='List'?_tempChild:this.child,this.name);
+
+                          return _core.getAddress(_tempChild,this.name);
                       }
                  }
 
@@ -941,20 +959,23 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 _scope.WidgetDefineProperty(address.indexOf('Css') != -1 ? _scope.CSSCache[address] : _scope.WidgetCache[address], arr);
             },
             getNxWidget:function(nxtype,newparams,domtag,defaultcss,defineProperty){
-               
+             
                 var p = !newparams?{}:newparams;
                 var NEW_WIDGET = {
                                  name:_scope.CreateWidgetName(nxtype),
                                  show:true,
                                  style:'',
                                  className:'',
-                                 type:nxtype,
+                                 type:nxtype,//
                                  defaultcss:defaultcss,
                                  tag:p.tag || domtag
                                 };
-             
-                Object.assign(NEW_WIDGET, p); 
 
+               /*pulic type handler*/
+
+      
+                Object.assign(NEW_WIDGET, p); 
+                
                 NEW_WIDGET.styleObj = _scope.CSS.strStyleToObj(_core.getKeyValue.call(NEW_WIDGET,'style'));
 
                 NEW_WIDGET.style = _scope.CSS.objStyleToStr(NEW_WIDGET.styleObj);
@@ -998,7 +1019,6 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                      _scope.SparkRender();
                      console.timeEnd("Render");
                   }
-
                 
 
               return NEW_WIDGET;
@@ -1074,7 +1094,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 !p && (p = {});
                 var event = {press:function(){},move:function(){},up:function(){}};
                 p.on=p.on?Object.assign(event,p.on):event;
-                p.position={x:0,y:0};
+                p.position={x:0,y:0,startX:0,startY:0};
                 return _core.getNxWidget('Drag',
                                     p,
                                     'div',
@@ -1104,6 +1124,74 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     'div',
                                     'position:fixed;background-color:#3D3F3F;',
                                     ['style','show'] 
+                                    );
+            },
+            Carousel:function(p) {
+               !p && (p = {});
+                var option = {
+                      direction:'horizontal',//horizontal(默认水平) || vertical(垂直)
+                     };
+                p.option=p.option?Object.assign(option,p.option):option;
+                p.activeIndex=0;
+                p.update = function(){
+                   var WrapperIndex = SparkUtil.isInArrayIncludes(this.child,{b:'CarouselWrapper'});
+                   if(WrapperIndex==-1)return;
+                   var w=this.width(),h=this.height();
+                   var Wrapper =  _scope.getAddressData(this.child[WrapperIndex]);
+                    this.style = 'overflow:hidden;position:relative;width:'+w+'px;height:'+h+'px;';
+                   
+                   /*设置*/
+                    Wrapper.bounded.x = (p.option.direction=='vertical')?true:false;
+                    Wrapper.bounded.y = (p.option.direction=='vertical')?false:true;
+
+                    var WrapperWidth = (p.option.direction=='vertical')?w:w*Wrapper.child.length;
+                    var WrapperHeight = (p.option.direction=='vertical')?h*Wrapper.child.length:h; 
+                    
+                    Wrapper.style='overflow:hidden;position:absolute;width:'+WrapperWidth+'px;height:'+WrapperHeight+'px;';
+                    
+                    SparkUtil.traverse(Wrapper.child,function(name,index,end){
+                       var _slide =  _scope.getAddressData(name);
+                           _slide.style='position:relative;width:'+w+'px;height:'+h+'px;'+(p.option.direction=='vertical'?'':'float:left;');
+                    })
+                
+                };
+              return _core.getNxWidget('Carousel',
+                                    p,
+                                    'div',
+                                    'position:relative;width:100%;height:100%;background-color:#3D3F3F;overflow:hidden;',
+                                    ['style','show'] 
+                                    );
+            },
+            CarouselWrapper:function(p) {
+              !p && (p = {});
+              /*a位置到b位置用时t*/
+              var run = function(a,b,t){
+
+              };
+                p.position={x:0,y:0,startX:0,startY:0};
+                p.bounded={
+                          y:true,//Y轴禁止拖动
+                          //x:true,//X轴禁止拖动
+                          parent:true,//父盒子约束,默认body
+                          out:false//禁止溢出边界
+                      };
+                p.type='Drag';
+                p.on = {
+                  press:function(){},
+                  move:function(){
+                    var _parentWidget = _scope.getAddressData(this.parentName);
+                    var a = this.width-Math.abs(this.position.x);
+                    var b = this.width/this.child.length*(_parentWidget.activeIndex+1)
+                         // run()
+                       console.log(this.position.x,this.position.y)
+                  },
+                  up:function(){}
+                };      
+              return _core.getNxWidget('CarouselWrapper',
+                                    p,
+                                    'div',
+                                    'width:100%;height:100%;position:absolute;background-color:#3D3F3F;overflow:hidden;',
+                                    ['style'] 
                                     );
             },
             //moreWiget...
@@ -1363,8 +1451,8 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                         var touch = ev.targetTouches && ev.targetTouches[0];
                         var screen = touch || ev;
                         
-                          _this.position.x=screen.clientX - _this.position.startX;
-                          _this.position.y=screen.clientY - _this.position.startY;
+                          _this.position.x=(_this.bounded && _this.bounded.x)?0:(screen.clientX - _this.position.startX);
+                          _this.position.y=(_this.bounded && _this.bounded.y)?0:(screen.clientY - _this.position.startY);
                           
                           //溢出边界
                           if(_this.bounded && _this.bounded.out){
@@ -1386,7 +1474,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                           //XY约束
                         var left = (_this.bounded && _this.bounded.x)?'':'left:'+_this.position.x+'px;',
                             top =  (_this.bounded && _this.bounded.y)?'':'top:'+_this.position.y+'px;';
-
+                            console.log(_this.position.x,_this.position.y)
                           _this.style=left+top;
  
                           _this.on['move'].call(_this);
@@ -1414,7 +1502,6 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
  SparkCoreHandler.prototype.addWidgetEvent  = function(target, node) {
         node = this.getAddressData(node);
         if(!node.on)return;
-
         var spfn = this.specialWidgetEvent(node.type);
         
 
@@ -1676,22 +1763,27 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                        if(val){
                           node.style='width:'+val+';'
                        }else{
-                         return parseInt(node.styleObj['width'] || node.$el.offsetWidth)
+                         //return parseInt(node.styleObj['width'] || node.$el.offsetWidth)
+                         return node.$el.offsetWidth;
                        }
                   };
                   node.height=function(val){
                         if(val){
                           node.style='height:'+val+';'
                        }else{
-                         return parseInt(node.styleObj['height'] || node.$el.offsetHeight)
+                         // return parseInt(node.styleObj['height'] || node.$el.offsetHeight)
+                         return node.$el.offsetHeight;
                        }
                   };
                   node.getChild = function(index){
                       if(node.child.length<=0)return;
                       return _scope.getAddressData(node.child[index]);
                   };
-
-                   
+                  
+                  /*轮播图执行*/
+                  if(node.type==='Carousel'){
+                     node.update();
+                   }  
                   node.init && node.init();
                   if(node.child && node.child.length>0){
                      SparkUtil.traverse(node.child,function(nodeItem,index,end){

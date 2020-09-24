@@ -9,7 +9,7 @@
 <script src="./spark.js"></script>
 <script>
     /**
-     * demo202009021 [拖动容器,slide]  
+     * demo202009021 [Slide，Dialog]  
      */
 	var SparkApp = new Spark({});
 
@@ -213,7 +213,7 @@
           item:function(item,index){
             return SparkApp.Box({
                 tag:'li',
-                style:'margin:5px;padding:5px;background-color:#666;',
+                style:'margin:5px;padding:5px;background-color:#666;border:1px dashed #fff;',
                 className:listStyle,
                 showAni:{ani:'fadeInLeft 500ms  both'},
                 hideAni:{ani:'bounceOutRight 500ms both',time:222},
@@ -332,13 +332,19 @@
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
 
        var Stack1 = SparkApp.Stack({
-           style:'width:50%;height:300px;background:#fff;overflow:hidden;',
+           style:'width:50%;height:300px;background:#fff;overflow:hidden;float:left;',
            child:[
                   SparkApp.Position({
-                   style:'width:100px;height:100px;background:blue;'
+                   child:[SparkApp.Text('移动端不显示')],
+                   style:'width:100px;height:100px;background:blue;',
+                   show:SparkApp.env.isMobile?false:true,
                   }),
+                  !SparkApp.env.isMobile?SparkApp.Position({
+                   child:[SparkApp.Text('移动端不渲染')],
+                   style:'width:100px;height:100px;background:#FF8905;left:40px;top:40px;',
+                   }):null,
                   SparkApp.Position({
-                       style:'width:100px;height:100px;background:pink;left:20px;top:20px;',
+                       style:'width:100px;height:100px;background:pink;left:80px;top:80px;',
                        child:[SparkApp.Text('不可越过边界')],
                        on:{
                         click(){
@@ -358,20 +364,64 @@
                           out:true//禁止溢出边界
 
                       },
+                      on:{
+                      	move(){
+                      		Stack2.getChild(0).style='left:'+this.position.x+'px;top:'+this.position.y+'px;';
+                      	}
+                      }
                   }) 
             ]
        })
+
+       var Stack2 =SparkApp.Stack({
+		           style:'width:50%;height:300px;background:yellow;overflow:hidden;float:right;',
+		           child:[
+				          SparkApp.Position({
+		                   style:'width:100px;height:100px;background:#F7156A;border-radius:100px;',
+		                  })]
+		          })
 
 
         /*层叠容器/可拖动容器：*/  
        var  wrap3 = SparkApp.Box({
              className:wrapcss,  
              style:'min-height:300px;height:auto;',
-             child:[Stack1]
+             child:[Stack1,Stack2]
          })
 
 
-       /*可拖动容器*/
+      
+
+        /*简单轮播图：*/  
+        var title4 =  SparkApp.Text('轮播图:',{
+        tag:'h1',style:'width:90%;margin:0 auto;'}); 
+
+        var Carousel1 = SparkApp.Carousel({
+           style:'width:500px;height:100%;margin:0 auto;background-color:#fff;',
+           option:{
+           //	direction:'vertical',//vertical horizontal
+           },
+           child:[
+                SparkApp.CarouselWrapper({
+                	 style:'background:pink;',
+                	 child:[
+                
+			                 SparkApp.Box({style:'background:red;'}),
+			                 SparkApp.Box({style:'background:blue;'})
+           	           ] 
+           	   })
+           ]
+        })
+
+        var  wrap4 = SparkApp.Box({
+             className:wrapcss,  
+             style:'height:300px;',
+             child:[Carousel1]
+         })
+
+
+
+     /*返回顶部*/
        var scrollTop1 = SparkApp.Fixed({
               style:'width:50px;height:50px;border-radius:50px;padding:9px; background:yellowgreen;right:20px;bottom:20px;',
               
@@ -383,22 +433,14 @@
               }
        })
 
-
     var page = SparkApp.Page({
      	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#272822;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
-      showAni:{ani:'fadeIn 500ms  both'},
-     	child:[title1,wrap,title2,wrap2,title3,wrap3,scrollTop1],
-       /* on:{
-            click:function(){
-                 useCode.text=  activeText.text = 'spark demo'; 
-            }
-        },*/
-       
+        showAni:{ani:'fadeIn 500ms  both'},
+     	child:[title1,wrap,title2,wrap2,title3,wrap3,title4,wrap4,scrollTop1]
      })
 
    SparkApp.screen.resize(function(screen){
         page.style='min-height:'+screen.height+'px;'
-
    })
 
 </script>	
