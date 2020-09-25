@@ -355,7 +355,7 @@
                        }
                    }),
                   shape1 = SparkApp.Drag({
-                     style:'width:100px;height:100px;background:#9300FF;border-radius:100px;',
+                     style:'width:100px;height:100px;background:#9300FF;border-radius:100px;z-index:9;',
                      //约束条件
                       bounded:{
                           // y:true,//Y轴禁止拖动
@@ -366,8 +366,10 @@
                       },
                       on:{
                       	move(){
+                          // console.log(this.position.direction)
                       		Stack2.getChild(0).style='left:'+this.position.x+'px;top:'+this.position.y+'px;';
-                      	}
+                      	},
+                        
                       }
                   }) 
             ]
@@ -392,20 +394,22 @@
 
       
 
-        /*简单轮播图：*/  
-        var title4 =  SparkApp.Text('轮播图:',{
+        /*轮播图：*/  
+        var title4 =  SparkApp.Text('轮播图(coding....):',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
 
         var Carousel1 = SparkApp.Carousel({
            style:'width:500px;height:100%;margin:0 auto;background-color:#fff;',
            option:{
-           //	direction:'vertical',//vertical horizontal
+             //direction:'vertical',//vertical horizontal
+              // speed:1000,
+              autoPlay:true
            },
            child:[
                 SparkApp.CarouselWrapper({
                 	 style:'background:pink;',
                 	 child:[
-                
+                       SparkApp.Box({style:'background:yellow;'}),   
 			                 SparkApp.Box({style:'background:red;'}),
 			                 SparkApp.Box({style:'background:blue;'})
            	           ] 

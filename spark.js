@@ -1130,6 +1130,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                !p && (p = {});
                 var option = {
                       direction:'horizontal',//horizontal(默认水平) || vertical(垂直)
+                      speed:1000,
+                      autoPlay:false
                      };
                 p.option=p.option?Object.assign(option,p.option):option;
                 p.activeIndex=0;
@@ -1143,6 +1145,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                    /*设置*/
                     Wrapper.bounded.x = (p.option.direction=='vertical')?true:false;
                     Wrapper.bounded.y = (p.option.direction=='vertical')?false:true;
+            
 
                     var WrapperWidth = (p.option.direction=='vertical')?w:w*Wrapper.child.length;
                     var WrapperHeight = (p.option.direction=='vertical')?h*Wrapper.child.length:h; 
@@ -1164,29 +1167,119 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
             },
             CarouselWrapper:function(p) {
               !p && (p = {});
-              /*a位置到b位置用时t*/
-              var run = function(a,b,t){
 
-              };
                 p.position={x:0,y:0,startX:0,startY:0};
-                p.bounded={
-                          y:true,//Y轴禁止拖动
-                          //x:true,//X轴禁止拖动
-                          parent:true,//父盒子约束,默认body
-                          out:false//禁止溢出边界
-                      };
-                p.type='Drag';
+                p.bounded={y:true,parent:false,out:false};
+                p.type = 'Drag';
                 p.on = {
                   press:function(){},
                   move:function(){
-                    var _parentWidget = _scope.getAddressData(this.parentName);
-                    var a = this.width-Math.abs(this.position.x);
-                    var b = this.width/this.child.length*(_parentWidget.activeIndex+1)
-                         // run()
-                       console.log(this.position.x,this.position.y)
+                    // var _parentWidget = _scope.getAddressData(this.parentName);
+                
+                        
+                       // console.log(this.position.x,this.position.y)
                   },
-                  up:function(){}
-                };      
+                  up:function(){
+                     var _parentWidget = _scope.getAddressData(this.parentName);
+                     var activeIndex = _parentWidget.activeIndex;
+                     var add = true;//前进或后退
+                        if(this.position.direction=='left' || this.position.direction=='up'){
+                           activeIndex = activeIndex+1;
+                           add=true;
+                           if(activeIndex>this.child.length-1){
+                             add=false;
+                             activeIndex=this.child.length-1;
+                           }
+                        }
+                        if(this.position.direction=='right' || this.position.direction=='down'){
+                           activeIndex = activeIndex-1;
+
+                           add=false;
+                           if(activeIndex<0){
+                             add=true;
+                             activeIndex=0;
+                           }
+                        }
+                     
+  
+                    var p = {
+                         a:{x:this.position.x,y:this.position.y},
+                         b:{x:this.bounded.y?(-this.width()/this.child.length*activeIndex):0,y:this.bounded.x?(-this.height()/this.child.length*activeIndex):0}
+                    }   
+                     
+                         this.displacement(p,add,_parentWidget.option.speed,activeIndex) 
+
+                  }
+                }; 
+                /*位移函数计算*/
+                p.displacement = function(p,add,time,activeIndex){
+                    var _parentWidget = _scope.getAddressData(this.parentName);
+                    var _this = this;
+                    var distance = this.bounded.y?Math.abs(p.b.x-p.a.x):Math.abs(p.b.y-p.a.y);
+ 
+                    var speed = parseInt((distance/time)*200)+1;
+                    var TempSpeed = speed;
+
+                    var runTimer=null; 
+                    var stime=0;
+                    var run = function(){
+                       var runTimer = setTimeout(function(){
+
+                              add?(p.a.x-=speed,p.a.y-=speed):(p.a.x+=speed,p.a.y+=speed);
+                               
+                              stime = 20;
+                              speed = speed>parseInt(TempSpeed*0.3)?speed-speed/4:speed;
+
+                              _this.position.x=p.a.x;
+                              _this.position.y=p.a.y;
+                              if(add){ //前进
+                                if(p.a.x>p.b.x){
+                                  run();
+                                }else{
+                                   _this.position.x = p.b.x;
+                                   clearTimeout(runTimer);
+                                   _parentWidget.activeIndex= activeIndex;
+                                   
+                                }
+                                if(p.a.y>p.b.y){
+                                   run();
+                                }else{
+                                   _this.position.y = p.b.y;
+                                   clearTimeout(runTimer);
+                                   _parentWidget.activeIndex= activeIndex;
+                                }
+                               
+                              }else{ //后退
+                                   
+                                   if(p.a.x<p.b.x){
+                                      run();
+                                    }else{
+                                       _this.position.x = p.b.x;
+                                       clearTimeout(runTimer);
+                                       _parentWidget.activeIndex= activeIndex;
+                                       
+                                    }
+                                    if(p.a.y<p.b.y){
+                                       run();
+                                    }else{
+                                       _this.position.y = p.b.y;
+                                       clearTimeout(runTimer);
+                                       _parentWidget.activeIndex= activeIndex;
+                                    }
+
+                              } 
+
+                          var left = (_this.bounded.x)?'':'left:'+_this.position.x+'px;',
+                              top =  (_this.bounded.y)?'':'top:'+_this.position.y+'px;';
+                              _this.style=left+top;
+
+                       },stime)
+                    
+                    }; 
+                  
+                  run();
+                    
+                };     
               return _core.getNxWidget('CarouselWrapper',
                                     p,
                                     'div',
@@ -1419,6 +1512,9 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                      status:0,
                      container:document.body,
                      _this:null,
+                     bodyEvent:function(){
+                        spfn.Drag.end()
+                      },
                      start: function(ev,target){
                         
                           var touch = ev.targetTouches && ev.targetTouches[0];
@@ -1435,57 +1531,79 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                           spfn.Drag._this = this;
                           this.on['press'].call(this);
                           addEventListener(spfn.Drag.container,SparkUtil.env.isMobile ? 'touchmove' : 'mousemove',spfn.Drag.move,{ passive: false })
-                          
-                          if(this.bounded && this.bounded.x || this.bounded && this.bounded.y){ 
-                              addEventListener(target,'mouseleave',function(){
-                                 spfn.Drag.end();
-                              })
+                        
+                       
+                          if(this.bounded && !this.bounded.parent){ 
+                              addEventListener(spfn.Drag.container,SparkUtil.env.isMobile ? 'touchend' : 'mouseup',spfn.Drag.bodyEvent)
                           }
                      },
                      move:function(e,target){//!SparkUtil.env.isMobile && 
-                           e.preventDefault();
-                       var ev = e || window.event;
-
-                       var _this = spfn.Drag._this;
-                      if(spfn.Drag.status){
+                         
+                      if(!spfn.Drag.status)return;
+                          e.preventDefault();e.stopPropagation();
+                        var ev = e || window.event;
+                        var _this = spfn.Drag._this;
                         var touch = ev.targetTouches && ev.targetTouches[0];
                         var screen = touch || ev;
-                        
-                          _this.position.x=(_this.bounded && _this.bounded.x)?0:(screen.clientX - _this.position.startX);
-                          _this.position.y=(_this.bounded && _this.bounded.y)?0:(screen.clientY - _this.position.startY);
                           
-                          //溢出边界
+                          
+                          var newX=(_this.bounded && _this.bounded.x)?0:(screen.clientX - _this.position.startX);
+                          var newY=(_this.bounded && _this.bounded.y)?0:(screen.clientY - _this.position.startY);
+                          
+            
+                          /*溢出边界*/
                           if(_this.bounded && _this.bounded.out){
                             var parentBoxWidth = (spfn.Drag.container.tagName==='BODY')? SparkUtil.screen.width():spfn.Drag.container.offsetWidth,
                                 parentBoxHeight = (spfn.Drag.container.tagName==='BODY')? SparkUtil.screen.height():spfn.Drag.container.offsetHeight;
-                            if(_this.position.x<=0){
-                              _this.position.x=0;
+                            if(newX<=0){
+                              newX=0;
                             }
-                            if(_this.position.x+_this.width()>=parentBoxWidth){
-                              _this.position.x = parentBoxWidth - _this.width();
+                            if(newX+_this.width()>=parentBoxWidth){
+                              newX = parentBoxWidth - _this.width();
                             }
-                            if(_this.position.y<=0){
-                             _this.position.y=0;
+                            if(newY<=0){
+                             newY=0;
                             }
-                             if(_this.position.y+_this.height()>=parentBoxHeight){
-                              _this.position.y = parentBoxHeight - _this.height();
+                             if(newY+_this.height()>=parentBoxHeight){
+                              newY = parentBoxHeight - _this.height();
                             }
                           }
+                          
+                          /*记录方向*/
+                           if(newX>_this.position.x){
+                             _this.position.direction='right'
+                           }
+                           if(newX<_this.position.x){
+                             _this.position.direction='left'
+                           }
+                            if(newY>_this.position.y){
+                             _this.position.direction='down'
+                           }
+                           if(newY<_this.position.y){
+                             _this.position.direction='up'
+                           }
+
+                          _this.position.x = newX;
+                          _this.position.y = newY;
                           //XY约束
                         var left = (_this.bounded && _this.bounded.x)?'':'left:'+_this.position.x+'px;',
                             top =  (_this.bounded && _this.bounded.y)?'':'top:'+_this.position.y+'px;';
-                            console.log(_this.position.x,_this.position.y)
+                            
+
                           _this.style=left+top;
  
                           _this.on['move'].call(_this);
-                      }    
+                       
                      },
                      end:function(target){
                        var _this = spfn.Drag._this;
                            spfn.Drag.status=0;
                            _this.on['up'].call(_this);
-                          removeEventListener(spfn.Drag.container,spfn.Drag.move)
-                     }  
+                          removeEventListener(spfn.Drag.container,SparkUtil.env.isMobile ? 'touchmove' : 'mousemove',spfn.Drag.move);
+                          if(_this.bounded && !_this.bounded.parent){
+                            removeEventListener(spfn.Drag.container,SparkUtil.env.isMobile ? 'touchend' : 'mouseup',spfn.Drag.bodyEvent);
+                          } 
+                      }  
                  }
                   
                 }
@@ -1540,13 +1658,12 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
         if(node.on['up']){
            addEventListener(target,SparkUtil.env.isMobile ? 'touchend' : 'mouseup', function(e){
                  e.stopPropagation();
-                if(node.type == 'Drag' && spfn){
+                 if(node.type == 'Drag' && spfn){
                     var ev = e || window.event;
                     spfn.end.call(node,ev,target)
                  }else{
                     node.on['up'].call(node);
                  }
-
             },{capture:true,passive:true});
           
         }
@@ -1755,6 +1872,7 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                                      y:parseInt(node.styleObj['top']),
                                      startX:parseInt(node.styleObj['left']),
                                      startY:parseInt(node.styleObj['top']),
+                                     direction:null,
                                    }
                   }
 
