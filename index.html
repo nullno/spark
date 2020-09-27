@@ -395,32 +395,59 @@
       
 
         /*轮播图：*/  
-        var title4 =  SparkApp.Text('轮播图(coding....):',{
+        var title4 =  SparkApp.Text('轮播(coding....):',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
 
         var Carousel1 = SparkApp.Carousel({
            style:'width:500px;height:100%;margin:0 auto;background-color:#fff;',
            option:{
              //direction:'vertical',//vertical horizontal
-              // speed:1000,
-              autoPlay:true
+              speed:1000,
+              autoPlay:true,
+              initSlide:0,
+              pagination:true,
            },
            child:[
-                SparkApp.CarouselWrapper({
+               SparkApp.CarouselWrapper({
                 	 style:'background:pink;',
                 	 child:[
                        SparkApp.Box({style:'background:yellow;'}),   
 			                 SparkApp.Box({style:'background:red;'}),
-			                 SparkApp.Box({style:'background:blue;'})
+			                 SparkApp.Box({style:'background:blue;'}),
+                       SparkApp.Box({style:'background:#9300FF;'}),   
+                       SparkApp.Box({style:'background:#F7156A;'}),
+                       SparkApp.Box({style:'background:#FFC0CB;'})
            	           ] 
            	   })
+
            ]
         })
 
         var  wrap4 = SparkApp.Box({
              className:wrapcss,  
              style:'height:300px;',
-             child:[Carousel1]
+             child:[Carousel1,
+               SparkApp.Text('上一张',{
+                        tag:'button',
+                        className:bthcss,
+                        style:'background-color:green;left:88px;bottom:125px;',
+                        on:{
+                            click(){
+                            Carousel1.slidePrev()
+                            }
+                        }
+                      }),
+                 SparkApp.Text('下一张',{
+                        tag:'button',
+                        className:bthcss,
+                        style:'background-color:green;right:88px;bottom:125px;',
+                        on:{
+                            click(){
+                            Carousel1.slideNext()
+                            }
+                        }
+                      }),
+             ]
          })
 
 

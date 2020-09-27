@@ -925,7 +925,13 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                            var _this = this;
                             if(this.type=='List'){
                                var tempDataArr=this.data;
-                                 /*jsonstr*/
+                                   if(_typeof(this.data,'Number')){
+                                       tempDataArr=[];
+                                       SparkUtil.traverse(this.data,function(index,end){
+                                           tempDataArr.push(index)
+                                       })
+                                   }
+                                    /*jsonstr*/
                                     if(_typeof(this.data,'String')){
                                           try{tempDataArr = JSON.parse(this.data);}
                                           catch(err){
@@ -1131,22 +1137,67 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 var option = {
                       direction:'horizontal',//horizontal(默认水平) || vertical(垂直)
                       speed:1000,
-                      autoPlay:false
+                      autoPlay:false,
+                      initSlide:0,
                      };
                 p.option=p.option?Object.assign(option,p.option):option;
                 p.activeIndex=0;
+                p.slidePrev = function(time){
+                    var activeIndex = this.activeIndex-1;
+                    this.slideTo(activeIndex,time)
+                };
+                p.slideNext = function(time){
+
+                   var activeIndex = this.activeIndex+1;
+
+                    this.slideTo(activeIndex,time)
+                      
+                };
+                p.slideTo=function(activeIndex,time){
+
+                  if(activeIndex==this.activeIndex || activeIndex<0 || activeIndex>this.maxIndex)return;
+                  
+                    time = time || 1000;
+                    var Wrapper = this.Wrapper;
+             
+                    Wrapper.displacement({
+                         a:{x:Wrapper.position.x,y:Wrapper.position.y},
+                         b:{x:Wrapper.bounded.y?(-Wrapper.width()/Wrapper.child.length*activeIndex):0,y:Wrapper.bounded.x?(-Wrapper.height()/Wrapper.child.length*activeIndex):0}
+                    },
+                    activeIndex>this.activeIndex,
+                    time,
+                    activeIndex) 
+                };
+                p.setPagination  = function(){
+                  var _HTML = SparkCoreManage.HTML;
+                  var _this = this;
+                    this.append(_HTML.List({
+                      style:'width:100%;background-color:rgba(0,0,0,0); color:#fff;position:absolute;z-index:0;bottom:0;',
+                        data:this.maxIndex+1,
+                        item:function(item,index){
+                                return  SparkApp.Box({  
+                                style:'display:inline-block;width:10px;height:10px;border-radius:10px;margin:3px;background-color:rgba(255,255,255,0.5);', 
+                                on:{
+                                  click:function(){
+                                     _this.slideTo(item);
+                                  }
+                                }  
+                              });
+                        }
+                     }))
+             
+                };
                 p.update = function(){
                    var WrapperIndex = SparkUtil.isInArrayIncludes(this.child,{b:'CarouselWrapper'});
                    if(WrapperIndex==-1)return;
                    var w=this.width(),h=this.height();
                    var Wrapper =  _scope.getAddressData(this.child[WrapperIndex]);
+
                     this.style = 'overflow:hidden;position:relative;width:'+w+'px;height:'+h+'px;';
                    
                    /*设置*/
                     Wrapper.bounded.x = (p.option.direction=='vertical')?true:false;
                     Wrapper.bounded.y = (p.option.direction=='vertical')?false:true;
-            
-
                     var WrapperWidth = (p.option.direction=='vertical')?w:w*Wrapper.child.length;
                     var WrapperHeight = (p.option.direction=='vertical')?h*Wrapper.child.length:h; 
                     
@@ -1155,8 +1206,21 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                     SparkUtil.traverse(Wrapper.child,function(name,index,end){
                        var _slide =  _scope.getAddressData(name);
                            _slide.style='position:relative;width:'+w+'px;height:'+h+'px;'+(p.option.direction=='vertical'?'':'float:left;');
-                    })
-                
+                    });
+                    this.Wrapper=Wrapper;
+                    this.maxIndex = Wrapper.child.length-1;
+
+                    this.option.initSlide =this.option.initSlide>this.maxIndex?this.maxIndex:this.option.initSlide;
+                     
+                    if(_typeof(this.option.initSlide,'Number'))this.slideTo(this.option.initSlide,100)
+                     
+                    if(this.option.pagination){
+
+                      this.setPagination();
+                    }
+                    
+                    
+                     
                 };
               return _core.getNxWidget('Carousel',
                                     p,
@@ -1174,12 +1238,10 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 p.on = {
                   press:function(){},
                   move:function(){
-                    // var _parentWidget = _scope.getAddressData(this.parentName);
-                
-                        
-                       // console.log(this.position.x,this.position.y)
                   },
                   up:function(){
+                     if(!this.displacementSwitch)return;
+                     this.displacementSwitch=false;
                      var _parentWidget = _scope.getAddressData(this.parentName);
                      var activeIndex = _parentWidget.activeIndex;
                      var add = true;//前进或后退
@@ -1199,20 +1261,23 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                              add=true;
                              activeIndex=0;
                            }
-                        }
-                     
-  
-                    var p = {
+                        };
+                   
+
+                    this.displacement({
                          a:{x:this.position.x,y:this.position.y},
                          b:{x:this.bounded.y?(-this.width()/this.child.length*activeIndex):0,y:this.bounded.x?(-this.height()/this.child.length*activeIndex):0}
-                    }   
-                     
-                         this.displacement(p,add,_parentWidget.option.speed,activeIndex) 
+                    },
+                    add,
+                    _parentWidget.option.speed,activeIndex) 
 
                   }
                 }; 
                 /*位移函数计算*/
+                p.displacementSwitch=true;
                 p.displacement = function(p,add,time,activeIndex){
+     
+                    time=time>1500?1500:time;
                     var _parentWidget = _scope.getAddressData(this.parentName);
                     var _this = this;
                     var distance = this.bounded.y?Math.abs(p.b.x-p.a.x):Math.abs(p.b.y-p.a.y);
@@ -1222,7 +1287,13 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
 
                     var runTimer=null; 
                     var stime=0;
-                    var run = function(){
+                    var clearTimer = function(runTimer){
+                          clearTimeout(runTimer);
+                          _parentWidget.activeIndex = activeIndex;
+                          _this.displacementSwitch = true;
+                    }
+                    var runDisplacement = function(){
+
                        var runTimer = setTimeout(function(){
 
                               add?(p.a.x-=speed,p.a.y-=speed):(p.a.x+=speed,p.a.y+=speed);
@@ -1230,41 +1301,39 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                               stime = 20;
                               speed = speed>parseInt(TempSpeed*0.3)?speed-speed/4:speed;
 
-                              _this.position.x=p.a.x;
-                              _this.position.y=p.a.y;
+                              _this.position.x=parseInt(p.a.x);
+                              _this.position.y=parseInt(p.a.y);
+  
                               if(add){ //前进
                                 if(p.a.x>p.b.x){
-                                  run();
+                                  runDisplacement();
                                 }else{
                                    _this.position.x = p.b.x;
-                                   clearTimeout(runTimer);
-                                   _parentWidget.activeIndex= activeIndex;
+
+                                   clearTimer(runTimer);
                                    
                                 }
                                 if(p.a.y>p.b.y){
-                                   run();
+                                   runDisplacement();
                                 }else{
                                    _this.position.y = p.b.y;
-                                   clearTimeout(runTimer);
-                                   _parentWidget.activeIndex= activeIndex;
+                                   clearTimer(runTimer);
                                 }
                                
                               }else{ //后退
                                    
                                    if(p.a.x<p.b.x){
-                                      run();
+                                      runDisplacement();
                                     }else{
                                        _this.position.x = p.b.x;
-                                       clearTimeout(runTimer);
-                                       _parentWidget.activeIndex= activeIndex;
+                                      clearTimer(runTimer);
                                        
                                     }
                                     if(p.a.y<p.b.y){
-                                       run();
+                                       runDisplacement();
                                     }else{
                                        _this.position.y = p.b.y;
-                                       clearTimeout(runTimer);
-                                       _parentWidget.activeIndex= activeIndex;
+                                       clearTimer(runTimer);
                                     }
 
                               } 
@@ -1277,7 +1346,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                     
                     }; 
                   
-                  run();
+                   runDisplacement();
                     
                 };     
               return _core.getNxWidget('CarouselWrapper',
@@ -1868,10 +1937,10 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
                   //drag type
                   if(node.type==='Drag'){
                       node.position={
-                                     x:parseInt(node.styleObj['left']),
-                                     y:parseInt(node.styleObj['top']),
-                                     startX:parseInt(node.styleObj['left']),
-                                     startY:parseInt(node.styleObj['top']),
+                                     x:node.$el.offsetLeft,
+                                     y:node.$el.offsetTop,
+                                     startX:0,
+                                     startY:0,
                                      direction:null,
                                    }
                   }
