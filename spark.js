@@ -1159,7 +1159,9 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                   
                     time = time || 1000;
                     var Wrapper = this.Wrapper;
-             
+                    if(!Wrapper.displacementSwitch)return;
+                    Wrapper.displacementSwitch=false;
+                       
                     Wrapper.displacement({
                          a:{x:Wrapper.position.x,y:Wrapper.position.y},
                          b:{x:Wrapper.bounded.y?(-Wrapper.width()/Wrapper.child.length*activeIndex):0,y:Wrapper.bounded.x?(-Wrapper.height()/Wrapper.child.length*activeIndex):0}
@@ -1171,12 +1173,23 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 p.setPagination  = function(){
                   var _HTML = SparkCoreManage.HTML;
                   var _this = this;
-                    this.append(_HTML.List({
-                      style:'width:100%;background-color:rgba(0,0,0,0); color:#fff;position:absolute;z-index:0;bottom:0;',
+                  this.paginationStyle = _HTML.Css('display:inline-block;width:10px;height:10px;border-radius:10px;margin:5px;background-color:rgba(255,255,255,0.5);');
+                  this.paginationDefaultStyle='background-color:rgba(255,255,255,0.5);';
+                  this.paginationActiveStyle='background-color:rgba(255,255,255,1);';
+                  this.paginationList = _HTML.List({
+                        tag:'div',
+                        style:'width:100%;background-color:rgba(0,0,0,0); color:#fff;position:absolute;z-index:0;bottom:0;',
                         data:this.maxIndex+1,
                         item:function(item,index){
-                                return  SparkApp.Box({  
-                                style:'display:inline-block;width:10px;height:10px;border-radius:10px;margin:3px;background-color:rgba(255,255,255,0.5);', 
+                                return  SparkApp.Box({
+                                tag:'i',
+                                style:'background-color:rgba(255,255,255,0.5);',  
+                                className:_this.paginationStyle,
+                                init:function(){
+                                   if(item==_this.option.initSlide){
+                                      this.style=_this.paginationActiveStyle;
+                                   }
+                                }, 
                                 on:{
                                   click:function(){
                                      _this.slideTo(item);
@@ -1184,11 +1197,13 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                 }  
                               });
                         }
-                     }))
+                     });
+                    this.append(this.paginationList)
              
                 };
                 p.update = function(){
                    var WrapperIndex = SparkUtil.isInArrayIncludes(this.child,{b:'CarouselWrapper'});
+
                    if(WrapperIndex==-1)return;
                    var w=this.width(),h=this.height();
                    var Wrapper =  _scope.getAddressData(this.child[WrapperIndex]);
@@ -1212,12 +1227,20 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
 
                     this.option.initSlide =this.option.initSlide>this.maxIndex?this.maxIndex:this.option.initSlide;
                      
-                    if(_typeof(this.option.initSlide,'Number'))this.slideTo(this.option.initSlide,100)
-                     
+                   
                     if(this.option.pagination){
-
-                      this.setPagination();
+                       this.setPagination();
                     }
+                    
+                     if(_typeof(this.option.initSlide,'Number')){
+                      var _this=this;
+                      var timer = setTimeout(function(){
+                              clearTimeout(timer)
+                             _this.slideTo(_this.option.initSlide,100);
+                       }) 
+                  
+                     }
+                     
                     
                     
                      
@@ -1262,7 +1285,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                              activeIndex=0;
                            }
                         };
-                   
+                      
+
 
                     this.displacement({
                          a:{x:this.position.x,y:this.position.y},
@@ -1291,6 +1315,14 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                           clearTimeout(runTimer);
                           _parentWidget.activeIndex = activeIndex;
                           _this.displacementSwitch = true;
+                          if(_parentWidget.option.pagination){
+                        
+                             _parentWidget.paginationStyle.style=_parentWidget.paginationDefaultStyle;
+                      
+                             _parentWidget.paginationList.getChild(activeIndex).style=_parentWidget.paginationActiveStyle;
+                          }
+                          
+                          // if()
                     }
                     var runDisplacement = function(){
 
@@ -1352,7 +1384,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
               return _core.getNxWidget('CarouselWrapper',
                                     p,
                                     'div',
-                                    'width:100%;height:100%;position:absolute;background-color:#3D3F3F;overflow:hidden;',
+                                    'width:100%;height:100%;position:absolute;background-color:#3D3F3F;overflow:hidden;touch-action:none;',
                                     ['style'] 
                                     );
             },
