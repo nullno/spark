@@ -222,17 +222,29 @@ var SparkUtil = {
                         script.onreadystatechange = null;
                         callback();
                     }
-                }
-                ;
+                  };
             } else {
                 //Others
                 script.onload = function() {
                     callback();
-                }
-                ;
+                };
             }
             script.src = jsurl;
             document.body.appendChild(script)
+        },
+        getfile:function(filepath,callback){
+          var XHR = new XMLHttpRequest();
+              XHR.open('get',filepath)
+              XHR.responseType = 'text';
+              XHR.onreadystatechange = function() {
+                  //准备状态改变触发
+                  if(XHR.readyState == 4 && XHR.status == 200) {
+                    
+                    callback(XHR.responseText)
+                  }
+                  //打印成功后返回的数据
+              }
+
         },
         /*arr unique*/
         unique:function (arr) {
@@ -314,7 +326,6 @@ var SparkUtil = {
         },
         /*遍历  datas <Array> || <Number>*/
         traverse:function(datas,callback){
-            //普通遍历
             if(_typeof(datas,'Array')){
                 var allLength = datas.length;
                 var maxEveryLength = 40;
@@ -1139,6 +1150,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                       speed:1000,
                       autoPlay:false,
                       initSlide:0,
+                      touchRatio:0.1,
+                      allowTouchMove:true,
                      };
                 p.option=p.option?Object.assign(option,p.option):option;
                 p.activeIndex=0;
@@ -1155,18 +1168,20 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 };
                 p.slideTo=function(activeIndex,time){
 
-                  if(activeIndex==this.activeIndex || activeIndex<0 || activeIndex>this.maxIndex)return;
+                  if( activeIndex<0 || activeIndex>this.maxIndex)return;
                   
                     time = time || 1000;
                     var Wrapper = this.Wrapper;
                     if(!Wrapper.displacementSwitch)return;
+
                     Wrapper.displacementSwitch=false;
+                   
                        
                     Wrapper.displacement({
                          a:{x:Wrapper.position.x,y:Wrapper.position.y},
                          b:{x:Wrapper.bounded.y?(-Wrapper.width()/Wrapper.child.length*activeIndex):0,y:Wrapper.bounded.x?(-Wrapper.height()/Wrapper.child.length*activeIndex):0}
                     },
-                    activeIndex>this.activeIndex,
+                    activeIndex>=this.activeIndex,
                     time,
                     activeIndex) 
                 };
@@ -1211,10 +1226,11 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                     this.style = 'overflow:hidden;position:relative;width:'+w+'px;height:'+h+'px;';
                    
                    /*设置*/
-                    Wrapper.bounded.x = (p.option.direction=='vertical')?true:false;
-                    Wrapper.bounded.y = (p.option.direction=='vertical')?false:true;
-                    var WrapperWidth = (p.option.direction=='vertical')?w:w*Wrapper.child.length;
-                    var WrapperHeight = (p.option.direction=='vertical')?h*Wrapper.child.length:h; 
+                    Wrapper.bounded.x = (this.option.direction=='vertical')?true:false;
+                    Wrapper.bounded.y = (this.option.direction=='vertical')?false:true;
+                    Wrapper.bounded.disable =  !this.option.allowTouchMove
+                    var WrapperWidth = (this.option.direction=='vertical')?w:w*Wrapper.child.length;
+                    var WrapperHeight = (this.option.direction=='vertical')?h*Wrapper.child.length:h; 
                     
                     Wrapper.style='overflow:hidden;position:absolute;width:'+WrapperWidth+'px;height:'+WrapperHeight+'px;';
                     
@@ -1256,30 +1272,50 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
               !p && (p = {});
 
                 p.position={x:0,y:0,startX:0,startY:0};
-                p.bounded={y:true,parent:false,out:false};
+                p.bounded={y:true,parent:false,out:false,disable:true};
                 p.type = 'Drag';
                 p.on = {
                   press:function(){},
                   move:function(){
+                          if(this.bounded.disable)return;
+                             var _parentWidget = _scope.getAddressData(this.parentName);
+                          if(this.bounded.y){
+                              this.displacementBounce = Math.abs(this.position.lastX-this.position.x)>=_parentWidget.option.touchRatio*_parentWidget.width();
+                          }
+                          if(this.bounded.x){
+                               this.displacementBounce = Math.abs(this.position.lastY-this.position.y)>=_parentWidget.option.touchRatio*_parentWidget.height();
+                          } 
                   },
                   up:function(){
-                     if(!this.displacementSwitch)return;
-                     this.displacementSwitch=false;
+                     if(!this.displacementSwitch || this.bounded.disable)return;
+
                      var _parentWidget = _scope.getAddressData(this.parentName);
                      var activeIndex = _parentWidget.activeIndex;
-                     var add = true;//前进或后退
+          
+                      this.displacementSwitch=false;
+                      this.bounded.disable = true;
+                      var add = true;//前进或后退
                         if(this.position.direction=='left' || this.position.direction=='up'){
-                           activeIndex = activeIndex+1;
-                           add=true;
+                           if(this.displacementBounce){
+                             activeIndex = activeIndex+1;
+                              add=true;
+                           }else{
+                            add=false;
+                           }
+                          
                            if(activeIndex>this.child.length-1){
                              add=false;
                              activeIndex=this.child.length-1;
                            }
                         }
                         if(this.position.direction=='right' || this.position.direction=='down'){
-                           activeIndex = activeIndex-1;
-
-                           add=false;
+                            if(this.displacementBounce){
+                              activeIndex = activeIndex-1;
+                               add=false;
+                            }else{
+                               add=true;
+                            }
+                          
                            if(activeIndex<0){
                              add=true;
                              activeIndex=0;
@@ -1288,85 +1324,114 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                       
 
 
-                    this.displacement({
-                         a:{x:this.position.x,y:this.position.y},
-                         b:{x:this.bounded.y?(-this.width()/this.child.length*activeIndex):0,y:this.bounded.x?(-this.height()/this.child.length*activeIndex):0}
-                    },
-                    add,
-                    _parentWidget.option.speed,activeIndex) 
+                    this.displacement(
+                          {
+                               a:{x:this.position.x,y:this.position.y},
+                               b:{x:this.bounded.y?(-this.width()/this.child.length*activeIndex):0,y:this.bounded.x?(-this.height()/this.child.length*activeIndex):0}
+                          },
+                          add,
+                          _parentWidget.option.speed,
+                          activeIndex
+                          ); 
 
                   }
                 }; 
                 /*位移函数计算*/
+                p.displacementBounce=true;
                 p.displacementSwitch=true;
                 p.displacement = function(p,add,time,activeIndex){
-     
+                    
+
+
                     time=time>1500?1500:time;
+                    
+
+                    
                     var _parentWidget = _scope.getAddressData(this.parentName);
                     var _this = this;
                     var distance = this.bounded.y?Math.abs(p.b.x-p.a.x):Math.abs(p.b.y-p.a.y);
  
                     var speed = parseInt((distance/time)*200)+1;
                     var TempSpeed = speed;
-
+                     
+                        
                     var runTimer=null; 
                     var stime=0;
-                    var clearTimer = function(runTimer){
-                          clearTimeout(runTimer);
-                          _parentWidget.activeIndex = activeIndex;
-                          _this.displacementSwitch = true;
-                          if(_parentWidget.option.pagination){
-                        
+
+                    if(_parentWidget.option.pagination){
                              _parentWidget.paginationStyle.style=_parentWidget.paginationDefaultStyle;
                       
                              _parentWidget.paginationList.getChild(activeIndex).style=_parentWidget.paginationActiveStyle;
                           }
+                    var clearTimer = function(){
+                          clearTimeout(runTimer);
+                          _parentWidget.activeIndex = activeIndex;
+                         
                           
-                          // if()
+                          _this.displacementSwitch = true;
+                          if(_parentWidget.option.allowTouchMove){
+                             _this.bounded.disable = false;
+                          }
+                         
+              
                     }
                     var runDisplacement = function(){
-
-                       var runTimer = setTimeout(function(){
-
+                       
+                        runTimer = setTimeout(function(){
+                       
+                             
                               add?(p.a.x-=speed,p.a.y-=speed):(p.a.x+=speed,p.a.y+=speed);
-                               
+                            
                               stime = 20;
-                              speed = speed>parseInt(TempSpeed*0.3)?speed-speed/4:speed;
-
+                             
+                              speed = parseInt(speed>parseInt(TempSpeed*0.3)?(speed-speed/4):speed)+1;
+                              
                               _this.position.x=parseInt(p.a.x);
                               _this.position.y=parseInt(p.a.y);
-  
+                              
+                              
                               if(add){ //前进
-                                if(p.a.x>p.b.x){
-                                  runDisplacement();
-                                }else{
-                                   _this.position.x = p.b.x;
-
-                                   clearTimer(runTimer);
-                                   
-                                }
-                                if(p.a.y>p.b.y){
-                                   runDisplacement();
-                                }else{
-                                   _this.position.y = p.b.y;
-                                   clearTimer(runTimer);
-                                }
+                                  // console.log('前进',speed, _this.position.x)
+                                if(_this.bounded.y){
+                       
+                                    if(p.a.x>p.b.x){
+                                     
+                                       runDisplacement();
+                                    }else{
+                                       _this.position.x = p.b.x;
+                                      
+                                       clearTimer();
+                                       
+                                    }
+                                } 
+                                if(_this.bounded.x){
+                                    if(p.a.y>p.b.y){
+                                       runDisplacement();
+                                    }else{
+                                       _this.position.y = p.b.y;
+                                       clearTimer();
+                                    }
+                                  }
                                
                               }else{ //后退
-                                   
+                                    // console.log('后退',speed, _this.position.x)
+                                 if(_this.bounded.y){  
                                    if(p.a.x<p.b.x){
                                       runDisplacement();
                                     }else{
                                        _this.position.x = p.b.x;
-                                      clearTimer(runTimer);
+                                      clearTimer();
                                        
                                     }
-                                    if(p.a.y<p.b.y){
-                                       runDisplacement();
-                                    }else{
-                                       _this.position.y = p.b.y;
-                                       clearTimer(runTimer);
-                                    }
+                                  }  
+                                  if(_this.bounded.x){ 
+                                      if(p.a.y<p.b.y){
+                                         runDisplacement();
+                                      }else{
+                                         _this.position.y = p.b.y;
+                                         clearTimer();
+                                      }
+                                  }
 
                               } 
 
@@ -1617,7 +1682,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                         spfn.Drag.end()
                       },
                      start: function(ev,target){
-                        
+                         if(this.bounded && this.bounded.disable)return;
                           var touch = ev.targetTouches && ev.targetTouches[0];
                           
                           var screen = touch || ev;
@@ -1626,7 +1691,8 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                           }
                           this.position.startX=screen.clientX - target.offsetLeft;
                           this.position.startY=screen.clientY - target.offsetTop;
-                           
+                          this.position.lastX= this.position.x;
+                          this.position.lastY= this.position.y;
 
                           spfn.Drag.status=1;
                           spfn.Drag._this = this;
@@ -1697,6 +1763,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                        
                      },
                      end:function(target){
+                          if(spfn.Drag.status==0)return;
                        var _this = spfn.Drag._this;
                            spfn.Drag.status=0;
                            _this.on['up'].call(_this);
@@ -2474,7 +2541,6 @@ Spark.prototype.remove =function(target,deldom){
 }
 /*回到顶部*/
 Spark.prototype.scrollTop = function(val,time){
-    
     var scrollTop = this.screen.scrollTop();
     time= time?time:500;
     val = val?val:0;
@@ -2493,7 +2559,7 @@ Spark.prototype.scrollTop = function(val,time){
                 up?scrollTop-=speed:scrollTop+=speed;
              
                 stime = 20;
-                speed = speed>parseInt(TempSpeed*0.2)?speed-speed/4:speed;
+                speed = parseInt(speed>parseInt(TempSpeed*0.2)?speed-speed/4:speed)+1;
               
                if(up){
                  if(scrollTop>val){
@@ -2522,7 +2588,17 @@ Spark.prototype.scrollTop = function(val,time){
     run(); 
 }
 
+Spark.prototype.main=function(component,callback){
+         
+         SparkUtil.getfile(component.Carousel1,function(text){
+                 console.log(text)
+         })
+          
+         
+             
+}
 
 
-    return Spark;
+
+return Spark;
 }));

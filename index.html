@@ -8,20 +8,31 @@
 <body>
 <script src="./spark.js"></script>
 <script>
-    /**
+      /**
      * demo202009021 [Dialog]  
      */
-	var SparkApp = new Spark({});
+  var SparkApp = new Spark({});
+   console.log(SparkApp)
+</script>
 
-      
-      console.log(SparkApp)
+<script src="component/Carousel.sp"></script>
+<script>
 
-     var title1 =  SparkApp.Text('状态：',{
+SparkApp.main({
+  Carousel1:'component/Carousel.sp',
+  },function(ee){
+
+ console.log(152)
+})
+
+
+
+var title1 =  SparkApp.Text('状态：',{
         child:[activeText=SparkApp.Text('READY....',{
          style:'color:red;',
          watch:{
                   text(ov,nv){
-                    console.log('ov:'+ov,'nv:'+nv)
+                      console.log('ov:'+ov,'nv:'+nv)
                   }
          } 
          })],
@@ -66,7 +77,7 @@
          child:[node1,img1]
      })
      
-     var bthcss = SparkApp.Css('position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
+     var bthcss = SparkApp.Css('border:0;position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
      var wrapcss=SparkApp.Css('width:90%;height:300px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;');
     
      var btnAdd1 = SparkApp.Box({
@@ -79,8 +90,6 @@
                  activeText.text='append';
                  useCode.text='后置追加元素：\n\n方法1:targetContainer.append([node1,node1]);\n方法2：SparkApp.append(targetContainer,[node1,node1]);';
                  targetContainer.append([node1,node1]);  
-
-               
      		}
      	}
      })
@@ -361,8 +370,8 @@
                           // y:true,//Y轴禁止拖动
                           // x:true,//X轴禁止拖动
                           parent:true,//父盒子约束,默认body
-                          out:true//禁止溢出边界
-
+                          out:true,//禁止溢出边界
+                          // disable:true,
                       },
                       on:{
                       	move(){
@@ -398,44 +407,7 @@
         var title4 =  SparkApp.Text('轮播(coding....):',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
 
-        var Carousel1 = SparkApp.Carousel({
-           style:'width:650px;height:100%;margin:0 auto;background-color:#000;',
-           option:{
-             //direction:'vertical',//vertical horizontal
-              speed:1000,
-              autoPlay:true,
-              initSlide:2,
-              pagination:true,
-           },
-           child:[
-               SparkApp.CarouselWrapper({
-                	 child:[
-                       SparkApp.Box({style:'background:#FF8905;',child:[
-                        SparkApp.Image('http://p1.music.126.net/iMILqNtgdhnyJdTqUUly1Q==/109951165347186457.jpg?imageView&quality=89',{
-                          style:'width:100%;height:100%;'})
-                      
-                        ]}),   
-			                 SparkApp.Box({style:'background:red;',child:[
-                        SparkApp.Image('http://p1.music.126.net/VPbE1x7XACrAEMACVAr6Sw==/109951165347585577.jpg?imageView&quality=89',{
-                          style:'width:100%;height:100%;'})
-                        ]}),
-			                 SparkApp.Box({style:'background:blue;',child:[
-                        SparkApp.Image('http://p1.music.126.net/4TWDMkbgrNcjqOdQczE-Uw==/109951165348628815.jpg?imageView&quality=89',{
-                          style:'width:100%;height:100%;'})
-                        ]}),
-                       SparkApp.Box({style:'background:#9300FF;',child:[
-                        SparkApp.Image('http://p1.music.126.net/L6_IG46iPayW5JgDcWIaGw==/109951165349039245.jpg?imageView&quality=89',{
-                          style:'width:100%;height:100%;'})
-                        ]}),   
-                       SparkApp.Box({style:'background:#F7156A;',child:[
-                        SparkApp.Image('http://p1.music.126.net/Q6NQhyIFFwtPEPQghDvHgA==/109951165346336516.jpg?imageView&quality=89',{
-                          style:'width:100%;height:100%;'})
-                        ]})
-           	           ] 
-           	   })
-
-           ]
-        });
+        
 
         var  wrap4 = SparkApp.Box({
              className:wrapcss,  
@@ -444,7 +416,7 @@
                SparkApp.Text('上一张',{
                         tag:'button',
                         className:bthcss,
-                        style:'background-color:green;left:88px;bottom:125px;',
+                        style:'background-color:rgba(0,0,0,0.5);left:88px;bottom:125px;',
                         on:{
                             click(){
                             Carousel1.slidePrev()
@@ -454,7 +426,7 @@
                  SparkApp.Text('下一张',{
                         tag:'button',
                         className:bthcss,
-                        style:'background-color:green;right:88px;bottom:125px;',
+                        style:'background-color:rgba(0,0,0,0.5);right:88px;bottom:125px;',
                         on:{
                             click(){
                             Carousel1.slideNext()
@@ -487,6 +459,7 @@
    SparkApp.screen.resize(function(screen){
         page.style='min-height:'+screen.height+'px;'
    })
+
 
 </script>	
 </body>
