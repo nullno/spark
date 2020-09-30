@@ -1035,7 +1035,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                      _scope.PageCache.push(NEW_WIDGET.name);
                      /*开始渲染*/
                      console.time("Render");
-                     _scope.SparkRender();
+                     // _scope.SparkRender();
                      console.timeEnd("Render");
                   }
                 
@@ -2501,7 +2501,7 @@ function Spark(params){
         this.vcss = SparkCoreManage.CSSCache;
         this.vdom = SparkCoreManage.WidgetCache;
         this.vpage= SparkCoreManage.PageCache;
-
+        this.Render = SparkCoreManage.SparkRender;
         this.urlParams={
           search: UrlParamManage.getUrlSearchParam(),
           hash: UrlParamManage.getUrlHashParam()
@@ -2597,24 +2597,23 @@ Spark.prototype.main=function(component,callback){
          script.id='mian';    
       var concatJS = function(url,key){
           SparkUtil.getfile(url,function(text){
-                    
-                    if(key=='Page'){
-                       script.innerHTML+=text;
+                 
+                      console.log(match(new RegExp('\\[\\[' + address + '\\]\\]')))
                       
-                         document.body.appendChild(script);
+                      // text.replace(new RegExp('\\[\\[' + address + '\\]\\]'), child)
+                        console.log(text)
+
+                        //  script.innerHTML+=text;
+                        // if(text)
                        
-                      
-                    }else{
-                      script.innerHTML+=text;
-                    }
                    
          })
 
       };
+
+      // document.body.appendChild(script);
          
-      for(var key in component){
-        concatJS(component[key],key)
-      }
+     concatJS(component+'.js')
          
           
 

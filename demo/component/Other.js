@@ -1,5 +1,10 @@
+/*Other 组件*/
 
-var title1 =  SparkApp.Text('状态：',{
+SparkApp.use('Carousel.js')
+
+function Other(){
+
+   var title1 =  SparkApp.Text('状态：',{
         child:[activeText=SparkApp.Text('READY....',{
          style:'color:red;',
          watch:{
@@ -10,6 +15,16 @@ var title1 =  SparkApp.Text('状态：',{
          })],
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
      
+  return {
+     'title1':title1,
+
+  }
+}
+
+SparkApp.registered('Other')
+
+
+
      var boxComCss = SparkApp.Css('position:absolute;width:50%;height:100%;text-align:left;padding:5px;background:#666;z-index:0;top:0;');
      var useCode = SparkApp.Text('READY....',{
           tag:'pre',
