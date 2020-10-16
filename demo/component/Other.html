@@ -1,10 +1,7 @@
-/*Other 组件*/
+<script>/*Other 组件*/
 
-SparkApp.use('Carousel.js')
 
-function Other(){
-
-   var title1 =  SparkApp.Text('状态：',{
+ var title1 =  SparkApp.Text('状态：',{
         child:[activeText=SparkApp.Text('READY....',{
          style:'color:red;',
          watch:{
@@ -15,14 +12,6 @@ function Other(){
          })],
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
      
-  return {
-     'title1':title1,
-
-  }
-}
-
-SparkApp.registered('Other')
-
 
 
      var boxComCss = SparkApp.Css('position:absolute;width:50%;height:100%;text-align:left;padding:5px;background:#666;z-index:0;top:0;');
@@ -49,6 +38,7 @@ SparkApp.registered('Other')
 				}
 			}
 		})
+     
 	var img1 = SparkApp.Image('https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3836963292,3556801655&fm=26&gp=0.jpg',
         {
             style:'width:100px;display:inline-block;',
@@ -423,12 +413,9 @@ SparkApp.registered('Other')
              ]
          })
 
-
-
-     /*返回顶部*/
+      /*返回顶部*/
        var scrollTop1 = SparkApp.Fixed({
               style:'width:50px;height:50px;border-radius:50px;padding:9px; background:yellowgreen;right:20px;bottom:20px;',
-              
               child:[SparkApp.Text('回到<br>顶部')],
               on:{
                 click:function(){
@@ -436,3 +423,10 @@ SparkApp.registered('Other')
                 }
               }
        })
+
+
+      SparkApp.Box({
+         child:[title1,wrap,title2,wrap2,title3,wrap3,title4,wrap4,scrollTop1]
+      })
+</script>
+       

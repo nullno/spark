@@ -2508,7 +2508,7 @@ function Spark(params){
         };
 
         this.env=SparkUtil.env;
-        this.screen = SparkUtil.screen
+        this.screen = SparkUtil.screen;
        
  
 }
@@ -2590,36 +2590,17 @@ Spark.prototype.scrollTop = function(val,time){
     run(); 
 }
 
+
+
 Spark.prototype.main=function(component,callback){
-         
-     var script = document.createElement('script');
-         script.type = "text/javascript";
-         script.id='mian';    
-      var concatJS = function(url,key){
-          SparkUtil.getfile(url,function(text){
-                 
-                      console.log(match(new RegExp('\\[\\[' + address + '\\]\\]')))
-                      
-                      // text.replace(new RegExp('\\[\\[' + address + '\\]\\]'), child)
-                        console.log(text)
 
-                        //  script.innerHTML+=text;
-                        // if(text)
-                       
-                   
-         })
-
-      };
-
-      // document.body.appendChild(script);
-         
-     concatJS(component+'.js')
-         
-          
-
-             
+          var _this = Spark.prototype.main;
+              
+             _this.store={};
+             _this.store.component=component;
+ 
+            callback(_this.store)
 }
-
 
 
 return Spark;

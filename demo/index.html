@@ -7,7 +7,19 @@
 </head>
 <body>
   <script src="../release/spark.js"></script>
-  <script src="./mian.js"></script>
+  <script>
+  	
+		/**
+		* demo202009021 [Dialog]  
+		*/
+		var SparkApp = new Spark();
 
+		SparkApp.main(['component/Home'],function(res){
+		     
+		     console.log(res)
+			 //SparkApp.Render()
+		})
+
+  </script>
 </body>
 </html>
