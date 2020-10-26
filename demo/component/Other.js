@@ -1,5 +1,8 @@
-<script>/*Other 组件*/
 
+SparkApp.module.Other ={
+ depends:[{name:'Carousel1',path:'component/Carousel'}],
+ render:function(){
+     var Carousel1 = SparkApp.module.Carousel1;
 
  var title1 =  SparkApp.Text('状态：',{
         child:[activeText=SparkApp.Text('READY....',{
@@ -28,18 +31,18 @@
      })
 
      var node1 = SparkApp.Box({
-			style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;',
+      style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;',
             showAni:{ani:'zoomIn 500ms both'},
             hideAni:{ani:'bounceOut 500ms both',time:500},
-			on:{
-				click:function(){
+      on:{
+        click:function(){
                     this.prepend(SparkApp.Text('node1'))
-			
-				}
-			}
-		})
+      
+        }
+      }
+    })
      
-	var img1 = SparkApp.Image('https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3836963292,3556801655&fm=26&gp=0.jpg',
+  var img1 = SparkApp.Image('https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3836963292,3556801655&fm=26&gp=0.jpg',
         {
             style:'width:100px;display:inline-block;',
             idName:'tupian',
@@ -58,17 +61,17 @@
      var wrapcss=SparkApp.Css('width:90%;height:300px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;');
     
      var btnAdd1 = SparkApp.Box({
-     	tag:'button',
-     	style:'background-color:green;left:2px;',
-     	className:bthcss,
-     	child:[SparkApp.Text('ADD append')],
-     	on:{
-     		click:function(_this){
+      tag:'button',
+      style:'background-color:green;left:2px;',
+      className:bthcss,
+      child:[SparkApp.Text('ADD append')],
+      on:{
+        click:function(_this){
                  activeText.text='append';
                  useCode.text='后置追加元素：\n\n方法1:targetContainer.append([node1,node1]);\n方法2：SparkApp.append(targetContainer,[node1,node1]);';
                  targetContainer.append([node1,node1]);  
-     		}
-     	}
+        }
+      }
      })
 
       var btnAdd2 = SparkApp.Box({
@@ -99,12 +102,12 @@
       
       /*after()*/
     var btnAfter = SparkApp.Box({
-     	tag:'button',
-     	style:'background-color:green;left:100px;',
-     	className:bthcss,
-     	child:[SparkApp.Text('ADD after')],
-     	on:{
-     		click:function(_this){
+      tag:'button',
+      style:'background-color:green;left:100px;',
+      className:bthcss,
+      child:[SparkApp.Text('ADD after')],
+      on:{
+        click:function(_this){
                  activeText.text='after';
                  useCode.text='指定元素后插入：\n\nimg1.after(<w>,{ani:<ani string>})';
 
@@ -118,40 +121,40 @@
                                                 }
                                             }
                                         })]);  
-     		 }
-     	  }
+         }
+        }
        })
        /*before()*/
        var btnBefore = SparkApp.Box({
-     	tag:'button',
-     	style:'background-color:green;left:100px;bottom:45px;',
-     	className:bthcss,
-     	child:[SparkApp.Text('ADD before')],
-     	on:{
-     		click:function(_this){
+      tag:'button',
+      style:'background-color:green;left:100px;bottom:45px;',
+      className:bthcss,
+      child:[SparkApp.Text('ADD before')],
+      on:{
+        click:function(_this){
                  activeText.text='before';
                  useCode.text='指定元素前插入：\n\nimg1.before(<w>,{ani:<ani string>})';
 
                  img1.before(node1);  
-     		 }
-     	  }
+         }
+        }
        })
 
 
       var btnDel1 = SparkApp.Box({
-     	tag:'button',
-     	style:'background-color:#666;right:2px;',
-     	className:bthcss,
-     	child:[SparkApp.Text('DEL Target node')],
-     	on:{
-     		click:function(_this){
+      tag:'button',
+      style:'background-color:#666;right:2px;',
+      className:bthcss,
+      child:[SparkApp.Text('DEL Target node')],
+      on:{
+        click:function(_this){
                   
                    activeText.text='remove widget';
                    useCode.text='删除指定元素：\n\n方法1:node1.remove(ani);\n方法2：SparkApp.remove(targetContainer,node1);';
                    // node1.style='animation: bounceOut 500ms both';
                    node1.remove();
 
-     		}
+        }
           }
      })
 
@@ -351,10 +354,10 @@
                           // disable:true,
                       },
                       on:{
-                      	move(){
+                        move(){
                           // console.log(this.position.direction)
-                      		Stack2.getChild(0).style='left:'+this.position.x+'px;top:'+this.position.y+'px;';
-                      	},
+                          Stack2.getChild(0).style='left:'+this.position.x+'px;top:'+this.position.y+'px;';
+                        },
                         
                       }
                   }) 
@@ -362,12 +365,12 @@
        })
 
        var Stack2 =SparkApp.Stack({
-		           style:'width:50%;height:300px;background:yellow;overflow:hidden;float:right;',
-		           child:[
-				          SparkApp.Position({
-		                   style:'width:100px;height:100px;background:#F7156A;border-radius:100px;',
-		                  })]
-		          })
+               style:'width:50%;height:300px;background:yellow;overflow:hidden;float:right;',
+               child:[
+                  SparkApp.Position({
+                       style:'width:100px;height:100px;background:#F7156A;border-radius:100px;',
+                      })]
+              })
 
 
         /*层叠容器/可拖动容器：*/  
@@ -383,8 +386,6 @@
         /*轮播图：*/  
         var title4 =  SparkApp.Text('轮播(coding....):',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
-
-        
 
         var  wrap4 = SparkApp.Box({
              className:wrapcss,  
@@ -425,8 +426,11 @@
        })
 
 
-      SparkApp.Box({
-         child:[title1,wrap,title2,wrap2,title3,wrap3,title4,wrap4,scrollTop1]
-      })
-</script>
+   return  SparkApp.Box({
+            child:[title1,wrap,title2,wrap2,title3,wrap3,title4,wrap4,scrollTop1]
+         })
+
+   }
+
+} 
        

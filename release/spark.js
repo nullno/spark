@@ -226,7 +226,7 @@ var SparkUtil = {
             } else {
                 //Others
                 script.onload = function() {
-                    callback();
+                    callback(script);
                 };
             }
             script.src = jsurl;
@@ -463,6 +463,8 @@ var SparkUtil = {
  */
 function SparkCoreHandler(){
    var _scope = this;
+   /*当前执行队列*/
+    this.renderQueues=[];
     /**
      * [DefaultSetting 默认配置]
      * @type {Object}
@@ -2195,31 +2197,6 @@ SparkCoreHandler.prototype.createDomTree=function(_rootAdress,domTarget,init,add
 }
 
 
-    /**
- * [SparkRouter 单页面路由功能]
- * @AuthorHTL
- * @DateTime  2020-03-30T23:42:32+0800
- */
-SparkCoreHandler.prototype.SparkRouter = function() {
-  
-}
-
-
-
-    /**
- * [Rander 所有节点渲染到页面上]
- * @AuthorHTL
- * @DateTime  2020-03-30T23:46:26+0800
- */
-SparkCoreHandler.prototype.SparkRender = function() {
-        if (this.PageCache.length == 0) {
-             console.warn('至少有存在一个Page页面')
-        } else if (this.PageCache.length > 1) {
-              this.SparkRouter()
-        } else {
-          this.createDomTree(this.PageCache[0],D.body,true)
-        }
- }
 
 /**
  * [clearWidget 删除清空组件]
@@ -2474,6 +2451,74 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
 
     return target;
 }
+
+
+
+/**
+ * [SparkRouter 单页面路由功能]
+ * @AuthorHTL
+ * @DateTime  2020-03-30T23:42:32+0800
+ */
+SparkCoreHandler.prototype.SparkRouter = function() {
+  
+}
+
+SparkCoreHandler.prototype.LoadModules = function(module){
+    var _scope = this;
+    console.log(_scope.module)
+    var modulePath = SparkUtil.includes(module.path,'.js')?module.path:module.path+'.js';
+   // SparkCoreManage.renderQueues.push({name:module.name,status:0});
+   // 
+    SparkUtil.getfile(modulePath,function(codeText){
+          
+          console.log(codeText)
+        // var depends =  _scope.module[module.name].depends;
+        //   if(depends && depends.length>0){
+
+        //    SparkUtil.traverse(depends,function(item,index,end){
+        //          SparkCoreManage.LoadModules.call(_scope,item)
+        //     })
+           
+        //   }
+         
+    })
+
+}
+
+    /**
+ * [Rander 所有节点渲染到页面上]
+ * @AuthorHTL
+ * @DateTime  2020-03-30T23:46:26+0800
+ */
+SparkCoreHandler.prototype.SparkRender = function(modules) {
+  var _this = SparkCoreManage;
+  var _scope = this;    
+  var pages = [];
+      if(_typeof(modules,'Object')){
+         pages.push(modules);
+       }
+      if(_typeof(modules,'Array')){
+         pages = pages.concat(modules);
+       }
+ 
+    
+       SparkUtil.traverse(pages,function(item,index,end){
+      
+               _this.LoadModules.call(_scope,item)
+       })
+       
+        return;
+  
+        if (_this.PageCache.length == 0) {
+             console.warn('至少有存在一个Page页面')
+        } else if (_this.PageCache.length > 1) {
+              _this.SparkRouter()
+        } else {
+          _this.createDomTree(_this.PageCache[0],D.body,true)
+        }
+
+ }
+
 /**
  * [urlParam url 参数缓存]
  * @type {[type]}
@@ -2502,14 +2547,14 @@ function Spark(params){
         this.vdom = SparkCoreManage.WidgetCache;
         this.vpage= SparkCoreManage.PageCache;
         this.Render = SparkCoreManage.SparkRender;
+        this.module = {};
+        this.moduleJs = null;
+        this.env = SparkUtil.env;
+        this.screen = SparkUtil.screen;
         this.urlParams={
           search: UrlParamManage.getUrlSearchParam(),
           hash: UrlParamManage.getUrlHashParam()
         };
-
-        this.env=SparkUtil.env;
-        this.screen = SparkUtil.screen;
-       
  
 }
 
@@ -2541,6 +2586,7 @@ Spark.prototype.remove =function(target,deldom){
   
   return SparkCoreManage.remove(target,deldom)
 }
+/*----------扩展--------------*/
 /*回到顶部*/
 Spark.prototype.scrollTop = function(val,time){
     var scrollTop = this.screen.scrollTop();
@@ -2566,23 +2612,22 @@ Spark.prototype.scrollTop = function(val,time){
                if(up){
                  if(scrollTop>val){
                    run()
-                 }
+                 };
                  if(scrollTop<=val){
                    clearTimeout(Timer);
                    scrollTop = val;
                  }
-               }else{
+                }else{
 
                    if(val>scrollTop){
                     run()
-                   }
+                   };
                   if(scrollTop>=val){
                     clearTimeout(Timer);
                      scrollTop = val;
                   }
                   
                }
-
                document.body.scrollTop = document.documentElement.scrollTop = scrollTop;
                 
           },stime)
@@ -2590,17 +2635,6 @@ Spark.prototype.scrollTop = function(val,time){
     run(); 
 }
 
-
-
-Spark.prototype.main=function(component,callback){
-
-          var _this = Spark.prototype.main;
-              
-             _this.store={};
-             _this.store.component=component;
- 
-            callback(_this.store)
-}
 
 
 return Spark;

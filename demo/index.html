@@ -14,12 +14,9 @@
 		*/
 		var SparkApp = new Spark();
 
-		SparkApp.main(['component/Home'],function(res){
-		     
-		     console.log(res)
-			 //SparkApp.Render()
-		})
-
+	     SparkApp.Render({name:'Home',path:'component/Home'});
+		
+        console.log(SparkApp)
   </script>
 </body>
 </html>
