@@ -13,8 +13,22 @@
 		* demo202009021 [Dialog]  
 		*/
 		var SparkApp = new Spark();
+         
 
-	     SparkApp.Render({name:'Home',path:'component/Home'});
+         var myPages = {
+         	             name:'Home',
+				         path:'component/Home',
+				         depends:{name:'Other',
+				                  path:'component/Other',
+                                  depends:{
+                                  	 name:'Carousel1',
+				                      path:'component/Carousel'
+                                  }
+				               }
+				        }
+
+
+	    SparkApp.Render(myPages);
 		
         console.log(SparkApp)
   </script>

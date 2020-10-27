@@ -1,6 +1,6 @@
-
+/*#include [Carousel1->component/Carousel1];
+*/
 SparkApp.module.Other ={
- depends:[{name:'Carousel1',path:'component/Carousel'}],
  render:function(){
      var Carousel1 = SparkApp.module.Carousel1;
 

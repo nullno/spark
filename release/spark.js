@@ -232,21 +232,22 @@ var SparkUtil = {
             script.src = jsurl;
             document.body.appendChild(script)
         },
-        getfile:function(filepath,callback){
-
+        getFile:function(filepath,resolve,reject){
+         
           var XHR = new XMLHttpRequest();
-              XHR.open('get',filepath)
-              XHR.responseType = 'text';
               XHR.onreadystatechange = function() {
-                  //准备状态改变触发
-              
                   if(XHR.readyState == 4 && XHR.status == 200) {
-                  
-                    callback(XHR.responseText)
+                    resolve && resolve(XHR.responseText)
+                  }else{
+                    reject && reject()
                   }
                   //打印成功后返回的数据
-              }
+              };
+              XHR.open('get',filepath)
+              XHR.responseType = 'text';
               XHR.send();
+
+
         },
         /*arr unique*/
         unique:function (arr) {
@@ -465,6 +466,7 @@ function SparkCoreHandler(){
    var _scope = this;
    /*当前执行队列*/
     this.renderQueues=[];
+    this.tempModuleLoadQueue=[];
     /**
      * [DefaultSetting 默认配置]
      * @type {Object}
@@ -2462,26 +2464,44 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
 SparkCoreHandler.prototype.SparkRouter = function() {
   
 }
-
-SparkCoreHandler.prototype.LoadModules = function(module){
-    var _scope = this;
-    console.log(_scope.module)
+/*模块加载相关函数*/
+SparkCoreHandler.prototype.LoadModule = function(module,callback){
     var modulePath = SparkUtil.includes(module.path,'.js')?module.path:module.path+'.js';
-   // SparkCoreManage.renderQueues.push({name:module.name,status:0});
-   // 
-    SparkUtil.getfile(modulePath,function(codeText){
-          
-          console.log(codeText)
-        // var depends =  _scope.module[module.name].depends;
-        //   if(depends && depends.length>0){
+    SparkUtil.getFile(modulePath,function(codeText){
+              callback(codeText)
+     })
+}
 
-        //    SparkUtil.traverse(depends,function(item,index,end){
-        //          SparkCoreManage.LoadModules.call(_scope,item)
-        //     })
-           
-        //   }
-         
-    })
+SparkCoreHandler.prototype.HandlerModuleCodeText = function(_modules){
+
+}
+/* _this.renderQueues
+   _this.tempModuleLoadQueue*/
+  
+SparkCoreHandler.prototype.HandlerModule = function(_modules){
+ var _this = SparkCoreManage;
+ var  tempModuleLoadQueue = [];
+ var _core = function(modules){
+   if(_typeof(modules,'Object')){
+    tempModuleLoadQueue.push(modules);
+      if(modules.depends){
+             _core(modules.depends);
+     }
+   }
+    if(_typeof(modules,'Array')){
+      SparkUtil.traverse(modules,function(item,index,end){
+          tempModuleLoadQueue.push(item)
+          if(item.depends){
+             _core(item.depends);
+          }
+     })
+   }
+}
+
+_core(_modules)
+
+
+return tempModuleLoadQueue.reverse();
 
 }
 
@@ -2490,23 +2510,66 @@ SparkCoreHandler.prototype.LoadModules = function(module){
  * @AuthorHTL
  * @DateTime  2020-03-30T23:46:26+0800
  */
-SparkCoreHandler.prototype.SparkRender = function(modules) {
+SparkCoreHandler.prototype.SparkRender = function(pages) {
   var _this = SparkCoreManage;
   var _scope = this;    
-  var pages = [];
-      if(_typeof(modules,'Object')){
-         pages.push(modules);
+  var PageModule = [];
+      if(_typeof(pages,'Object')){
+         PageModule.push(pages);
        }
-      if(_typeof(modules,'Array')){
-         pages = pages.concat(modules);
+      if(_typeof(pages,'Array')){
+         PageModule = PageModule.concat(pages);
        }
  
-    
-       SparkUtil.traverse(pages,function(item,index,end){
+
+    _this.tempModuleLoadQueue =  _this.HandlerModule(PageModule);
+
+    _this.HandlerModuleCodeText(_this.tempModuleLoadQueue,function(){
+
+    })
       
-               _this.LoadModules.call(_scope,item)
+      console.log( _this.tempModuleLoadQueue)
+
+    return;
+       SparkUtil.traverse(pages,function(item,index,end){
+          _this.LoadModule(item,function(codeText){
+                     // console.log(codeText)
+                     _scope.moduleJs+=codeText;
+                     var isdepends = SparkUtil.includes(codeText,'#include [');
+
+                      if(isdepends){
+                         var  depends = codeText.match(new RegExp(/#include \[([\w\W]*?)\];/g));
+                             
+                               SparkUtil.traverse(depends,function(itemA,index,end){
+                                     var moduleItem = {
+                                            name:itemA.split('->')[0].replace('#include [',''),
+                                            path:itemA.split('->')[1].replace('];',''),
+                                         };
+
+                                    
+                                     SparkCoreManage.LoadModule(moduleItem,function(codeTextA){
+                                        
+                                         _scope.moduleJs = codeText.replace(itemA,codeTextA);
+                                        
+                                     })
+                                })
+                       
+                     }else{
+                            setTimeout(function(){
+                            console.log(_scope.moduleJs)
+                                 }, 1000)
+                     }
+            })
        })
        
+  //      setTimeout(function(){
+  // console.log(_scope.moduleJs)
+  //      }, 1000)
+
+
+        
+    
+
         return;
   
         if (_this.PageCache.length == 0) {
