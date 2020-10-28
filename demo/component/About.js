@@ -1,14 +1,16 @@
-var Carousel1 ={
-  name:'Carousel1',
-  render: function(){
 
-    SparkApp.module.Carousel1 =  SparkApp.Carousel({
-           style:'width:650px;height:100%;margin:0 auto;background-color:#000;',
+/*#include [Other->component/Other];
+*/
+var About={
+ render:function(){
+ 
+     var Carousel2 =  SparkApp.Carousel({
+           style:'width:650px;height:300px;margin:0 auto;background-color:#000;',
            option:{
               //direction:'vertical',//vertical horizontal
               //speed:1000,
               autoPlay:true,
-              initSlide:2,
+              // initSlide:0,
               pagination:true,
               // touchRatio:0.5,
            },
@@ -17,7 +19,7 @@ var Carousel1 ={
                    child:[
                        SparkApp.Box({style:'background:#FF8905;',child:[
                         SparkApp.Image('http://p1.music.126.net/iMILqNtgdhnyJdTqUUly1Q==/109951165347186457.jpg?imageView&quality=89',{
-                          style:'width:100%;height:100%;'})
+                          style:'width:100%;height:100%;display:block;'})
                         ]}),   
                        SparkApp.Box({style:'background:red;',child:[
                         SparkApp.Image('http://p1.music.126.net/VPbE1x7XACrAEMACVAr6Sw==/109951165347585577.jpg?imageView&quality=89',{
@@ -40,6 +42,22 @@ var Carousel1 ={
 
            ]
         });
-   }  
+    
+     var dd =  SparkApp.Text('55555');
+    var Page = SparkApp.Page({
+	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:red;overflow:auto;padding:20px 0; padding-bottom:50px;color:#fff;',
+	        //showAni:{ani:'fadeIn 500ms  both'},
+	     	child:[Carousel2]
+	     })
+       SparkApp.screen.resize(function(screen){
+	        Page.style='min-height:'+screen.height+'px;'
+	   })
+       
+       SparkApp.module.About =  Page;
+	
+  }
+
 }
+
+
 

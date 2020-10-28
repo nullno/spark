@@ -1,9 +1,8 @@
 /*#include [Carousel1->component/Carousel1];
 */
-SparkApp.module.Other ={
+var Other ={ 
  render:function(){
      var Carousel1 = SparkApp.module.Carousel1;
-
  var title1 =  SparkApp.Text('状态：',{
         child:[activeText=SparkApp.Text('READY....',{
          style:'color:red;',
@@ -286,7 +285,7 @@ SparkApp.module.Other ={
                             }
                         }
                       }),
-                        SparkApp.Text('更新数据1',{
+                      SparkApp.Text('更新数据1',{
                         tag:'button',
                         className:bthcss,
                         style:'background-color:green;left:85px;bottom:45px;',
@@ -413,6 +412,50 @@ SparkApp.module.Other ={
                       }),
              ]
          })
+  
+
+
+        var title5 =  SparkApp.Text('对话框弹窗:',{
+        tag:'h1',style:'width:90%;margin:0 auto;'}); 
+       
+        
+        var Dialog1 = SparkApp.Dialog({
+             style:'width:500px;height:200px;background:#fff;',
+             showAni:{ani:'bounceIn 500ms both'},
+             child:[
+               SparkApp.Text('x',{
+                        style:'position:absolute;background:red;text-align:center;color:#fff; width:30px;height:30px;line-height:30px; right:0;top:0;',
+                         on:{
+                            click(_this){
+                             
+                                  // Dialog1.remove({ani:'bounceOut 500ms both',time:500});
+                                  Dialog1.show=false;
+                                
+                            }
+                          }
+                        
+                      })
+             ]
+
+         });
+        var  wrap5 = SparkApp.Box({
+             className:wrapcss,  
+             style:'height:100px;',
+             child:[
+                SparkApp.Text('弹窗1',{
+                        tag:'button',
+                        className:bthcss,
+                        style:'background-color:green;left:2px;bottom:30px;',
+                        on:{
+                            click(){
+                             
+                                  SparkApp.module.Home.append(Dialog1)
+                                
+                            }
+                        }
+                  }),
+             ]
+           })
 
       /*返回顶部*/
        var scrollTop1 = SparkApp.Fixed({
@@ -426,8 +469,9 @@ SparkApp.module.Other ={
        })
 
 
-   return  SparkApp.Box({
-            child:[title1,wrap,title2,wrap2,title3,wrap3,title4,wrap4,scrollTop1]
+   SparkApp.module.Other =  SparkApp.Box({
+            style:'background-color:none;',  
+            child:[title1,wrap,title2,wrap2,title3,wrap3,title4,wrap4,title5,wrap5,scrollTop1]
          })
 
    }

@@ -10,12 +10,11 @@
   <script>
   	
 		/**
-		* demo202009021 [Dialog]  
+		* demo202009021 [Dialog]  mainJs压缩  
 		*/
 		var SparkApp = new Spark();
-         
 
-         var myPages = {
+	    SparkApp.Render([{
          	             name:'Home',
 				         path:'component/Home',
 				         depends:{name:'Other',
@@ -25,10 +24,13 @@
 				                      path:'component/Carousel'
                                   }
 				               }
-				        }
-
-
-	    SparkApp.Render(myPages);
+				        },
+				        // {
+         	  //            name:'About',
+				        //  path:'component/About',
+				        //  }
+                        ]
+				        );
 		
         console.log(SparkApp)
   </script>
