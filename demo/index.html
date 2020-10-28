@@ -19,10 +19,15 @@
 				         path:'component/Home',
 				         depends:{name:'Other',
 				                  path:'component/Other',
-                                  depends:{
-                                  	 name:'Carousel1',
+                                  depends:[{
+                                  	  name:'Carousel1',
 				                      path:'component/Carousel'
-                                  }
+                                     },
+                                     {
+                                  	  name:'Dialog',
+				                      path:'component/Dialog'
+                                     }
+                                     ]
 				               }
 				        },
 				        // {

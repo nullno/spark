@@ -534,8 +534,10 @@ function SparkCoreHandler(){
                       }else if(nval && obj.showAni){
                           obj.style='animation:'+obj.showAni+';';
                           obj.style='r_d_n';
-                       }else{
+                       }else if(nval){
                           obj.style='r_d_n';
+                       }else if(!nval){
+                         obj.style='display:none;';
                        }
                      
               return nval;
@@ -993,7 +995,10 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                  defaultcss:defaultcss,
                                  tag:p.tag || domtag
                                 };
-
+                
+                if(p.stopProp){
+                     p.on={click:function(){}};
+                }
                /*pulic type handler*/
 
       
@@ -1461,28 +1466,52 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
             },
             Dialog:function(p) {
                var _HTML = SparkCoreManage.HTML;
-               p.init=function(){
-                 Dialog.style = 'margin-left:-'+Dialog.width()/2+'px;margin-top:-'+Dialog.height()/2+'px;';
-               };
-
+               var d = {
+                    bgColor : 'rgba(0,0,0,0.5)',
+                    bgClose : false,
+                    stopProp: true
+                   };
+               p = Object.assign(d,p);
+               p.show = false;
                var Dialog = _core.getNxWidget('Dialog',
                                     p,
                                     'div',
-                                    'width:10px;height:10px;position:absolute;top:50%;left:50%;background-color:#3D3F3F;',
+                                    'width:50px;height:50px;position:absolute;top:50%;left:50%;background-color:#3D3F3F;cursor:auto;',
                                     ['style','show'] 
                                     );
               
               
                   
-                var DialogBg = _HTML.Fixed({
-                    style:'top:0;left:0;right:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;overflow:hidden;',
+                var DialogWarp = _HTML.Fixed({
+                    style:'top:0;left:0;right:0;width:100%;height:100%;background-color:'+p.bgColor+';z-index:9999;overflow:hidden;cursor:auto;',
                     child:[Dialog],
-                    show:true, 
+                    show:false,
+                    on:p.bgClose?{
+                      click:function(_this){
+                          this.close();
+                      }
+                    }:null,
+                    close:function(){
+                       Dialog.show = false;
+                       if(Dialog.hideAni && Dialog.hideAni.time){
+                          setTimeout(function(){
+                              DialogWarp.show = false;
+                            },Dialog.hideAni.time)
+                    
+                       }else{
+                          DialogWarp.show = false;
+                       }
+                    },
+                    open:function(){
+                     DialogWarp.show = Dialog.show = true;
+                     Dialog.style = 'margin-left:-'+Dialog.width()/2+'px;margin-top:-'+Dialog.height()/2+'px;';
+                    }
+                    
                    })
 
 
          
-              return DialogBg;
+              return DialogWarp;
             },
             //moreWiget...
         }
@@ -2536,7 +2565,6 @@ SparkCoreHandler.prototype.ChunkVendors = function(codeText,callback){
 SparkCoreHandler.prototype.HandlerModuleCodeText = function(callback){
    var _this = SparkCoreManage;
    var modules =  _this.tempModuleLoadQueue;
-   console.log(modules)
    if(modules.length<=0)return;
    var i=0;
    var mainCodeText = '';

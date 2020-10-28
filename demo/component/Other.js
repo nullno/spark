@@ -415,29 +415,10 @@ var Other ={
   
 
 
-        var title5 =  SparkApp.Text('对话框弹窗:',{
-        tag:'h1',style:'width:90%;margin:0 auto;'}); 
+        var title5 =  SparkApp.Text('对话框弹窗:',{tag:'h1',style:'width:90%;margin:0 auto;'}); 
        
         
-        var Dialog1 = SparkApp.Dialog({
-             style:'width:500px;height:200px;background:#fff;',
-             showAni:{ani:'bounceIn 500ms both'},
-             child:[
-               SparkApp.Text('x',{
-                        style:'position:absolute;background:red;text-align:center;color:#fff; width:30px;height:30px;line-height:30px; right:0;top:0;',
-                         on:{
-                            click(_this){
-                             
-                                  // Dialog1.remove({ani:'bounceOut 500ms both',time:500});
-                                  Dialog1.show=false;
-                                
-                            }
-                          }
-                        
-                      })
-             ]
-
-         });
+       
         var  wrap5 = SparkApp.Box({
              className:wrapcss,  
              style:'height:100px;',
@@ -448,8 +429,9 @@ var Other ={
                         style:'background-color:green;left:2px;bottom:30px;',
                         on:{
                             click(){
-                             
-                                  SparkApp.module.Home.append(Dialog1)
+                                 
+                                SparkApp.module.Dialog.type1.open();
+                                  
                                 
                             }
                         }
