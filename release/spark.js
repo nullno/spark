@@ -996,7 +996,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                  tag:p.tag || domtag
                                 };
                 
-                if(p.stopProp){
+                if(p.stopProp && !p.on){
                      p.on={click:function(){}};
                 }
                /*pulic type handler*/
@@ -1268,10 +1268,13 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                   
                      }
                      
-                    
-                    
                      
                 };
+
+                var _HTML = SparkCoreManage.HTML;  
+                p.child = [_HTML.CarouselWrapper({
+                            child:p.child
+                          })];
               return _core.getNxWidget('Carousel',
                                     p,
                                     'div',
@@ -1464,54 +1467,119 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                                     ['style'] 
                                     );
             },
-            Dialog:function(p) {
+            Modal:function(p) {
                var _HTML = SparkCoreManage.HTML;
-               var d = {
-                    bgColor : 'rgba(0,0,0,0.5)',
+              
+               var option = {
+                    bgColor : 'rgba(0,0,0,0.5)',//
                     bgClose : false,
-                    stopProp: true
+                    bgShow : false,
+                    drag:false,
+                    stopProp: true,
+                    positionMargin:'3%',
+                    autoClose:false,
+                    position:'center'
                    };
-               p = Object.assign(d,p);
+               p = Object.assign(option,p);
                p.show = false;
-               var Dialog = _core.getNxWidget('Dialog',
+               
+               var Modal= {
+                   wrap:null,
+                   inner:null,
+                   set:function(m){
+                     var positionMargin = m.positionMargin;
+                        switch(m.position){
+                         case 'topcenter':
+                            this.inner.style = 'top:'+positionMargin+';left:50%;margin-left:-'+this.inner.width()/2+'px;margin-top:none;bottom:none;';
+                         break;
+                         case 'topleft':
+                            this.inner.style = 'top:'+positionMargin+';left:'+positionMargin+';margin-top:none;margin-left:none;bottom:none;';
+                         break;
+                         case 'topright':
+                             this.inner.style = 'top:'+positionMargin+';right:'+positionMargin+';margin-top:none;margin-left:none;bottom:none;';
+                         break;
+                         case 'bottomcenter':
+                           this.inner.style = 'bottom:'+positionMargin+';left:50%;margin-left:-'+this.inner.width()/2+'px;margin-top:none;top:none;';
+                         break;
+                         case 'bottomleft':
+                            this.inner.style = 'bottom:'+positionMargin+';left:'+positionMargin+';margin-top:none;margin-left:none;top:none;';
+                         break;
+                         case 'bottomright':
+                           this.inner.style = 'bottom:'+positionMargin+';right:'+positionMargin+';margin-top:none;margin-left:none;top:none;';
+                         break;
+                         default:
+                           this.inner.style = 'top:50%;left:50%;margin-left:-'+this.inner.width()/2+'px;margin-top:-'+this.inner.height()/2+'px;bottom:none;right:none;';
+                         break;
+                        }
+                       this.autoClose(m);
+                    },
+                    autoCloseTimer:null,
+                    autoClose:function(m){
+                      if(_typeof(m.autoClose,'Number')){
+                         var speed = m.autoClose<1000?1000:m.autoClose;
+                         this.autoCloseTimer = setTimeout(function(){
+                          clearTimeout(Modal.autoCloseTimer)
+                            m.close();
+                          }, speed)
+                       } 
+                    },
+                    con:function(){
+                      delete p.child;
+                      delete p.hideAni;
+                      delete p.showAni
+                      delete p.show;
+                      delete p.style;
+                      Object.assign(Modal.wrap,p);
+                    }
+               };
+
+                if(!p.bgShow){
+                   p.on = p.bgClose?{click:function(){this.close();}}:null;
+                   p.close = function(){
+                       Modal.inner.show = false;
+                       clearTimeout(Modal.autoCloseTimer);
+                   };
+                   p.open = function(){
+                      if(Modal.inner.show)return;
+                       Modal.inner.show = true;
+                       Modal.set(Modal.inner);
+                       // Modal.autoClose(Modal.inner);
+                   };
+                 }
+
+                Modal.inner = _core.getNxWidget('Modal',
                                     p,
                                     'div',
-                                    'width:50px;height:50px;position:absolute;top:50%;left:50%;background-color:#3D3F3F;cursor:auto;',
+                                    'width:50px;height:50px;position:fixed;z-index:9999;background-color:#3D3F3F;cursor:auto;',
                                     ['style','show'] 
                                     );
-              
-              
-                  
-                var DialogWarp = _HTML.Fixed({
-                    style:'top:0;left:0;right:0;width:100%;height:100%;background-color:'+p.bgColor+';z-index:9999;overflow:hidden;cursor:auto;',
-                    child:[Dialog],
-                    show:false,
-                    on:p.bgClose?{
-                      click:function(_this){
-                          this.close();
-                      }
-                    }:null,
-                    close:function(){
-                       Dialog.show = false;
-                       if(Dialog.hideAni && Dialog.hideAni.time){
-                          setTimeout(function(){
-                              DialogWarp.show = false;
-                            },Dialog.hideAni.time)
-                    
-                       }else{
-                          DialogWarp.show = false;
-                       }
-                    },
-                    open:function(){
-                     DialogWarp.show = Dialog.show = true;
-                     Dialog.style = 'margin-left:-'+Dialog.width()/2+'px;margin-top:-'+Dialog.height()/2+'px;';
-                    }
-                    
-                   })
-
-
-         
-              return DialogWarp;
+               
+                Modal.wrap = p.bgShow?_HTML.Fixed({
+                        style:'top:0;left:0;right:0;width:100%;height:100%;background-color:'+p.bgColor+';z-index:9999;overflow:hidden;cursor:auto;',
+                        child:[Modal.inner],
+                        show:false,
+                        on:p.bgClose?{click:function(){this.close();}}:null,
+                        close:function(){
+                           Modal.inner.show = false;
+                           if(Modal.inner.hideAni && Modal.inner.hideAni.time){
+                              setTimeout(function(){
+                                  Modal.wrap.show = false;
+                                },Modal.inner.hideAni.time)
+                        
+                           }else{
+                              Modal.wrap.show = false;
+                           }
+                           clearTimeout(Modal.autoCloseTimer);
+                        },
+                        open:function(){
+                         if(Modal.wrap.show)return;
+                          Modal.wrap.show = Modal.inner.show = true;
+                          Modal.set(Modal.wrap);
+                        }
+                        
+                       }):null;
+                   p.bgShow && Modal.con();
+              return p.bgShow?Modal.wrap:Modal.inner;
             },
             //moreWiget...
         }
@@ -1627,7 +1695,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                /*样式字符串转对象*/
                strStyleToObj:function(str){
                     var tempObj={};
-                     if(typeof str !='string'){
+                    // typeof str !='string'
+                     if(!_typeof(str,'String')){
                        return tempObj;
                       }
                    
@@ -2548,10 +2617,9 @@ SparkCoreHandler.prototype.ChunkVendors = function(codeText,callback){
 
  
       var MainJs = D.createElement('script')
-          MainJs.type = "text/javascript";
+          // MainJs.type = "text/javascript";
+          // MainJs.id='chunk-vendors';
           MainJs.innerHTML=codeText;
-          MainJs.id='chunk-vendors';
-
           D.body.appendChild(MainJs);
       var tempTimer = setTimeout(function(){
                callback();
@@ -2655,10 +2723,10 @@ SparkCoreHandler.prototype.SparkRender = function(pages) {
      _this.HandlerModuleCodeText(function(mainCodeText){
           _this.ChunkVendors(mainCodeText,function(){
               if (_this.PageCache.length == 0) {
-                var noTip = D.createElement('h2')
-                noTip.innerHTML='Warning:please solve the error or you need to create a page!';
+                var noTip = D.createElement('div')
+                noTip.innerHTML='<h2 style="background:#000;color:#fff;padding:5px;">warning:please solve the error -> failed to create page!<h2>';
                 D.body.insertBefore(noTip,D.body.firstChild);
-                console.warn('please solve the error or you need to create a page!')
+                console.warn('please solve the error -> failed to create page!')
               } else if (_this.PageCache.length > 1) {
                 _this.SparkRouter();
               } else {

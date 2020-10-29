@@ -415,24 +415,70 @@ var Other ={
   
 
 
-        var title5 =  SparkApp.Text('对话框弹窗:',{tag:'h1',style:'width:90%;margin:0 auto;'}); 
+        var title5 =  SparkApp.Text('模态框弹窗:',{tag:'h1',style:'width:90%;margin:0 auto;'}); 
        
         
        
         var  wrap5 = SparkApp.Box({
              className:wrapcss,  
-             style:'height:100px;',
+             style:'height:100px;display:flex;align-items:center;justify-content:space-around;',
              child:[
                 SparkApp.Text('弹窗1',{
-                        tag:'button',
-                        className:bthcss,
-                        style:'background-color:green;left:2px;bottom:30px;',
+                        style:'background-color:green;color:#fff;padding:5px;',
                         on:{
                             click(){
-                                 
-                                SparkApp.module.Dialog.type1.open();
-                                  
-                                
+                                SparkApp.module.Modals.type1.open();
+                            }
+                        }
+                  }),
+                SparkApp.Text('弹窗2(默认 center)',{
+                        style:'background-color:green;color:#fff;padding:5px;',
+                        on:{
+                            click(){
+                               SparkApp.module.Modals.type2.position='center';
+                                SparkApp.module.Modals.type2.open();
+                            }
+                        }
+                  }),
+                SparkApp.Text('弹窗3(topcenter)',{
+                        style:'background-color:green;color:#fff;padding:5px;',
+                        on:{
+                            click(){
+
+                                SparkApp.module.Modals.type2.position='topcenter';
+                                SparkApp.module.Modals.type2.open();
+                            }
+                        }
+                  }),
+                 SparkApp.Text('弹窗4(bottomcenter)',{
+                        style:'background-color:green;color:#fff;padding:5px;',
+                        on:{
+                            click(){
+                     
+                                SparkApp.module.Modals.type2.position='bottomcenter';
+                                SparkApp.module.Modals.type2.open();
+                            }
+                        }
+                  }),
+                  SparkApp.Text('弹窗5(bottomleft)',{
+                        style:'background-color:green;color:#fff;padding:5px;',
+                        on:{
+                            click(){
+                     
+                                SparkApp.module.Modals.type2.position='bottomleft';
+                                SparkApp.module.Modals.type2.open();
+                            }
+                        }
+                  }),
+                   SparkApp.Text('弹窗6(自动关闭2000ms)',{
+                        style:'background-color:green;color:#fff;padding:5px;',
+                        on:{
+                            click(){
+                     
+                                SparkApp.module.Modals.type2.autoClose=2000;
+                                SparkApp.module.Modals.type2.position='bottomcenter';
+                                SparkApp.module.Modals.type2.open();
+                                SparkApp.module.Modals.type2.autoClose=false;
                             }
                         }
                   }),
