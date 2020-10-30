@@ -4,7 +4,7 @@
                      style:'width:500px;height:200px;background:#fff;border:2px solid #9300FF;border-radius:5px;overflow:hidden;',
                      showAni:{ani:'fadeInDown 100ms ease-out both'},
                      hideAni:{ani:'fadeOutUp 100ms both',time:100},
-                     // bgClose:true,//点击任意可关闭 默认false
+                     bgClose:true,//点击任意可关闭 默认false
                      // bgColor:'rgba(255,255,255,0.5)',//背景颜色 默认rgba(0,0,0,0.5)
                      bgShow:true,//是否有背景 默认false
                      drag:false,//是否可拖动 默认false

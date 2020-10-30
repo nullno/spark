@@ -46,14 +46,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SPARKJS</title>
+	<meta charset="UTF-8" />
+	<title>SPARKJS</title>
 </head>
 <body>
   <script src="./js/spark.js"></script>
   <script>
-    var SparkApp = new Spark();
-      SparkApp.Render({name:'Home',path:'component/Home'});
+		var SparkApp = new Spark();
+	    SparkApp.Render({name:'Home',path:'component/Home'});
   </script>
 </body>
 </html>
@@ -64,38 +64,38 @@ var Home={
  render:function(){
 
     var Hi = SparkApp.Text('hello spark!',
-      {style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
-      stopProp:true,
-      on:{  
-          press(){
-            this.text = '不要摸我嘛~';
-          },
-          up(){
-                this.text = '----SPARK----';
-          }
-        }
-      });
+    	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
+    	stopProp:true,
+    	on:{  
+	     	  press(){
+	     			this.text = '不要摸我嘛~';
+	     	  },
+	     	  up(){
+	     	  	    this.text = '----SPARK----';
+	     	  }
+	     	}
+    	});
     var Page = SparkApp.Page({
-        style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#34495e;',
-        child:[
+	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#34495e;',
+	     	child:[
                  Hi
-        ],
-        on:{
-          click(){
-            if(Hi.text=='hello spark!'){
-              Hi.text = 'hello word!'
-              this.style='background-color:#34495e;color:#fff;'
-            }else{
-              Hi.text = 'hello spark!' 
-              this.style='background-color:#fff;color:#34495e;'
-            }
-            
-          },
-        }
-       })
+	     	],
+	     	on:{
+	     		click(){
+	     			if(Hi.text=='hello spark!'){
+	     				Hi.text = 'hello word!'
+	     				this.style='background-color:#34495e;color:#fff;'
+	     			}else{
+	     				Hi.text = 'hello spark!' 
+	     				this.style='background-color:#fff;color:#34495e;'
+	     			}
+	     			
+	     		},
+	     	}
+	     })
 
        SparkApp.module.Home =  Page;
-  
+	
   }
 
 }
