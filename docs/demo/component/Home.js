@@ -15,7 +15,7 @@ var Home={
 	     	}
     	});
     var Page = SparkApp.Page({
-	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#34495e;',
+	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#7566F9;',
 	     	child:[
                  Hi
 	     	],
@@ -23,10 +23,10 @@ var Home={
 	     		click(){
 	     			if(Hi.text=='hello spark!'){
 	     				Hi.text = 'hello word!'
-	     				this.style='background-color:#34495e;color:#fff;'
+	     				this.style='background-color:#7566F9;color:#fff;'
 	     			}else{
 	     				Hi.text = 'hello spark!' 
-	     				this.style='background-color:#fff;color:#34495e;'
+	     				this.style='background-color:#fff;color:#7566F9;'
 	     			}
 	     			
 	     		},

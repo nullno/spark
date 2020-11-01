@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>List组件</title>
+	<link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
+</head>
+<body>
+   <script src="./js/spark.js"></script>
+  <script>
+		var SparkApp = new Spark();
+        
+        var listStyle = SparkApp.Css('background-color:#fff;margin:5px;padding:5px;line-height:50px;color:#666;overflow:hidden;border-radius:5px;box-shadow:0 0 5px #ccc;');
+
+        var List =  SparkApp.List({
+		   data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
+		   item(item,index){
+		   	 var template =  SparkApp.Box({
+		                tag:'li',
+		                className:listStyle,
+		                style:'background-color:#fff;',
+		                showAni:{ani:'fadeInLeft 500ms  both'},
+                        hideAni:{ani:'bounceOutRight 500ms both',time:222},
+		                child:[
+		                      SparkApp.Text(index,{listIndex:true}),
+		                      SparkApp.Text('---'+item.b),
+		                      SparkApp.Text('删除',{
+		                      	style:'float:right;',
+		                        on:{click(){
+		                       
+		                        	  template.remove({ani:'bounceOutRight 500ms both',time:500})
+		                          }}
+		                        }),
+		                     ],
+		                init(){
+		                    // if(this.listIndex== 1){
+		                    //     this.style='background-color:#7566F9;color:#fff;';
+		                    // }else{
+		                    //     this.style='background-color:#fff;color:#666;';
+		                    // }
+		                },
+		                on:{
+		                    click(){
+		                       alert(item.b)
+		                    },
+		                    hover(){
+		                    	 listStyle.style='background-color:#fff;color:#666;'
+		                    	 this.style='background-color:#7566F9;color:#fff;';
+		                    	},
+		                    leave(){
+		                    	 this.style='background-color:#fff;color:#666;';
+		                    }	
+		                }
+
+		            });
+
+		   	    return template;
+		   }
+
+		 })
+        
+
+        var btncss = SparkApp.Css('background:#9300FF;color:#fff;border-radius:5px;padding:20px 10px;margin:5px;');
+  
+        var  option1= SparkApp.Text('头部插入数据',
+              {
+              	 className:btncss,
+              	 on:{
+                        click(){
+       
+                           List.insertFirst({a:'item',b:'头部插入数据1'+Math.random(0,100)*10})
+
+                           
+                        }
+
+                     }   
+              });
+        var  option2 = SparkApp.Text('尾部插入数据',
+              {
+              	 className:btncss,
+              	 on:{
+                        click(){
+       
+                            List.insertLast([{a:'item',b:'尾部插入数据1'+Math.random(0,100)*10},{a:'item',b:'尾部插入数据2'+Math.random(0,100)*10}]);
+                           
+                        }
+
+                     }   
+              });
+
+        var  option3 = SparkApp.Text('指定位置插入数据',
+              {
+              	 className:btncss,
+              	 on:{
+                        click(){
+       
+                            List.insert(1,[{a:'item',b:'指定位置插入数据1'+Math.random(0,100)*10},{a:'item',b:'指定位置插入数据2'+Math.random(0,100)*10}]);
+                               
+                           
+                        }
+
+                     }   
+              });
+
+          var  option4 = SparkApp.Text('更新倒数第二条数据',
+              {
+              	 className:btncss,
+              	 on:{
+                        click(){
+                              List.update(List.data.length-2,{a:'更新',b:'倒数第二条数据已更新',c:{f:'666666'}})
+                           
+                           
+                        }
+
+                     }   
+              });
+
+             var  option5 = SparkApp.Text('删除倒数第二条数据',
+              {
+              	 className:btncss,
+              	 on:{
+                        click(){
+       
+                           List.delete(List.data.length-2,1);
+                           
+                        }
+
+                     }   
+              });
+
+               var  option6 = SparkApp.Text('删除前两条数据',
+              {
+              	 className:btncss,
+              	 on:{
+                        click(){
+                           List.delete(0,2);
+                        }
+
+                     }   
+              });
+
+                  var  option7 = SparkApp.Text('清空数据',
+              {
+              	 className:btncss,
+              	 on:{
+                        click(){
+       
+                           List.clear();
+                           
+                        }
+
+                     }   
+              });
+
+
+         var  optionBox = SparkApp.Fixed({
+         	   style:'width:100%;display:flex;justify-content:center;bottom:3%;background:transparent;',
+         	   child:[option1,option2,option3,option4,option5,option6,option7]
+         }) 
+         SparkApp.Page({
+	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
+	     	child:[List,optionBox]
+	     })
+       
+	    SparkApp.Render();
+
+  </script>
+</body>
+</html>

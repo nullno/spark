@@ -783,11 +783,12 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                              }
                              
                              if(index>=_thisMaxIndex){
+
                                 _thisMaxIndex==0?_this.insertFirst(newdatas,noani):_this.insertLast(newdatas,noani);
                             
                              }else{
-                              
-                                  SparkUtil.traverse(newdata,function(item,index,end){
+                                
+                                  SparkUtil.traverse(newdatas,function(item,index,end){
                                      var _widget = _this.item(item,'');
                                      noani?(delete _widget.showAni,_widget.style='animation:none;'):'';
                                      tempWidget.push(_widget);
@@ -802,8 +803,8 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                             return this;
                      },
                      update:function(index,newdata){
-                        if(_typeof(newdata,'Undefined') || _typeof(newdata,'Null') || index>this.data.length-1){
-                                  console.warn('no data or not found');return;
+                        if(_typeof(newdata,'Undefined') || _typeof(newdata,'Null') || index>this.data.length-1 || index<0){
+                                  console.warn('not found data');return;
                             }
                      
                       var tempData=null;
@@ -814,6 +815,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                       if(_typeof(newdata,'String')|| _typeof(newdata,'Number')){
                             tempData = newdata;
                       }
+
                       this.insert(index,tempData,true);
                       
                       this.delete(((index+1>=this.data.length-1)?this.data.length-2:index+1),1,true);
@@ -1071,7 +1073,7 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
 
                 _scope.CSSCache[address] = obj;
                 _core.setDefineProperty(address, ['style']);
-                obj = 0;
+
                 return _scope.CSSCache[address];
             },
             Page: function(p) {
@@ -1584,7 +1586,6 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                         }
                         
                        }):null;
-                  console.log(Modal.wrap)
                    p.bgShow && Modal.con();
               return p.bgShow?Modal.wrap:Modal.inner;
             },
@@ -1932,7 +1933,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                 node.on['click'](node);
             }, 100) : function(e){
                  e.stopPropagation();
-                 node.on['click'].call(node);
+                 node.on['click'].call(node,e);
 
             },{capture:false,passive:true})
         }
@@ -1944,7 +1945,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                     var ev = e || window.event;
                     spfn.start.call(node,ev,target)
                  }else{
-                    node.on['press'].call(node);
+                    node.on['press'].call(node,e);
                  }
             },{capture:true,passive:true});
            
@@ -1954,7 +1955,7 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
            addEventListener(target,SparkUtil.env.isMobile ? 'touchmove' : 'mousemove', function(e){
                    e.stopPropagation();
 
-                   node.on['move'].call(node);
+                   node.on['move'].call(node,e);
               
             },{capture:true,passive:true});
            
@@ -1966,10 +1967,38 @@ SparkCoreHandler.prototype.getAddressData = function(address) {
                     var ev = e || window.event;
                     spfn.end.call(node,ev,target)
                  }else{
-                    node.on['up'].call(node);
+                    node.on['up'].call(node,e);
                  }
             },{capture:true,passive:true});
           
+        }
+
+        if(node.on['hover']){
+           addEventListener(target,'mouseover', function(e){
+                 e.stopPropagation();
+                  node.on['hover'].call(node,e);
+            });
+        }
+
+        if(node.on['enter']){
+           addEventListener(target,'mouseenter', function(e){
+                 e.stopPropagation();
+                  node.on['enter'].call(node,e);
+            });
+        }
+
+        if(node.on['out']){
+           addEventListener(target,'mouseout', function(e){
+                 e.stopPropagation();
+                  node.on['out'].call(node,e);
+            });
+        }
+
+         if(node.on['leave']){
+           addEventListener(target,'mouseleave', function(e){
+                 e.stopPropagation();
+                  node.on['leave'].call(node,e);
+            });
         }
   
  }
@@ -2692,9 +2721,11 @@ SparkCoreHandler.prototype.HandlerModule = function(_modules){
  * @AuthorHTL
  * @DateTime  2020-03-30T23:42:32+0800
  */
-SparkCoreHandler.prototype.SparkRouter = function() {
+SparkCoreHandler.prototype.SparkRouter = function(type) {
   var _this = SparkCoreManage;
-  _this.PageCache = _this.PageCache.reverse();
+  if(type=='PageModule'){
+    _this.PageCache = _this.PageCache.reverse();
+  }
   var pages = _this.PageCache;
   var i=0;
   var _core = function(pageitem){
@@ -2718,6 +2749,22 @@ SparkCoreHandler.prototype.SparkRender = function(pages) {
   var _this = SparkCoreManage;
   var _scope = this;    
   var PageModule = [];
+  var _core = function(type){
+      if (_this.PageCache.length == 0) {
+                var noTip = D.createElement('div')
+                noTip.innerHTML='<h2 style="background:#000;color:#fff;padding:5px;">warning:please solve the error -> failed to create page!<h2>';
+                D.body.insertBefore(noTip,D.body.firstChild);
+                console.warn('please solve the error -> failed to create page!')
+              } else if (_this.PageCache.length > 1) {
+                _this.SparkRouter(type);
+              } else {
+                _this.createDomTree(_this.PageCache[0],D.body,true);
+              }
+  }  
+
+      if(_typeof(pages,'Undefined')){
+            _core('PageSingle')
+       }
       if(_typeof(pages,'Object')){
          PageModule.push(pages);
        }
@@ -2729,16 +2776,7 @@ SparkCoreHandler.prototype.SparkRender = function(pages) {
 
      _this.HandlerModuleCodeText(function(mainCodeText){
           _this.ChunkVendors(mainCodeText,function(){
-              if (_this.PageCache.length == 0) {
-                var noTip = D.createElement('div')
-                noTip.innerHTML='<h2 style="background:#000;color:#fff;padding:5px;">warning:please solve the error -> failed to create page!<h2>';
-                D.body.insertBefore(noTip,D.body.firstChild);
-                console.warn('please solve the error -> failed to create page!')
-              } else if (_this.PageCache.length > 1) {
-                _this.SparkRouter();
-              } else {
-                _this.createDomTree(_this.PageCache[0],D.body,true);
-              }
+             _core('PageModule')
           });
 
      })

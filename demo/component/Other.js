@@ -25,7 +25,8 @@ var Other ={
             click:function(){
                  useCode.text='显示隐藏：\n\nimg1.show=!img1.show';
                 img1.show=!img1.show
-            }
+            },
+
           }
      })
 
@@ -186,6 +187,14 @@ var Other ={
             child:function(o,n){
              console.log('update')
             }
+        },
+        on:{
+            hover:function(){
+                 this.style='border:1px dashed red;'
+            },
+            leave:function(){
+               this.style='border:1px dashed #fff;'
+            }
         }
     })
  
@@ -194,6 +203,7 @@ var Other ={
     
     var listStyle = SparkApp.Css('margin:5px;padding:5px;background-color:#666;');//animation: fadeInLeft 500ms both;
     
+ 
 
     var  List = SparkApp.List({
           data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
@@ -294,7 +304,7 @@ var Other ={
                              
                               useCode.text="更新数据:\n\n List.update(index,<newdata>)";
                               
-                              List.update(List.data.length-1,{a:'hellllllll',c:{f:'666666'}})
+                              List.update(List.data.length-2,{a:'hellllllll',c:{f:'666666'}})
                      
                             }
                         }
