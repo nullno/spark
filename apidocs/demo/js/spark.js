@@ -1231,13 +1231,16 @@ SparkCoreHandler.prototype.WidgetDefineProperty =function(obj, propertys) {
                 };
                 p.stopAutoPlay=function(){
                   if(this.autoPlayTimer){
+
                      clearTimeout(this.autoPlayTimer);
+                     this.option.autoPlay = false;
+                     this.autoPlayTimer = null;
                   } 
                 }
-                p.startAutoPlay=function(){
+                p.startAutoPlay=function(time){
 
                   var _this = this;
-                  this.option.autoPlay = this.option.autoPlay || true;
+                  this.option.autoPlay = time || this.option.autoPlay || true;
                   var time = (this.option.autoPlay === true)?3000:this.option.autoPlay; 
                       time= time>2000?time:2000;
             

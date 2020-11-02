@@ -1,0 +1,23 @@
+{
+  "name": "spark",
+  "version": "1.0.0",
+  "description": "Create web quickly",
+  "scripts": {
+    "dev": "dev",
+    "build":"webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nullno/spark.git"
+  },
+  "author": "wjd",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nullno/spark/issues"
+  },
+  "homepage": "https://github.com/nullno/spark#readme",
+  "devDependencies": {
+    "webpack": "^5.3.2",
+    "webpack-cli": "^4.1.0"
+  }
+}

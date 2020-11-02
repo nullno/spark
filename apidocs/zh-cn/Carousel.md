@@ -72,7 +72,7 @@ SparkApp.Carousel({
  
  `Carousel.stopAutoPlay()` 停止自动轮播
 
- `Carousel.startAutoPlay()` 开始自动轮播
+ `Carousel.startAutoPlay(time)` 开始自动轮播
 
  `Carousel.on.slideStart()`  滑动开始监听
 
