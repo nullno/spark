@@ -59,12 +59,14 @@ var Other ={
      
      var bthcss = SparkApp.Css('border:0;position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
      var wrapcss=SparkApp.Css('width:90%;height:300px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;');
-    
+     
+     var bthcss5 =  SparkApp.Css('background:red; color:pink;');
      var btnAdd1 = SparkApp.Box({
       tag:'button',
       style:'background-color:green;left:2px;',
       className:bthcss,
       child:[SparkApp.Text('ADD append')],
+      shover:bthcss5,
       on:{
         click:function(_this){
                  activeText.text='append';
@@ -154,6 +156,9 @@ var Other ={
                    // node1.style='animation: bounceOut 500ms both';
                    node1.remove();
 
+                   // targetContainer.empty();
+                   // SparkApp.remove(targetContainer,node1);
+
         }
           }
      })
@@ -168,7 +173,7 @@ var Other ={
                     activeText.text='remove WidgetIndex';
                     useCode.text="删除索引元素：\n\n方式1：targetContainer.remove(<Widget> | <Index> |<firstChild,lastChild>)\n\n方式2：\n删除指定索引：SparkApp.remove(targetContainer,2);\n删除第一个:SparkApp.remove(targetContainer,'firstChild')\n删除最后一个：SparkApp.remove(targetContainer,'lastChild');";
                 
-                     targetContainer.removeChild(0)
+                     targetContainer.removeChild(node1)
                   
 
             }
@@ -214,7 +219,7 @@ var Other ={
                 style:'margin:5px;padding:5px;background-color:#666;border:1px dashed #fff;',
                 className:listStyle,
                 showAni:{ani:'fadeInLeft 500ms  both'},
-                hideAni:{ani:'bounceOutRight 500ms both',time:222},
+                hideAni:{ani:'bounceOutRight 500ms both',time:500},
                 child:[
                       SparkApp.Box({
                         style:'min-width:20px;height:20px;background:blue;line-height:20px;float:left;',

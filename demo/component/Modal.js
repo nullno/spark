@@ -16,6 +16,7 @@
                                 style:'position:absolute;background:#9300FF;text-align:center;color:#fff; width:30px;height:30px;line-height:30px; right:0;top:0;',
                                  on:{
                                     click(){
+
                                          Modal1.close();
                                     }
                                   }
@@ -39,6 +40,7 @@
                                 style:'position:absolute;background:#3C6B87;text-align:center;color:#fff; width:30px;height:30px;line-height:30px; right:0;top:0;',
                                  on:{
                                     click(){
+                              
                                          Modal2.close();
                                     }
                                   }
