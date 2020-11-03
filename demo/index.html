@@ -6,15 +6,12 @@
     <link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
 </head>
 <body>
-  <script src="../release/spark.js"></script>
+  <script src="../release/version@1.1/spark.min.js"></script>
   <script>
-  	
-		/**
-		* demo202009021 [Dialog]  mainJs压缩  
-		*/
-		var SparkApp = new Spark();
 
-	    SparkApp.Render([{
+  	Spark.ad(1)
+
+	    Spark.Render([{
          	             name:'Home',
 				         path:'component/Home',
 				         depends:{name:'Other',
@@ -37,7 +34,7 @@
                         ]
 				        );
 		
-        console.log(SparkApp)
+        console.log(Spark)
   </script>
 </body>
 </html>

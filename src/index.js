@@ -1,8 +1,15 @@
- function component() {
-    var element = document.createElement('div');
+
+function Spark() {
 
 
-    element.innerHTML = 'csc';
+    return {
 
-    return element;
-  }
+       a(s){
+            console.log(s)
+       }
+    }
+}
+
+
+
+export default Spark();

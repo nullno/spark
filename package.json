@@ -2,13 +2,14 @@
   "name": "spark",
   "version": "1.0.0",
   "description": "Create web quickly",
+  "main": "./release/version@1.1/spark.min.js",
   "scripts": {
-    "dev": "dev",
-    "build":"webpack"
+    "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nullno/spark.git"
+    "url": "https://github.com/nullno/spark.git"
   },
   "author": "wjd",
   "license": "ISC",
@@ -17,7 +18,14 @@
   },
   "homepage": "https://github.com/nullno/spark#readme",
   "devDependencies": {
-    "webpack": "^5.3.2",
-    "webpack-cli": "^4.1.0"
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-es2015": "^6.24.1",
+    "clean-webpack-plugin": "^3.0.0",
+    "html-webpack-plugin": "^4.5.0",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   }
 }
