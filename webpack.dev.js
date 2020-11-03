@@ -9,11 +9,11 @@ const webpackConfig  = {
    },
    output: {
     filename: '[name].dev.js',
-    path: path.resolve(__dirname, 'dist'),
-    globalObject: 'this',
-    library:"Spark",
+    path: path.resolve(__dirname, './dist'),
+    library: 'Spark',
     libraryTarget: 'umd',
-    libraryExport: 'default'
+    globalObject: 'this'
+    // libraryExport: 'default',
    },
    devServer:{
    	 disableHostCheck: true,
@@ -30,8 +30,9 @@ const webpackConfig  = {
    module: {
         rules: [
         {
-        	test:/\.(js|jsx)$/,
-        	use: 'babel-loader',
+          test: /\.(js)$/,
+          exclude: /(node_modules|bower_components)/,
+          use: 'babel-loader'
         }
         ],
     },

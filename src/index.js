@@ -1,15 +1,4 @@
 
-function Spark() {
+import Spark from './core/index.js'
 
-
-    return {
-
-       a(s){
-            console.log(s)
-       }
-    }
-}
-
-
-
-export default Spark();
+export default Spark;

@@ -5,14 +5,10 @@
 	<title>index-single</title>
 </head>
 <body>
-  <script src="../release/spark.js"></script>
+   <script src="./spark.min.js"></script>
   <script>
   	
-		/**
-		* demo202009021 [Dialog]  mainJs压缩  
-		*/
-		var SparkApp = new Spark();
-        var Hi = SparkApp.Text('hello spark!',
+        var Hi = Spark.Text('hello spark!',
     	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
     	stopProp:true,
     	on:{  
@@ -25,8 +21,8 @@
 	     	}
     	});
 
-       SparkApp.Page({
-	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#34495e;',
+       Spark.Page({
+	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;',
 	     	child:[
                  Hi
 	     	],
@@ -44,7 +40,7 @@
 	     	}
 	     })
        
-	    SparkApp.Render();
+	    Spark.Render();
 
   </script>
 </body>

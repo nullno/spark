@@ -2,7 +2,7 @@ const Spark = require('../index.js');
 	
    
    console.log(Spark)
-	Spark.a(16)
+
 
         var Hi = Spark.Text('hello spark!',
     	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',

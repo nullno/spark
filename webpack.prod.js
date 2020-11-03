@@ -11,10 +11,10 @@ const webpackConfig  = {
    output: {
     filename: '[name].min.js',
     path: path.resolve(__dirname, 'release/version@1.1'),
-    globalObject: 'this',
-    library:"Spark",
+    library: 'Spark',
     libraryTarget: 'umd',
-    libraryExport: 'default'
+    globalObject: 'this'
+    // libraryExport: 'default',
    },
    plugins:[
     new UglifyJsPlugin(),
@@ -23,11 +23,16 @@ const webpackConfig  = {
    module: {
         rules: [
         {
-        	test:/\.(js|jsx)$/,
-        	use: 'babel-loader',
+        	test: /\.(js)$/,
+          exclude: /(node_modules|bower_components)/,
+          use: 'babel-loader'
         }
         ],
     },
+
+    stats:{
+        version: true,
+    }
 
 };
 

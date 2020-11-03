@@ -6,15 +6,14 @@
 	<link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
 </head>
 <body>
-   <script src="./js/spark@1.0.min.js"></script>
+  <script src="./js/spark.min.js"></script>
   <script>
-		var SparkApp = new Spark();
-        
-        var Stack1 =SparkApp.Stack({
+
+        var Stack1 =Spark.Stack({
                style:'width:50%;height:300px;background:#fff;overflow:hidden;float:left;',
                child:[
                 
-                  shape1 = SparkApp.Drag({
+                  shape1 = Spark.Drag({
                      style:'width:250px;height:100px;background:#000;border-radius:100px;z-index:9;left:165px;top:103px;',
                      //约束条件
                       bounded:{
@@ -35,22 +34,22 @@
                   ]
               });
 
-        var Stack2 =SparkApp.Stack({
+        var Stack2 =Spark.Stack({
                style:'width:50%;height:300px;background:#7566F9;overflow:hidden;float:right;',
                child:[
-                  SparkApp.Position({
+                  Spark.Position({
                        style:'width:250px;height:100px;background:#fff;border-radius:100px;left:165px;top:103px;',
                       })]
               });
        
-       var  wrap = SparkApp.Box({ 
+       var  wrap = Spark.Box({ 
              style:'width:90%;height:300px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;overflow:hidden;border-radius:100px;',
              child:[Stack1,Stack2]
          })
 
-         var btncss = SparkApp.Css('background:#9300FF;color:#fff;border-radius:5px;padding:20px 10px;margin:5px;');
+         var btncss = Spark.Css('background:#9300FF;color:#fff;border-radius:5px;padding:20px 10px;margin:5px;');
          // 设置约束条件1
-         var  setbounded1= SparkApp.Text('不可越过边界',
+         var  setbounded1= Spark.Text('不可越过边界',
               {
               	 className:btncss,
               	 on:{
@@ -64,7 +63,7 @@
               });
 
           // 设置约束条件2
-          var  setbounded2= SparkApp.Text('Y轴可以拖动',
+          var  setbounded2= Spark.Text('Y轴可以拖动',
               {
               	 className:btncss,
               	 on:{
@@ -76,7 +75,7 @@
                      }   
               });
           // 设置约束条件3
-          var  setbounded3 = SparkApp.Text('X轴可以拖动',
+          var  setbounded3 = Spark.Text('X轴可以拖动',
               {
               	 className:btncss,
               	 on:{
@@ -88,16 +87,16 @@
                      }   
               });  
  
-         var  optionBox = SparkApp.Fixed({
+         var  optionBox = Spark.Fixed({
          	   style:'width:100%;display:flex;justify-content:center;bottom:3%;background:transparent;',
          	   child:[setbounded1,setbounded2,setbounded3]
          }) 
-         SparkApp.Page({
-	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
+         Spark.Page({
+	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
 	     	child:[wrap,optionBox]
 	     })
        
-	    SparkApp.Render();
+	    Spark.Render();
 
   </script>
 </body>

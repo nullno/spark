@@ -2,9 +2,9 @@
 */
 var Other ={ 
  render:function(){
-     var Carousel1 = SparkApp.module.Carousel1;
- var title1 =  SparkApp.Text('状态：',{
-        child:[activeText=SparkApp.Text('READY....',{
+     var Carousel1 = Spark.module.Carousel1;
+ var title1 =  Spark.Text('状态：',{
+        child:[activeText=Spark.Text('READY....',{
          style:'color:red;',
          watch:{
                   text(ov,nv){
@@ -16,8 +16,8 @@ var Other ={
      
 
 
-     var boxComCss = SparkApp.Css('position:absolute;width:50%;height:100%;text-align:left;padding:5px;background:#666;z-index:0;top:0;');
-     var useCode = SparkApp.Text('READY....',{
+     var boxComCss = Spark.Css('position:absolute;width:50%;height:100%;text-align:left;padding:5px;background:#666;z-index:0;top:0;');
+     var useCode = Spark.Text('READY....',{
           tag:'pre',
           className:boxComCss,
           style:'left:0;',
@@ -30,19 +30,19 @@ var Other ={
           }
      })
 
-     var node1 = SparkApp.Box({
+     var node1 = Spark.Box({
       style:'min-width:20px;height:20px;background:red;display:inline-block;margin:2px;color:#fff;padding:0 5px;line-height:20px;overflow:hidden;',
             showAni:{ani:'zoomIn 500ms both'},
             hideAni:{ani:'bounceOut 500ms both',time:500},
       on:{
         click:function(){
-                    this.prepend(SparkApp.Text('node1'))
+                    this.prepend(Spark.Text('node1'))
       
         }
       }
     })
      
-  var img1 = SparkApp.Image('https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3836963292,3556801655&fm=26&gp=0.jpg',
+  var img1 = Spark.Image('https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3836963292,3556801655&fm=26&gp=0.jpg',
         {
             style:'width:100px;display:inline-block;',
             idName:'tupian',
@@ -51,47 +51,47 @@ var Other ={
             show:true,//默认true;
          });
 
-     var targetContainer = SparkApp.Box({
+     var targetContainer = Spark.Box({
          className:boxComCss,
          style:'right:0;',
          child:[node1,img1]
      })
      
-     var bthcss = SparkApp.Css('border:0;position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
-     var wrapcss=SparkApp.Css('width:90%;height:300px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;');
+     var bthcss = Spark.Css('border:0;position:absolute;bottom:2px;background-color:#ccc;color:#fff;padding:10px;')
+     var wrapcss=Spark.Css('width:90%;height:300px;margin:20px auto;border:1px dashed #fff; border-radius:5px;position:relative;text-align:center;');
      
-     var bthcss5 =  SparkApp.Css('background:red; color:pink;');
-     var btnAdd1 = SparkApp.Box({
+     var bthcss5 =  Spark.Css('background:red; color:pink;');
+     var btnAdd1 = Spark.Box({
       tag:'button',
       style:'background-color:green;left:2px;',
       className:bthcss,
-      child:[SparkApp.Text('ADD append')],
+      child:[Spark.Text('ADD append')],
       shover:bthcss5,
       on:{
         click:function(_this){
                  activeText.text='append';
-                 useCode.text='后置追加元素：\n\n方法1:targetContainer.append([node1,node1]);\n方法2：SparkApp.append(targetContainer,[node1,node1]);';
+                 useCode.text='后置追加元素：\n\n方法1:targetContainer.append([node1,node1]);\n方法2：Spark.append(targetContainer,[node1,node1]);';
                  targetContainer.append([node1,node1]);  
         }
       }
      })
 
-      var btnAdd2 = SparkApp.Box({
+      var btnAdd2 = Spark.Box({
         tag:'button',
         style:'background-color:green;left:2px;bottom:45px;',
         className:bthcss,
-        child:[SparkApp.Text('ADD prepend')],
+        child:[Spark.Text('ADD prepend')],
         on:{
             click:function(_this){
                  activeText.text='prepend';
-                 useCode.text='前置添加元素：\n\n方法1:targetContainer.prepend(node2);\n方法2：SparkApp.prepend(targetContainer,node2);';
-                 targetContainer.prepend(SparkApp.Box({
+                 useCode.text='前置添加元素：\n\n方法1:targetContainer.prepend(node2);\n方法2：Spark.prepend(targetContainer,node2);';
+                 targetContainer.prepend(Spark.Box({
                                             style:'min-width:20px;height:20px;background:yellow;display:inline-block;margin:2px;color:blue;padding:0 5px;line-height:20px;overflow:hidden;animation: bounceInLeft 0.5s both;',
                                             showAni:{ani:'bounceInLeft 0.5s both'},
                                             hideAni:{ani:'bounceOut 500ms both',time:500},
                                             on:{
                                                 click:function(){
-                                                  this.prepend(SparkApp.Text('node2'))
+                                                  this.prepend(Spark.Text('node2'))
                                                 }
                                             }
                                         })
@@ -103,23 +103,23 @@ var Other ={
      })
       
       /*after()*/
-    var btnAfter = SparkApp.Box({
+    var btnAfter = Spark.Box({
       tag:'button',
       style:'background-color:green;left:100px;',
       className:bthcss,
-      child:[SparkApp.Text('ADD after')],
+      child:[Spark.Text('ADD after')],
       on:{
         click:function(_this){
                  activeText.text='after';
                  useCode.text='指定元素后插入：\n\nimg1.after(<w>,{ani:<ani string>})';
 
-                 img1.after([SparkApp.Box({
+                 img1.after([Spark.Box({
                                             style:'min-width:20px;height:20px;background:pink;display:inline-block;margin:2px;color:blue;padding:0 5px;line-height:20px;overflow:hidden;',
                                             showAni:{ani:'zoomIn 500ms both'},
                                             hideAni:{ani:'bounceOut 500ms both',time:500},
                                             on:{
                                                 click:function(){
-                                                  this.prepend(SparkApp.Text('node3'))
+                                                  this.prepend(Spark.Text('node3'))
                                                 }
                                             }
                                         })]);  
@@ -127,11 +127,11 @@ var Other ={
         }
        })
        /*before()*/
-       var btnBefore = SparkApp.Box({
+       var btnBefore = Spark.Box({
       tag:'button',
       style:'background-color:green;left:100px;bottom:45px;',
       className:bthcss,
-      child:[SparkApp.Text('ADD before')],
+      child:[Spark.Text('ADD before')],
       on:{
         click:function(_this){
                  activeText.text='before';
@@ -143,35 +143,35 @@ var Other ={
        })
 
 
-      var btnDel1 = SparkApp.Box({
+      var btnDel1 = Spark.Box({
       tag:'button',
       style:'background-color:#666;right:2px;',
       className:bthcss,
-      child:[SparkApp.Text('DEL Target node')],
+      child:[Spark.Text('DEL Target node')],
       on:{
         click:function(_this){
                   
                    activeText.text='remove widget';
-                   useCode.text='删除指定元素：\n\n方法1:node1.remove(ani);\n方法2：SparkApp.remove(targetContainer,node1);';
+                   useCode.text='删除指定元素：\n\n方法1:node1.remove(ani);\n方法2：Spark.remove(targetContainer,node1);';
                    // node1.style='animation: bounceOut 500ms both';
                    node1.remove();
 
                    // targetContainer.empty();
-                   // SparkApp.remove(targetContainer,node1);
+                   // Spark.remove(targetContainer,node1);
 
         }
           }
      })
 
-      var btnDel2 = SparkApp.Box({
+      var btnDel2 = Spark.Box({
         tag:'button',
         style:'background-color:#666;right:2px;bottom:45px;',
         className:bthcss,
-        child:[SparkApp.Text('DEL index=0')],
+        child:[Spark.Text('DEL index=0')],
         on:{
             click:function(_this){
                     activeText.text='remove WidgetIndex';
-                    useCode.text="删除索引元素：\n\n方式1：targetContainer.remove(<Widget> | <Index> |<firstChild,lastChild>)\n\n方式2：\n删除指定索引：SparkApp.remove(targetContainer,2);\n删除第一个:SparkApp.remove(targetContainer,'firstChild')\n删除最后一个：SparkApp.remove(targetContainer,'lastChild');";
+                    useCode.text="删除索引元素：\n\n方式1：targetContainer.remove(<Widget> | <Index> |<firstChild,lastChild>)\n\n方式2：\n删除指定索引：Spark.remove(targetContainer,2);\n删除第一个:Spark.remove(targetContainer,'firstChild')\n删除最后一个：Spark.remove(targetContainer,'lastChild');";
                 
                      targetContainer.removeChild(node1)
                   
@@ -184,7 +184,7 @@ var Other ={
 
      
 
-   var  wrap = SparkApp.Box({
+   var  wrap = Spark.Box({
         className:wrapcss,
         style:'overflow:hidden;',
         child:[useCode,targetContainer,btnAdd1,btnAdd2,btnAfter,btnBefore,btnDel1,btnDel2],
@@ -203,33 +203,33 @@ var Other ={
         }
     })
  
-    var title2 =  SparkApp.Text('列表渲染：',{
+    var title2 =  Spark.Text('列表渲染：',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
     
-    var listStyle = SparkApp.Css('margin:5px;padding:5px;background-color:#666;');//animation: fadeInLeft 500ms both;
+    var listStyle = Spark.Css('margin:5px;padding:5px;background-color:#666;');//animation: fadeInLeft 500ms both;
     
  
 
-    var  List = SparkApp.List({
+    var  List = Spark.List({
           data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
           style:'width:100%;margin:0px auto;padding:5px;padding-bottom:100px;overflow:hidden;',
           item:function(item,index){
-            return SparkApp.Box({
+            return Spark.Box({
                 tag:'li',
                 style:'margin:5px;padding:5px;background-color:#666;border:1px dashed #fff;',
                 className:listStyle,
                 showAni:{ani:'fadeInLeft 500ms  both'},
                 hideAni:{ani:'bounceOutRight 500ms both',time:500},
                 child:[
-                      SparkApp.Box({
+                      Spark.Box({
                         style:'min-width:20px;height:20px;background:blue;line-height:20px;float:left;',
-                        child:[SparkApp.Text(index,{listIndex:true})]
+                        child:[Spark.Text(index,{listIndex:true})]
                       }),
-                      SparkApp.Text(index,{listIndex:true}),
-                      SparkApp.Text('---'+item.a+'---',{
+                      Spark.Text(index,{listIndex:true}),
+                      Spark.Text('---'+item.a+'---',{
                         on:{click(){alert(item.b)}}
                         }),
-                     (item.c)?SparkApp.Text(item.c.f):SparkApp.Text(item.b),
+                     (item.c)?Spark.Text(item.c.f):Spark.Text(item.b),
           
                     
                      ],
@@ -257,11 +257,11 @@ var Other ={
      })
 
     /*渲染列表框*/
-     var  wrap2 = SparkApp.Box({
+     var  wrap2 = Spark.Box({
            className:wrapcss,  
            style:'min-height:300px;height:auto;',
            child:[List,
-                SparkApp.Text('尾部插入1',{
+                Spark.Text('尾部插入1',{
                     tag:'button',
                     className:bthcss,
                     style:'background-color:green;left:2px;bottom:0;',
@@ -273,7 +273,7 @@ var Other ={
                         }
                     }
                   }),
-                    SparkApp.Text('头部插入2',{
+                    Spark.Text('头部插入2',{
                         tag:'button',
                         className:bthcss,
                         style:'background-color:green;left:2px;bottom:45px;',
@@ -286,7 +286,7 @@ var Other ={
                             }
                         }
                       }),
-                     SparkApp.Text('指定位置插入3',{
+                     Spark.Text('指定位置插入3',{
                         tag:'button',
                         className:bthcss,
                         style:'background-color:green;left:85px;bottom:0;',
@@ -300,7 +300,7 @@ var Other ={
                             }
                         }
                       }),
-                      SparkApp.Text('更新数据1',{
+                      Spark.Text('更新数据1',{
                         tag:'button',
                         className:bthcss,
                         style:'background-color:green;left:85px;bottom:45px;',
@@ -314,7 +314,7 @@ var Other ={
                             }
                         }
                       }),
-                       SparkApp.Text('删除列表',{
+                       Spark.Text('删除列表',{
                         tag:'button',
                         className:bthcss,
                         style:'background-color:#666;right:2px;bottom:0;',
@@ -331,24 +331,24 @@ var Other ={
        });
 
 
-       var title3 =  SparkApp.Text('层叠容器/可拖动容器:',{
+       var title3 =  Spark.Text('层叠容器/可拖动容器:',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
 
-       var Stack1 = SparkApp.Stack({
+       var Stack1 = Spark.Stack({
            style:'width:50%;height:300px;background:#fff;overflow:hidden;float:left;',
            child:[
-                  SparkApp.Position({
-                   child:[SparkApp.Text('移动端不显示')],
+                  Spark.Position({
+                   child:[Spark.Text('移动端不显示')],
                    style:'width:100px;height:100px;background:blue;',
-                   show:SparkApp.env.isMobile?false:true,
+                   show:Spark.env.isMobile?false:true,
                   }),
-                  !SparkApp.env.isMobile?SparkApp.Position({
-                   child:[SparkApp.Text('移动端不渲染')],
+                  !Spark.env.isMobile?Spark.Position({
+                   child:[Spark.Text('移动端不渲染')],
                    style:'width:100px;height:100px;background:#FF8905;left:40px;top:40px;',
                    }):null,
-                  SparkApp.Position({
+                  Spark.Position({
                        style:'width:100px;height:100px;background:pink;left:80px;top:80px;',
-                       child:[SparkApp.Text('不可越过边界')],
+                       child:[Spark.Text('不可越过边界')],
                        on:{
                         click(){
 
@@ -357,7 +357,7 @@ var Other ={
                         },
                        }
                    }),
-                  shape1 = SparkApp.Drag({
+                  shape1 = Spark.Drag({
                      style:'width:100px;height:100px;background:#9300FF;border-radius:100px;z-index:9;',
                      //约束条件
                       bounded:{
@@ -378,17 +378,17 @@ var Other ={
             ]
        })
 
-       var Stack2 =SparkApp.Stack({
+       var Stack2 =Spark.Stack({
                style:'width:50%;height:300px;background:yellow;overflow:hidden;float:right;',
                child:[
-                  SparkApp.Position({
+                  Spark.Position({
                        style:'width:100px;height:100px;background:#F7156A;border-radius:100px;',
                       })]
               })
 
 
         /*层叠容器/可拖动容器：*/  
-       var  wrap3 = SparkApp.Box({
+       var  wrap3 = Spark.Box({
              className:wrapcss,  
              style:'min-height:300px;height:auto;',
              child:[Stack1,Stack2]
@@ -398,14 +398,14 @@ var Other ={
       
 
         /*轮播图：*/  
-        var title4 =  SparkApp.Text('轮播(coding....):',{
+        var title4 =  Spark.Text('轮播(coding....):',{
         tag:'h1',style:'width:90%;margin:0 auto;'}); 
 
-        var  wrap4 = SparkApp.Box({
+        var  wrap4 = Spark.Box({
              className:wrapcss,  
              style:'height:300px;',
              child:[Carousel1,
-               SparkApp.Text('上一张',{
+               Spark.Text('上一张',{
                         tag:'button',
                         className:bthcss,
                         style:'background-color:rgba(0,0,0,0.5);left:88px;bottom:125px;',
@@ -415,7 +415,7 @@ var Other ={
                             }
                         }
                       }),
-                 SparkApp.Text('下一张',{
+                 Spark.Text('下一张',{
                         tag:'button',
                         className:bthcss,
                         style:'background-color:rgba(0,0,0,0.5);right:88px;bottom:125px;',
@@ -430,70 +430,70 @@ var Other ={
   
 
 
-        var title5 =  SparkApp.Text('模态框弹窗:',{tag:'h1',style:'width:90%;margin:0 auto;'}); 
+        var title5 =  Spark.Text('模态框弹窗:',{tag:'h1',style:'width:90%;margin:0 auto;'}); 
        
         
        
-        var  wrap5 = SparkApp.Box({
+        var  wrap5 = Spark.Box({
              className:wrapcss,  
              style:'height:100px;display:flex;align-items:center;justify-content:space-around;',
              child:[
-                SparkApp.Text('弹窗1',{
+                Spark.Text('弹窗1',{
                         style:'background-color:green;color:#fff;padding:5px;',
                         on:{
                             click(){
-                                SparkApp.module.Modals.type1.open();
+                                Spark.module.Modals.type1.open();
                             }
                         }
                   }),
-                SparkApp.Text('弹窗2(默认 center)',{
+                Spark.Text('弹窗2(默认 center)',{
                         style:'background-color:green;color:#fff;padding:5px;',
                         on:{
                             click(){
-                               SparkApp.module.Modals.type2.position='center';
-                                SparkApp.module.Modals.type2.open();
+                               Spark.module.Modals.type2.position='center';
+                                Spark.module.Modals.type2.open();
                             }
                         }
                   }),
-                SparkApp.Text('弹窗3(topcenter)',{
+                Spark.Text('弹窗3(topcenter)',{
                         style:'background-color:green;color:#fff;padding:5px;',
                         on:{
                             click(){
 
-                                SparkApp.module.Modals.type2.position='topcenter';
-                                SparkApp.module.Modals.type2.open();
+                                Spark.module.Modals.type2.position='topcenter';
+                                Spark.module.Modals.type2.open();
                             }
                         }
                   }),
-                 SparkApp.Text('弹窗4(bottomcenter)',{
+                 Spark.Text('弹窗4(bottomcenter)',{
                         style:'background-color:green;color:#fff;padding:5px;',
                         on:{
                             click(){
                      
-                                SparkApp.module.Modals.type2.position='bottomcenter';
-                                SparkApp.module.Modals.type2.open();
+                                Spark.module.Modals.type2.position='bottomcenter';
+                                Spark.module.Modals.type2.open();
                             }
                         }
                   }),
-                  SparkApp.Text('弹窗5(bottomleft)',{
+                  Spark.Text('弹窗5(bottomleft)',{
                         style:'background-color:green;color:#fff;padding:5px;',
                         on:{
                             click(){
                      
-                                SparkApp.module.Modals.type2.position='bottomleft';
-                                SparkApp.module.Modals.type2.open();
+                                Spark.module.Modals.type2.position='bottomleft';
+                                Spark.module.Modals.type2.open();
                             }
                         }
                   }),
-                   SparkApp.Text('弹窗6(自动关闭2000ms)',{
+                   Spark.Text('弹窗6(自动关闭2000ms)',{
                         style:'background-color:green;color:#fff;padding:5px;',
                         on:{
                             click(){
                      
-                                SparkApp.module.Modals.type2.autoClose=2000;
-                                SparkApp.module.Modals.type2.position='bottomcenter';
-                                SparkApp.module.Modals.type2.open();
-                                SparkApp.module.Modals.type2.autoClose=false;
+                                Spark.module.Modals.type2.autoClose=2000;
+                                Spark.module.Modals.type2.position='bottomcenter';
+                                Spark.module.Modals.type2.open();
+                                Spark.module.Modals.type2.autoClose=false;
                             }
                         }
                   }),
@@ -501,18 +501,18 @@ var Other ={
            })
 
       /*返回顶部*/
-       var scrollTop1 = SparkApp.Fixed({
+       var scrollTop1 = Spark.Fixed({
               style:'width:50px;height:50px;border-radius:50px;padding:9px; background:yellowgreen;right:20px;bottom:20px;',
-              child:[SparkApp.Text('回到<br>顶部')],
+              child:[Spark.Text('回到<br>顶部')],
               on:{
                 click:function(){
-                  SparkApp.scrollTop(0,500);
+                  Spark.scrollTop(0,500);
                 }
               }
        })
 
 
-   SparkApp.module.Other =  SparkApp.Box({
+   Spark.module.Other =  Spark.Box({
             style:'background-color:none;',  
             child:[title1,wrap,title2,wrap2,title3,wrap3,title4,wrap4,title5,wrap5,scrollTop1]
          })

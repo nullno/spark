@@ -6,25 +6,24 @@
 	<link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
 </head>
 <body>
-   <script src="./js/spark@1.0.min.js"></script>
+  <script src="./js/spark.min.js"></script>
   <script>
-		var SparkApp = new Spark();
-        
-        var listStyle = SparkApp.Css('background-color:#fff;margin:5px;padding:5px;line-height:50px;color:#666;overflow:hidden;border-radius:5px;box-shadow:0 0 5px #ccc;');
 
-        var List =  SparkApp.List({
+        var listStyle = Spark.Css('background-color:#fff;margin:5px;padding:5px;line-height:50px;color:#666;overflow:hidden;border-radius:5px;box-shadow:0 0 5px #ccc;');
+
+        var List =  Spark.List({
 		   data:[{a:'item',b:'hello world'},{a:'item',b:'hello spark'},{a:'item',b:'hello CS'}],
 		   item(item,index){
-		   	 var template =  SparkApp.Box({
+		   	 var template =  Spark.Box({
 		                tag:'li',
 		                className:listStyle,
 		                style:'background-color:#fff;',
 		                showAni:{ani:'fadeInLeft 500ms  both'},
                         hideAni:{ani:'bounceOutRight 500ms both',time:222},
 		                child:[
-		                      SparkApp.Text(index,{listIndex:true}),
-		                      SparkApp.Text('---'+item.b),
-		                      SparkApp.Text('删除',{
+		                      Spark.Text(index,{listIndex:true}),
+		                      Spark.Text('---'+item.b),
+		                      Spark.Text('删除',{
 		                      	style:'float:right;',
 		                        on:{click(){
 		                       
@@ -60,9 +59,9 @@
 		 })
         
 
-        var btncss = SparkApp.Css('background:#9300FF;color:#fff;border-radius:5px;padding:20px 10px;margin:5px;');
+        var btncss = Spark.Css('background:#9300FF;color:#fff;border-radius:5px;padding:20px 10px;margin:5px;');
   
-        var  option1= SparkApp.Text('头部插入数据',
+        var  option1= Spark.Text('头部插入数据',
               {
               	 className:btncss,
               	 on:{
@@ -75,7 +74,7 @@
 
                      }   
               });
-        var  option2 = SparkApp.Text('尾部插入数据',
+        var  option2 = Spark.Text('尾部插入数据',
               {
               	 className:btncss,
               	 on:{
@@ -88,7 +87,7 @@
                      }   
               });
 
-        var  option3 = SparkApp.Text('指定位置插入数据',
+        var  option3 = Spark.Text('指定位置插入数据',
               {
               	 className:btncss,
               	 on:{
@@ -102,7 +101,7 @@
                      }   
               });
 
-          var  option4 = SparkApp.Text('更新倒数第二条数据',
+          var  option4 = Spark.Text('更新倒数第二条数据',
               {
               	 className:btncss,
               	 on:{
@@ -115,7 +114,7 @@
                      }   
               });
 
-             var  option5 = SparkApp.Text('删除倒数第二条数据',
+             var  option5 = Spark.Text('删除倒数第二条数据',
               {
               	 className:btncss,
               	 on:{
@@ -128,7 +127,7 @@
                      }   
               });
 
-               var  option6 = SparkApp.Text('删除前两条数据',
+               var  option6 = Spark.Text('删除前两条数据',
               {
               	 className:btncss,
               	 on:{
@@ -139,7 +138,7 @@
                      }   
               });
 
-                  var  option7 = SparkApp.Text('清空数据',
+                  var  option7 = Spark.Text('清空数据',
               {
               	 className:btncss,
               	 on:{
@@ -153,16 +152,16 @@
               });
 
 
-         var  optionBox = SparkApp.Fixed({
+         var  optionBox = Spark.Fixed({
          	   style:'width:100%;display:flex;justify-content:center;bottom:3%;background:transparent;',
          	   child:[option1,option2,option3,option4,option5,option6,option7]
          }) 
-         SparkApp.Page({
-	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
+         Spark.Page({
+	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
 	     	child:[List,optionBox]
 	     })
        
-	    SparkApp.Render();
+	    Spark.Render();
 
   </script>
 </body>

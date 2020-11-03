@@ -2,7 +2,7 @@
 var Home={
  render:function(){
 
-    var Hi = SparkApp.Text('hello spark!',
+    var Hi = Spark.Text('hello spark!',
     	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
     	stopProp:true,
     	on:{  
@@ -14,8 +14,8 @@ var Home={
 	     	  }
 	     	}
     	});
-    var Page = SparkApp.Page({
-	     	style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#7566F9;',
+    var Page = Spark.Page({
+	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#7566F9;',
 	     	child:[
                  Hi
 	     	],
@@ -33,7 +33,7 @@ var Home={
 	     	}
 	     })
 
-       SparkApp.module.Home =  Page;
+       Spark.module.Home =  Page;
 	
   }
 
