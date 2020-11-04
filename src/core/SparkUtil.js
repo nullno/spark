@@ -1,4 +1,11 @@
+
+/* Util tools*/  
+/**
+ * [SparkUtil 工具包]
+ * @type {Object}
+ */
 import { _typeof } from './common.js'
+
 const inBrowser = typeof window !== 'undefined';
 const UA = inBrowser && window.navigator.userAgent.toLowerCase();
 

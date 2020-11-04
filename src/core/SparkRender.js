@@ -1,6 +1,13 @@
 import { _typeof,D } from './common.js'
+
 import SparkUtil from './SparkUtil.js'
+
+import CreateDomTree from './CreateDomTree.js'
+
 import SparkCoreHandler from './SparkCoreHandler.js'
+
+
+let tempModuleLoadQueue = [];
 
 const _this = SparkCoreHandler;
 
@@ -34,7 +41,7 @@ const ChunkVendors = function(codeText,callback){
 /*模块脚本代码*/
 const  HandlerModuleCodeText = function(callback){
 
-   var modules =  _this.tempModuleLoadQueue;
+   var modules =  tempModuleLoadQueue;
    if(modules.length<=0)return;
    var i=0;
    var mainCodeText = '';
@@ -53,20 +60,18 @@ const  HandlerModuleCodeText = function(callback){
    _core(modules[i])
 
 }
-/* _this.renderQueues
-   _this.tempModuleLoadQueue*/
-  
+
 const HandlerModule = function(_modules){
-     var  tempModuleLoadQueue = [];
+     var  _tempModuleLoadQueue = [];
      var _core = function(modules){
        if(_typeof(modules,'Object')){
-        tempModuleLoadQueue.push(modules);
+        _tempModuleLoadQueue.push(modules);
           if(modules.depends){
                  _core(modules.depends);
          }
        }
         if(_typeof(modules,'Array')){
-          tempModuleLoadQueue = tempModuleLoadQueue.concat(modules)
+          _tempModuleLoadQueue = _tempModuleLoadQueue.concat(modules)
           SparkUtil.traverse(modules,function(item,index,end){
               if(item.depends){
                  _core(item.depends);
@@ -76,7 +81,7 @@ const HandlerModule = function(_modules){
     }
 
     _core(_modules);
-    _this.tempModuleLoadQueue = tempModuleLoadQueue.reverse();
+    tempModuleLoadQueue = _tempModuleLoadQueue.reverse();
 
 }
 
@@ -88,13 +93,13 @@ const HandlerModule = function(_modules){
  */
 const  SparkRouter = function(type) {
 
-  if(type=='PageModule'){
+  if(type == 'PageModule'){
     _this.PageCache = _this.PageCache.reverse();
   }
   var pages = _this.PageCache;
   var i=0;
   var _core = function(pageitem){
-    SparkCoreHandler.createDomTree(pageitem,D.body,true,'',function(){
+     createDomTree(pageitem,D.body,true,'',function(){
          i++;
          if(i>=pages.length){
           return 
@@ -122,7 +127,7 @@ const SparkRender = function(pages) {
               } else if (_this.PageCache.length > 1) {
                 SparkRouter(type);
               } else {
-                _this.createDomTree(_this.PageCache[0],D.body,true);
+                CreateDomTree(_this.PageCache[0],D.body,true);
               }
   }  
 
