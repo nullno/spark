@@ -4,7 +4,7 @@
  * @AuthorHTL
  * @DateTime  2020-04-05T04:21:49+0800
  */
-import { addEventListener } from './common.js'
+import { addEventListener } from './Common.js'
 
 import SparkUtil from './SparkUtil.js'
 
@@ -14,7 +14,9 @@ import SpecialWidgetEvent from './SpecialWidgetEvent.js'
 
 export default function(target, node) {
         node = GetAddressData(node);
+        
         if(!node.on)return;
+
         var spfn = SpecialWidgetEvent(node.type);
         
 

@@ -1,8 +1,10 @@
-import { _typeof } from './common.js'
+import { _typeof } from './Common.js'
 
 import SparkUtil from './SparkUtil.js'
 
-import SparkCoreHandler from './SparkCoreHandler.js'
+import Cache from './Cache.js'
+
+import WidgetOperate from './WidgetOperate.js'
 
 import UrlParamHandler from './UrlParamHandler.js'
 
@@ -22,9 +24,9 @@ if(DefaultSetting.devTool===true && _typeof(DefaultSetting.devTool,'Boolean')){
 }
 
 const Spark = {
-        vcss:SparkCoreHandler.CSSCache,
-        vdom: SparkCoreHandler.WidgetCache,
-        vpage:SparkCoreHandler.PageCache,
+        vcss:Cache.CSSCache,
+        vdom: Cache.WidgetCache,
+        vpage:Cache.PageCache,
         Render: SparkRender,
         module : {},
         moduleJs : null,
@@ -38,7 +40,7 @@ const Spark = {
     };
 
 Spark.Util._typeof = _typeof;
-/*通用组件追加/删除*/
+
 /**
  * [addNext 向下添加组件]
  * @AuthorHTL
@@ -49,19 +51,19 @@ Spark.Util._typeof = _typeof;
 Spark.append = function(target,newdoms){
 
 
- return SparkCoreHandler.addDom(target,newdoms,'append')
+ return WidgetOperate.addDom(target,newdoms,'append')
  
 }
 /*组件向上添加*/
 Spark.prepend =function(target,newdoms){
 
-  return SparkCoreHandler.addDom(target,newdoms,'prepend')
+  return WidgetOperate.addDom(target,newdoms,'prepend')
   
 }    
 /*移除组件*/
 Spark.remove =function(target,deldom){
   
-  return SparkCoreHandler.remove(target,deldom)
+  return WidgetOperate.remove(target,deldom)
 }
 
 /*获取组件对象信息*/

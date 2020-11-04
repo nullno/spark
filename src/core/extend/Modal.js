@@ -1,3 +1,7 @@
+/**
+ * 模态框
+ */
+import { _typeof } from '../Common.js'
 
 import WidgetManager from '../WidgetManager.js'
 
@@ -81,7 +85,7 @@ export default function(p) {
                    };
                  }
 
-                p.style='width:50px;height:50px;position:fixed;z-index:9999;background-color:#3D3F3F;cursor:auto;';
+                p.style=p.style?p.style+'position:fixed;z-index:9999;cursor:auto;':'width:50px;height:50px;position:fixed;z-index:9999;background-color:#3D3F3F;cursor:auto;';
                         
                 Modal.inner = WidgetManager.Fixed(p);
 

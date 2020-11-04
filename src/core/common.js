@@ -4,10 +4,10 @@ export function _typeof(data,type){
 
 export const D = document;
 
-export  function addEventListener(a,b,c,d){
+export function addEventListener(a,b,c,d){
           a && a.addEventListener(b, c, d || false);
   } 
 
-export  function removeEventListener(a,b,c,d){
+export function removeEventListener(a,b,c,d){
           a && a.removeEventListener(b, c, d || false);
   } 

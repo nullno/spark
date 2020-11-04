@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>轮播组件</title>
-  <link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
-</head>
-<body>
-   <script src="./js/spark.min.js"></script>
-  <script>
-   
-      var Carousel = Spark.Carousel({
+  const Spark = require('../index.js');
+  
+  var Carousel = Spark.Carousel({
            style:'width:650px;height:300px;margin:50px auto;background-color:#000;',
            option:{
               //direction:'vertical',//vertical horizontal
@@ -21,7 +12,7 @@
               // allowTouchMove:false
            },
            onInit:function(){
-             console.log(this.activeIndex)
+             console.log('当前帧：'+this.activeIndex)
            },
            on:{
             slideStart:function(){
@@ -159,7 +150,3 @@
        })
        
       Spark.Render();
-
-  </script>
-</body>
-</html>

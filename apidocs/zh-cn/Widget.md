@@ -4,10 +4,10 @@
 * 多个Page组成多页面，会自动开启路由的方式访问页面 [#路由](zh-cn/more-pages.md)；
 * 执行Render()方法开始渲染页面[#Render](zh-cn/more-pages.md)；
 ```javascript
-SparkApp.Page({
+Spark.Page({
 	child:[<widget>]
 })
-SparkApp.Render();
+Spark.Render();
 ```
 -------------------
 ## 样式(Css)
@@ -15,8 +15,8 @@ SparkApp.Render();
 定义样式类创建组件，方便样式管理，样式复用,`权重 < 组件.style`;
 
 ```javascript
-var pagecss = SparkApp.Css('background-color:#666;font-size:20px;');
-SparkApp.Page({
+var pagecss = Spark.Css('background-color:#666;font-size:20px;');
+Spark.Page({
 	className:pagecss,
 	style:'background-color:#fff;'，
 	child:[<widget>]
@@ -29,9 +29,9 @@ SparkApp.Page({
 创建文本,默认标签为span,通过tag可定义标签类型，设定text属性值即可改变视图文本
 
 ```javascript
-SparkApp.Text('hello spark!',<options>);
+Spark.Text('hello spark!',<options>);
 
-var Hi =  SparkApp.Text('hello spark!',{
+var Hi =  Spark.Text('hello spark!',{
 	tag:'h1',
 	on:{
 		click(){
@@ -43,12 +43,12 @@ var Hi =  SparkApp.Text('hello spark!',{
  -------------------
 ## 图片(Image)
 ```javascript
-SparkApp.Image('img link',<options>)
+Spark.Image('img link',<options>)
 ```
  -------------------
 ## 输入框(Input)
 ```javascript
-SparkApp.Input({
+Spark.Input({
 	//tag:'textarea',//默认input
 })
 ```
@@ -56,7 +56,7 @@ SparkApp.Input({
  -------------------
 ## 容器(Box)
 ```javascript
-SparkApp.Box({
+Spark.Box({
 	child:[Hi]
 })
 ```
@@ -69,7 +69,7 @@ SparkApp.Box({
 
 
 ```javascript
-   var List =  SparkApp.List({
+   var List =  Spark.List({
 		   data:<Array> | <Json Array String> ,
 		   item(item,index){
 		   	 return <widget template>
@@ -125,7 +125,7 @@ SparkApp.Box({
 `bounded`  属性定义拖动条件；
 `bounded.parent` 属性约定是否在父级元素内拖动，定义后不可修改；
 ```javascript
- SparkApp.Drag({
+ Spark.Drag({
          style:'width:100px;height:100px;background:#9300FF;border-radius:100px;z-index:9;',
                      //约束条件
                       bounded:{
@@ -166,16 +166,16 @@ SparkApp.Box({
 
 ```javascript
    //堆叠容器(Stack)
-    SparkApp.Stack({
+    Spark.Stack({
                  child:[]
               })
    //固定定位容器(Fixed)
-   SparkApp.Fixed({
+   Spark.Fixed({
                  child:[]
               })
 
    //绝对定位容器(Position)
-    SparkApp.Position({
+    Spark.Position({
                  child:[]
               })
 ```

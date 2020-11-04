@@ -1,7 +1,9 @@
-   /**
-     * [WidgetWatchParams 监听属性管理]
-     * @type {Object}
-     */
+/**
+  * [WidgetWatchParams 监听属性管理]
+  * @type {Object}
+  */
+import { D } from './Common.js'
+
 import SparkUtil from './SparkUtil.js'
     
 import CSSManager from './CSSManager.js'
@@ -73,7 +75,7 @@ export default {
               /*变化监听*/
               obj.watch && obj.watch['className'] && obj.watch['className'](tempOld, nval);
               /*类名改变*/
-              var nodeList = document.getElementsByClassName(obj.name);
+              var nodeList = D.getElementsByClassName(obj.name);
               SparkUtil.traverse(nodeList.length,function(i,end){
                    nodeList[i].className = obj.className?nodeList[i].className.replace(tempOld,nval):nodeList[i].className+' '+nval;
               })
@@ -94,7 +96,7 @@ export default {
               /*变化监听*/
               obj.watch && obj.watch['text'] && obj.watch['text'](tempOld, nval);
               /*数据改变*/
-              var nodeList = document.getElementsByClassName(obj.name);
+              var nodeList = D.getElementsByClassName(obj.name);
               SparkUtil.traverse(nodeList.length,function(i,end){
                    nodeList[i].innerText = nval;
               })

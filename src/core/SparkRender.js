@@ -1,15 +1,13 @@
-import { _typeof,D } from './common.js'
+import { _typeof,D } from './Common.js'
 
 import SparkUtil from './SparkUtil.js'
 
 import CreateDomTree from './CreateDomTree.js'
 
-import SparkCoreHandler from './SparkCoreHandler.js'
-
+import Cache from './Cache.js'
 
 let tempModuleLoadQueue = [];
 
-const _this = SparkCoreHandler;
 
 
 /*模块加载相关函数*/
@@ -94,9 +92,9 @@ const HandlerModule = function(_modules){
 const  SparkRouter = function(type) {
 
   if(type == 'PageModule'){
-    _this.PageCache = _this.PageCache.reverse();
+    Cache.PageCache = Cache.PageCache.reverse();
   }
-  var pages = _this.PageCache;
+  var pages = Cache.PageCache;
   var i=0;
   var _core = function(pageitem){
      createDomTree(pageitem,D.body,true,'',function(){
@@ -119,15 +117,15 @@ const SparkRender = function(pages) {
 
   var PageModule = [];
   var _core = function(type){
-      if (_this.PageCache.length == 0) {
+      if (Cache.PageCache.length == 0) {
                 var noTip = D.createElement('div')
                 noTip.innerHTML='<h2 style="background:#000;color:#fff;padding:5px;">warning:please solve the error -> failed to create page!<h2>';
                 D.body.insertBefore(noTip,D.body.firstChild);
                 console.warn('please solve the error -> failed to create page!')
-              } else if (_this.PageCache.length > 1) {
+              } else if (Cache.PageCache.length > 1) {
                 SparkRouter(type);
               } else {
-                CreateDomTree(_this.PageCache[0],D.body,true);
+                CreateDomTree(Cache.PageCache[0],D.body,true);
               }
   }  
 

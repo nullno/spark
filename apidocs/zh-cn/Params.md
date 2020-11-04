@@ -23,7 +23,7 @@ style:'background:#666;\
 .test{background:#666;color:red;}
 </style>
 
-className:SparkApp.Css('background:#666;color:red;')
+className:Spark.Css('background:#666;color:red;')
 
 className:'.test'
 
@@ -34,7 +34,7 @@ className:'.test'
 ```
 shover:'background:#666;color:red;'
 
-shover:'SparkApp.Css('background:#666;color:red;')'
+shover:'Spark.Css('background:#666;color:red;')'
 ```
 
 ## widget.tag
@@ -102,24 +102,24 @@ hideAni:{ani:'bounceOutRight 500ms both',time:500},
 > 从头部添加子组件`child`,支持批量添加
 ```
  //单个添加
- widget.prepend(SparkApp.Text('node1'))
+ widget.prepend(Spark.Text('node1'))
  //批量添加
- widget.prepend([SparkApp.Text('node1'),SparkApp.Text('node2')])
+ widget.prepend([Spark.Text('node1'),Spark.Text('node2')])
 
  //其他方法指定组件内添加
- SparkApp.prepend(targetContainer,node1);
+ Spark.prepend(targetContainer,node1);
 ```
 ## widget.append()
 > 从尾部添加子组件`child`,支持批量添加
 ```
  //单个添加
- widget.append(SparkApp.Text('node1'))
+ widget.append(Spark.Text('node1'))
 
  //批量添加
- widget.append([SparkApp.Text('node1'),SparkApp.Text('node2')])
+ widget.append([Spark.Text('node1'),Spark.Text('node2')])
 
   //其他方法指定组件内添加
- SparkApp.prepend(targetContainer,node1);
+ Spark.prepend(targetContainer,node1);
 ```
 ## widget.before()
 > 在某一组件之前添加,支持批量添加
@@ -130,12 +130,12 @@ hideAni:{ani:'bounceOutRight 500ms both',time:500},
 > 移除组件,设置`hideAni`可设置移除动画
 ```
 方法1: widget.remove();
-方法2：SparkApp.remove(widgetParent,widget);
+方法2：Spark.remove(widgetParent,widget);
 
 
-删除指定索引组件：SparkApp.remove(targetContainer,2);
-删除第一个:SparkApp.remove(targetContainer,'firstChild');
-删除最后一个：SparkApp.remove(targetContainer,'lastChild');
+删除指定索引组件：Spark.remove(targetContainer,2);
+删除第一个:Spark.remove(targetContainer,'firstChild');
+删除最后一个：Spark.remove(targetContainer,'lastChild');
 ```
 ## widget.removeChild()
 > 移除子组件

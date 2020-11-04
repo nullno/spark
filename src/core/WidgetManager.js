@@ -5,7 +5,8 @@
  * * 路由，页面，文本，图片，视频，音频，容器，拖动容器，画布，文字按钮，文字图标，列表，
     横向排列，纵向排列,局部滚动容器，弹窗，swiper(需要引入swiper)
  */
-import SparkCoreHandler from './SparkCoreHandler.js'
+
+import Cache from './Cache.js'
 
 import CreateWidgetName from './CreateWidgetName.js'
 
@@ -23,10 +24,10 @@ const WidgetManager ={
                 obj.styleObj = CSSManager.cssParse.strStyleToObj(p);
                 obj.style = CSSManager.cssParse.objStyleToStr(obj.styleObj);
 
-                SparkCoreHandler.CSSCache[address] = obj;
+                Cache.CSSCache[address] = obj;
                 WidgetParse.setDefineProperty(address, ['style']);
 
-                return SparkCoreHandler.CSSCache[address];
+                return Cache.CSSCache[address];
             },
             Page: function(p) {
   

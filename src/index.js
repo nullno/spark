@@ -1,4 +1,3 @@
-
-import Spark from './core/index.js'
+import Spark from './core/index'
 
 export default Spark;

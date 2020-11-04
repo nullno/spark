@@ -5,7 +5,7 @@
  * @param     {[type]}                 address [description]
  * @return    {[type]}                         [description]
  */
-import SparkCoreHandler from './SparkCoreHandler.js'
+import Cache from './Cache.js'
 
 export default function(address) {
         try {
@@ -18,5 +18,5 @@ export default function(address) {
             console.error(err);
             return {}
         }
-        return address && SparkCoreHandler.WidgetCache[address];
+        return address && Cache.WidgetCache[address];
  }

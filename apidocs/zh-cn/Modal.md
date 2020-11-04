@@ -1,6 +1,6 @@
  #### 常用弹窗模态框
 ```javascript
-SparkApp.Modal({
+Spark.Modal({
                      style:'width:500px;height:200px;background:#fff;border:2px solid #9300FF;border-radius:5px;overflow:hidden;',
                      showAni:{ani:'fadeInDown 100ms ease-out both'},
                      hideAni:{ani:'fadeOutUp 100ms both',time:100},
@@ -12,7 +12,7 @@ SparkApp.Modal({
                      // positionMargin:'3%', //距离边距间距 默认3%
                      //autoClose:3000,//设置毫秒延时自动关闭，默认不false
                      child:[
-                       SparkApp.Text('x',{
+                       Spark.Text('x',{
                                 style:'position:absolute;background:#9300FF;text-align:center;color:#fff; width:30px;height:30px;line-height:30px; right:0;top:0;',
                                  on:{
                                     click(){

@@ -1,7 +1,7 @@
 
 /*[cssParse  样式解析注入 STYLE web版]*/
 
-import { _typeof,D } from './common.js'
+import { _typeof,D } from './Common.js'
 
 import SparkUtil from './SparkUtil.js'
 
@@ -168,7 +168,7 @@ const CSSManager = {
      * @AuthorHTL
      * @DateTime  2020-04-02T22:18:59+0800
      */
-       ResetCss :function(cssStr) {
+      ResetCss :function(cssStr) {
           
         var grayStr = DefaultSetting.gray==true?'html{ filter: grayscale(100%); -webkit-filter: grayscale(100%); -moz-filter: grayscale(100%); -ms-filter: grayscale(100%); -o-filter: grayscale(100%); filter: url("data:image/svg+xml;utf8,#grayscale"); filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1); -webkit-filter: grayscale(1);}':'';
 

@@ -4,14 +4,14 @@
  * @DateTime  2020-09-21T15:23:23+0800
  * @return    {[type]}                 [description]
  */
-import { addEventListener,removeEventListener } from './common.js'
+import { addEventListener,removeEventListener } from './Common.js'
 
 import SparkUtil from './SparkUtil.js'
 
 import GetAddressData from './GetAddressData.js'
 
 export default function(type){
-      var _scope = this;
+
       var spfn = {
                  'Drag':{
                      status:0,

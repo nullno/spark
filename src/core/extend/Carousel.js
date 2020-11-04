@@ -1,5 +1,7 @@
-/*轮播图*/
-import { _typeof } from '../common.js'
+/**
+ * 轮播图
+ */
+import { _typeof } from '../Common.js'
 
 import SparkUtil from '../SparkUtil.js';
 
@@ -266,14 +268,15 @@ const CarouselWrapper =  function(p) {
 
                    var activeIndex = this.activeIndex+1;
 
-                    this.slideTo(activeIndex,time)
+                    this.slideTo(activeIndex,time);
+                    
                       
                 };
                 p.stopAutoPlay=function(){
                   if(this.autoPlayTimer){
 
                      clearTimeout(this.autoPlayTimer);
-                     this.option.autoPlay = false;
+                     // this.option.autoPlay = false;
                      this.autoPlayTimer = null;
                   } 
                 }
@@ -291,7 +294,7 @@ const CarouselWrapper =  function(p) {
                                           _this.autoPlayNext = false;
                                         }
                                         if(_this.activeIndex === 0){
-                                          _this.autoPlayNext = true
+                                          _this.autoPlayNext = true;
                                         }
                                         if(_this.autoPlayNext){
                                           _this.slideNext()

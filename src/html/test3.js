@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Modal组件</title>
-  <link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
-</head>
-<body>
- <script src="./js/spark.min.js"></script>
-  <script>
+
+const Spark = require('../index.js');
   
+   
+   console.log(Spark)
+
+   
       var Modal1 = Spark.Modal({
                      style:'width:500px;height:200px;background:#fff;border:2px solid #7566F9;border-radius:5px;overflow:hidden;',
                      showAni:{ani:'fadeInDown 100ms ease-out both'},
@@ -34,7 +30,7 @@
                  });
           
             var Modal2 = Spark.Modal({
-                     style:'width:500px;height:200px;background:#fff;border:2px solid #3C6B87;border-radius:5px;overflow:hidden;',
+                     style:'width:500px;height:200px;background:#fff;border:2px solid #7566F9;border-radius:5px;overflow:hidden;',
                      showAni:{ani:'fadeInDown 100ms ease-out both'},
                      hideAni:{ani:'fadeOutUp 100ms both',time:100},
                      // bgClose:true,//点击任意可关闭 默认false
@@ -46,7 +42,7 @@
                      //autoClose:3000,//设置毫秒延时自动关闭，默认不false
                      child:[
                        Spark.Text('x',{
-                                style:'position:absolute;background:#3C6B87;text-align:center;color:#fff; width:30px;height:30px;line-height:30px; right:0;top:0;',
+                                style:'position:absolute;background:#7566F9;text-align:center;color:#fff; width:30px;height:30px;line-height:30px; right:0;top:0;',
                                  on:{
                                     click(){
                               
@@ -152,7 +148,3 @@
        })
        
       Spark.Render();
-
-  </script>
-</body>
-</html>

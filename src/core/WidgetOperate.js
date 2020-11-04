@@ -1,65 +1,25 @@
-import { _typeof,D,addEventListener,removeEventListener } from './common.js'
-
+/**
+ * [WidgetOperate 组件操作]
+ * @AuthorHTL
+ * @DateTime  2020-08-21T12:14:58+0800
+ */
+import { _typeof } from './Common.js'
 
 import SparkUtil from './SparkUtil.js' 
  
 import GetAddressData from './GetAddressData.js'
 
-
 import CreateDomTree from './CreateDomTree.js'
-/**
- * [SparkCoreHandler 核心功能]
- * @AuthorHTL
- * @DateTime  2020-08-21T12:14:58+0800
- */
-function SparkCoreHandler(){
-   var _scope = this;
-   /*当前执行队列*/
-    this.renderQueues=[];
-    this.tempModuleLoadQueue=[];
-
-    /**
-     * [widgetClassNames 组件名字缓存]
-     * @type {Array}
-     */
-    this.widgetClassNames = [];
-    /**
-   * [_scope.CSSCache 样式管理]
-   * @type {Object}
-   */
-     this.CSSCache = {};
-      /**
-   * [_scope.WidgetCache 组件缓存]
-   * @type {Object}
-   */
-     this.WidgetCache = {};
-      /**
-   * [_scope.PageCache 页面缓存]
-   * @type {Array}
-   */
-     this.PageCache = [];
-    /**
-     * [SparkEventCache 事件缓存]
-     * @type {Array}
-     */
-     this.EventCache=[];
-     
-
-}
 
 
-
-
-
-
-
+const WidgetOperate = {};
 /**
  * [clearWidget 删除清空组件]
  * @AuthorHTL
  * @DateTime  2020-09-18T17:01:28+0800
  * @return    {[type]}                 [description]
  */
-SparkCoreHandler.prototype.clearWidget = function(_Widget){
+WidgetOperate.clearWidget = function(_Widget){
     var _scope = this;
     if(!_typeof(_Widget.$el,'HTMLCollection') || (_typeof(_Widget.$el,'HTMLCollection') && _Widget.$el.length === 0)){
          delete  this.WidgetCache[_Widget.name];
@@ -78,7 +38,7 @@ SparkCoreHandler.prototype.clearWidget = function(_Widget){
  * @DateTime  2020-09-16T00:37:43+0800
  * @return    {[type]}                 [description]
  */
-SparkCoreHandler.prototype.updateListIndex = function(_ListWidget){
+WidgetOperate.updateListIndex = function(_ListWidget){
      
     var _scope = this;
 
@@ -103,9 +63,6 @@ SparkCoreHandler.prototype.updateListIndex = function(_ListWidget){
               _core(_thisWidget,index)
           }
     })
-
-
-
 }
 /**
  * [addDom 添加节点]
@@ -115,7 +72,7 @@ SparkCoreHandler.prototype.updateListIndex = function(_ListWidget){
  * @param     {[type]}                 newdoms [description]
  * @param     {[type]}                 addtype [description]
  */
-SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype,set){
+WidgetOperate.addDom = function(target,newdoms,addtype,set){
    var _scope = this;
      // console.log('-----'+addtype+'-----')
       var abTarget = target;
@@ -192,7 +149,7 @@ SparkCoreHandler.prototype.addDom = function(target,newdoms,addtype,set){
  * @param     {[type]}                 deldom [description]
  * @return    {[type]}                        [description]
  */
-SparkCoreHandler.prototype.remove = function(target,deldom){
+WidgetOperate.remove = function(target,deldom){
    var _scope = this;
        //三种删除方式
         // console.log('-----remove-----')
@@ -308,6 +265,4 @@ SparkCoreHandler.prototype.remove = function(target,deldom){
 }
 
 
-
-
-export default  new SparkCoreHandler();
+export default  WidgetOperate;

@@ -1,9 +1,11 @@
 /*
  WidgetParse 组件解析
  */
-import { _typeof } from './common.js'
+import { _typeof } from './Common.js'
 
 import SparkUtil from './SparkUtil.js' 
+
+import Cache from './Cache.js'
 
 import CreateWidgetName from './CreateWidgetName.js'
 
@@ -11,14 +13,14 @@ import GetAddressData from './GetAddressData.js'
 
 import CSSManager from './CSSManager.js'
 
-import SparkCoreHandler from './SparkCoreHandler.js'
+import WidgetOperate from './WidgetOperate.js'
 
-import WidgetWatchParams from './WidgetWatchParams.js'
+import WidgetObserved from './WidgetObserved.js'
 
 
 const WidgetParse = {
             WidgetDefineProperty:function(obj, propertys) {
-                var _scope = this;
+               
                 var lastV = {};
                    SparkUtil.traverse(propertys,function(propertyItem,index,end){
                         lastV[propertyItem] = obj[propertyItem];
@@ -30,14 +32,14 @@ const WidgetParse = {
                                     return tempVal;
                                 },
                                 set: function(newval) {
-                                    tempVal = lastV[a] = WidgetWatchParams[a]([lastV[a]][0], newval, obj);
+                                    tempVal = lastV[a] = WidgetObserved[a]([lastV[a]][0], newval, obj);
                                 }
                             })
                             obj[a] = lastV[a];
                         })(propertyItem)
                    })
                 
-          },
+           },
             getAddress: function(widgets,parentName) {
                  if(!widgets)return [];
                 var addressArr = [];
@@ -185,11 +187,11 @@ const WidgetParse = {
 
                    },
                     append:function(newdoms,set){
-                            return SparkCoreHandler.addDom(this,newdoms,'append',set)
+                            return WidgetOperate.addDom(this,newdoms,'append',set)
                     },
                     prepend:function(newdoms,set){
 
-                            return SparkCoreHandler.addDom(this,newdoms,'prepend',set)
+                            return WidgetOperate.addDom(this,newdoms,'prepend',set)
                     },
                     removeChild:function(deldom,set){
                                  var _this = this,
@@ -208,22 +210,22 @@ const WidgetParse = {
                                      tempWidget.style='animation:'+aniSet.ani+';';
                                      var removeTimer=setTimeout(function(){
                                                     clearTimeout(removeTimer);
-                                                    SparkCoreHandler.remove(_this,deldom);
+                                                    WidgetOperate.remove(_this,deldom);
                                                     tempWidget.style='animation:none;';
                                                     tempWidget = null;
                                         },aniSet.time)
                                    }else{
-                                      SparkCoreHandler.remove(this,deldom)
+                                      WidgetOperate.remove(this,deldom)
                                    }
                            
                          return this;
                        },
                        after:function(newdoms,set){
 
-                            return SparkCoreHandler.addDom(this,newdoms,'after',set)
+                            return WidgetOperate.addDom(this,newdoms,'after',set)
                        },
                        before:function(newdoms,set){
-                            return SparkCoreHandler.addDom(this,newdoms,'before',set)    
+                            return WidgetOperate.addDom(this,newdoms,'before',set)    
                        },
                        remove:function(set,noani){
                           var tempWidget = this;
@@ -237,12 +239,12 @@ const WidgetParse = {
                                     tempWidget.style='animation:'+aniSet.ani+';';
                                     var removeTimer=setTimeout(function(){
                                        clearTimeout(removeTimer);
-                                       SparkCoreHandler.remove(SparkCoreHandler.WidgetCache[item],tempWidget);
+                                       WidgetOperate.remove(GetAddressData(item),tempWidget);
                                        tempWidget.style='animation:none;';
                                      },aniSet.time)
                                   }else{
 
-                                     SparkCoreHandler.remove(SparkCoreHandler.WidgetCache[item],tempWidget)
+                                     WidgetOperate.remove(GetAddressData(item),tempWidget)
                                   }
                                  })
                                
@@ -252,11 +254,11 @@ const WidgetParse = {
                                     tempWidget.style='animation:'+aniSet.ani+';';
                                     var removeTimer=setTimeout(function(){
                                               clearTimeout(removeTimer);
-                                              SparkCoreHandler.remove(SparkCoreHandler.WidgetCache[tempWidget.parentName],tempWidget);
+                                              WidgetOperate.remove(GetAddressData(tempWidget.parentName),tempWidget);
                                               tempWidget.style='animation:none;';
                                        },aniSet.time)
                                 }else{
-                                      SparkCoreHandler.remove(SparkCoreHandler.WidgetCache[tempWidget.parentName],tempWidget)
+                                         WidgetOperate.remove(GetAddressData(tempWidget.parentName),tempWidget)
                                 }
                             }
                 
@@ -264,7 +266,8 @@ const WidgetParse = {
                     },
                     empty:function(){
                              SparkUtil.traverse(this.child,function(item,index){
-                              SparkCoreHandler.WidgetCache[item] && SparkCoreHandler.WidgetCache[item].remove('',true);
+                              var w = GetAddressData(item); 
+                                  w && w.remove('',true);
                              })
                             
                     }   
@@ -350,7 +353,7 @@ const WidgetParse = {
             },
             setDefineProperty: function(address, arr) {
 
-                WidgetParse.WidgetDefineProperty(address.indexOf('Css') != -1 ? SparkCoreHandler.CSSCache[address] : SparkCoreHandler.WidgetCache[address], arr);
+                WidgetParse.WidgetDefineProperty(address.indexOf('Css') != -1 ? Cache.CSSCache[address] : GetAddressData(address), arr);
             
             },
             getNxWidget:function(nxtype,newparams,domtag,defaultcss,defineProperty){
@@ -411,21 +414,17 @@ const WidgetParse = {
                   NEW_WIDGET.remove = WidgetParse.getDomEvent.call(NEW_WIDGET,'remove');
 
                  
-                 SparkCoreHandler.WidgetCache[NEW_WIDGET.name] = NEW_WIDGET;
+                 Cache.WidgetCache[NEW_WIDGET.name] = NEW_WIDGET;
 
                  /*数据变化监听*/
                  defineProperty && WidgetParse.setDefineProperty(NEW_WIDGET.name, defineProperty);
               
                   if(nxtype=='Page'){
-                     SparkCoreHandler.PageCache.push(NEW_WIDGET.name);
-                     /*开始渲染*/
-                     console.time("Render");
-                     // SparkCoreHandler.SparkRender();
-                     console.timeEnd("Render");
+                   Cache.PageCache.push(NEW_WIDGET.name);
                   }
                 
 
-              return NEW_WIDGET;
+                     return NEW_WIDGET;
 
             }
         };

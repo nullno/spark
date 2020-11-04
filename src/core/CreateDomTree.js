@@ -9,11 +9,9 @@
  * @param     {Function}               callback    [description]
  * @return    {[type]}                             [description]
  */
-import { _typeof,D } from './common.js'
+import { _typeof,D } from './Common.js'
 
 import SparkUtil from './SparkUtil.js'
-
-import SparkCoreHandler from './SparkCoreHandler.js'
 
 import GetAddressData from './GetAddressData.js'
 
@@ -22,8 +20,6 @@ import AddWidgetEvent from './AddWidgetEvent.js'
 import DefaultSetting from './DefaultSetting.js'
 
 import CSSManager from './CSSManager.js'
-
-const _scope = SparkCoreHandler;
 
 export default function (_rootAdress,domTarget,init,addtype,callback){
      
