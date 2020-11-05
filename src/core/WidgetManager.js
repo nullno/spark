@@ -125,19 +125,27 @@ const WidgetManager ={
                        multiline:false,
                        value:'',
                        style:'',
+                       autofocus:false,
+                       placeholder:'please input....',
+                       placeholderStyle:'color:#ccc;',
+                       placeholderEnable:p.value!='',
+                       onStyle:'color:#000;box-shadow:0 0 5px #4B95FF;',
+                       offStyle:'color:#000;box-shadow:none;'
                   }
 
                 
                  var event = {
                           input:function(e){
-                     
                              this.writing = true;
                              this.value = this.$el.innerText.replace(/<[\/\s]*(?:(?!div|br)[^>]*)>/g,'');
                              // console.log(this.value)
-                             this.on['inputing'] && this.on['inputing'].call(this,e)
+                             if(this.value!=''){
+                              this.placeholderEnable = false;
+                             }
+                             this.on['inputing'] && this.on['inputing'].call(this,e);
                            
                           },
-                          keydown:function(e){
+                          onkeydown:function(e){
 
                               if(!this.enable){
                                  e.preventDefault();
@@ -147,21 +155,56 @@ const WidgetManager ={
                                 e.preventDefault();
                               }
                              
-                            }
-                         };
+                            },
+                          onblur:function(e){
+                              
+                              this.writing = false;
+                              if(this.value=='' || this.placeholderEnable){
+                                 this.value = this.placeholder;
+   
+                                 this.style = this.offStyle+this.placeholderStyle;
+                              }else{
+                                this.style = this.offStyle;
+                              }
+                            },
+                          onfocus:function(e){
+                              this.style = this.onStyle;
+                             
+                              if(this.placeholderEnable || this.value==this.placeholder){
+                                  this.value='';
+                              }
+
+                            },
+
+                          };
                   
                 
                  p.attributes='contenteditable=true';
                   
 
-                 p.on=p.on?Object.assign(event,p.on):event;
+                 p.on=p.on?Object.assign(p.on,event):event;
                 
                  p = Object.assign(option,p);
 
                  p.style += (!p.multiline?'white-space:nowrap;':'');
                  
 
-
+                 p.autofocus=function(){
+                           var obj = this.$el;
+                            if (window.getSelection) {
+                                obj.focus(); 
+                                var range = window.getSelection();
+                                range.selectAllChildren(obj);
+                                range.collapseToEnd();
+                            }
+                            else if (document.selection) {//ie10 9 8 7 6 5
+                                var range = document.selection.createRange();
+                                range.moveToElementText(obj);
+                                range.collapse(false);
+                                range.select();
+                            } 
+                        }
+        
                 return WidgetParse.getNxWidget('Input',
                                     p,
                                     'div',

@@ -13,11 +13,8 @@ export default {
               var tempOld = oval;
               if (oval === nval)
                   return nval;
-              /*变化监听*/
-              obj.watch && obj.watch['show'] && obj.watch['show'].call(obj,tempOld, nval);
-              /*数据改变*/
              
-            
+              /*数据改变*/
                  var aniSet = obj.hideAni;
 
                      if(!nval && aniSet && aniSet.ani){
@@ -35,7 +32,8 @@ export default {
                        }else if(!nval){
                          obj.style='display:none;';
                        }
-                     
+               /*变化监听*/
+              obj.watch && obj.watch['show'] && obj.watch['show'].call(obj,tempOld, nval);       
               return nval;
           },
           style: function(oval, nval, obj) {
@@ -72,13 +70,14 @@ export default {
               if (typeof nval === 'string') {
               if (oval === nval)
                   return nval;
-              /*变化监听*/
-              obj.watch && obj.watch['className'] && obj.watch['className'].call(obj,tempOld, nval);
+             
               /*类名改变*/
               var nodeList = D.getElementsByClassName(obj.name);
               SparkUtil.traverse(nodeList.length,function(i,end){
                    nodeList[i].className = obj.className?nodeList[i].className.replace(tempOld,nval):nodeList[i].className+' '+nval;
               })
+               /*变化监听*/
+              obj.watch && obj.watch['className'] && obj.watch['className'].call(obj,tempOld, nval);
               }else{
                  return nval;
              
@@ -89,14 +88,15 @@ export default {
               var tempOld = oval;
               if (oval === nval)
                   return nval;
-              /*变化监听*/
-              obj.watch && obj.watch['text'] && obj.watch['text'].call(obj,tempOld, nval);
+             
               /*数据改变*/
               var nodeList = D.getElementsByClassName(obj.name);
               SparkUtil.traverse(nodeList.length,function(i,end){
                    nodeList[i].innerText = nval;
               })
-            
+              
+               /*变化监听*/
+              obj.watch && obj.watch['text'] && obj.watch['text'].call(obj,tempOld, nval);
               return nval;
           },
           child: function(oval, nval, obj) {
@@ -113,14 +113,19 @@ export default {
               var tempOld = oval;
               if (oval === nval)
                   return nval;
-              /*变化监听*/
-              obj.watch && obj.watch['value'] && obj.watch['value'].call(obj,tempOld, nval);
+              if(nval!=''){
+                  obj.placeholderEnable=false; 
+              }  
+            
               if(!obj.writing){
                 var nodeList = D.getElementsByClassName(obj.name);
                 SparkUtil.traverse(nodeList.length,function(i,end){
                      nodeList[i].innerText = nval;
                 })
               }
+               
+                 /*变化监听*/
+              obj.watch && obj.watch['value'] && obj.watch['value'].call(obj,tempOld, nval);
 
               return nval;
           }

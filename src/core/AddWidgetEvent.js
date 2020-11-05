@@ -101,10 +101,22 @@ export default function(target, node) {
                   node.on['input'].call(node,e);
             });
         }
-        if(node.on['keydown']){ 
+        if(node.on['onkeydown']){ 
            target.onkeydown = function(e) {
                   e.stopPropagation();
-                  node.on['keydown'].call(node,e);
+                  node.on['onkeydown'].call(node,e);
+            };
+        }
+         if(node.on['onblur']){ 
+           target.onblur = function(e) {
+                  e.stopPropagation();
+                  node.on['onblur'].call(node,e);
+            };
+        }
+        if(node.on['onfocus']){ 
+           target.onfocus = function(e) {
+                  e.stopPropagation();
+                  node.on['onfocus'].call(node,e);
             };
         }
 

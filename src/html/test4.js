@@ -9,16 +9,11 @@
     var Input = Spark.Input({
          watch:{
              value(o,n){
-                    Input2.value = Text.getChild(0).text = n;
+                    !this.placeholderEnable && (Text.getChild(0).text = n);
              }
          },
          value:'请输入....',
-         on:{
-               inputing:function(e){
-                    console.log(this.value)
-                    Input2.value=this.value;
-               }
-         }
+         
     });
     
     var title1_1 = Spark.Text('多行输入框：',{style:'padding:5px;'})
@@ -29,7 +24,7 @@
                inputing:function(e){
 
    
-                 Input.value=this.value;
+                 Text.getChild(0).text =this.value;
                      
                }
          },
@@ -44,16 +39,11 @@
                 init(){
                        
                        Input.value=8888;
-                       // this.getChild(0).text=Input.value;
-                
-                   // 
+                       Input.autofocus()
+                       
                 }
       });
    
-
-
-
-
 
 
    Spark.Page({
