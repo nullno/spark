@@ -281,11 +281,13 @@ const WidgetParse = {
                       html:function(){
                           var idName = this.idName?'id='+this.idName:'';
                           var className = WidgetParse.getClassName(this)+this.name;
+                          var attributes = this.attributes || '';
+                          
+                          var content = (this.text || this.value)?(this.text || this.value)+'[['+this.name+']]':'[['+this.name+']]';
 
                           return  this.type=='Image'?
-                            '<img '+idName+' class="'+className+'" src="'+this.imgurl+'" />'
-                            : '<'+this.tag+' '+idName+' class="'+className+'">'+
-                            (this.type=='Text'?this.text+'[['+this.name+']]':'[['+this.name+']]')+'</'+this.tag+'>';
+                            '<img '+idName+' class="'+className+'" src="'+this.imgurl+'" '+attributes+'/>'
+                            : '<'+this.tag+' '+idName+' class="'+className+'" '+attributes+'>'+content+'</'+this.tag+'>';
                       },
                       style:function(){
 
@@ -365,7 +367,8 @@ const WidgetParse = {
                                  className:'',
                                  type:nxtype,//
                                  defaultcss:defaultcss,
-                                 tag:p.tag || domtag
+                                 tag:p.tag || domtag,
+                                 rendered:false
                                 };
                 
                 if(p.stopProp){

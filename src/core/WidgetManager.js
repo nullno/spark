@@ -6,6 +6,7 @@
     横向排列，纵向排列,局部滚动容器，弹窗，swiper(需要引入swiper)
  */
 
+
 import Cache from './Cache.js'
 
 import CreateWidgetName from './CreateWidgetName.js'
@@ -76,7 +77,7 @@ const WidgetManager ={
                                     p,
                                     'ul',
                                     '',
-                                    ['style','child','show']
+                                    ['style','child','show','className']
                                     );
             },
             Drag:function(p) {
@@ -88,7 +89,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'position:fixed;background-color:#3D3F3F;',
-                                    ['style','show']
+                                    ['style','show','className']
                                     );
             },
             Stack:function(p) {
@@ -96,7 +97,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'position:relative;background-color:#3D3F3F;',
-                                    ['style','show']
+                                    ['style','show','className']
                                     );
             },
             Position:function(p) {
@@ -104,7 +105,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'position:absolute;background-color:#3D3F3F;',
-                                    ['style','show'] 
+                                    ['style','show','className'] 
                                     );
             },
             Fixed:function(p) {
@@ -112,10 +113,68 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'position:fixed;background-color:#3D3F3F;',
-                                    ['style','show'] 
+                                    ['style','show','className'] 
                                     );
             },
-            
+            Input:function(p){
+                 !p && (p = {});
+
+                  var option = {
+                       enable:true,
+                       writing:false,
+                       multiline:false,
+                       value:'',
+                       style:'',
+                  }
+
+                
+                 var event = {
+                          input:function(e){
+                     
+                             this.writing = true;
+                             this.value = this.$el.innerText.replace(/<[\/\s]*(?:(?!div|br)[^>]*)>/g,'');
+                             // console.log(this.value)
+                             this.on['inputing'] && this.on['inputing'].call(this,e)
+                           
+                          },
+                          keydown:function(e){
+
+                              if(!this.enable){
+                                 e.preventDefault();
+                              }
+                              if(e.keyCode == 13 && !this.multiline){
+                                e.cancelBubble=true;
+                                e.preventDefault();
+                              }
+                             
+                            }
+                         };
+                  
+                
+                 p.attributes='contenteditable=true';
+                  
+
+                 p.on=p.on?Object.assign(event,p.on):event;
+                
+                 p = Object.assign(option,p);
+
+                 p.style += (!p.multiline?'white-space:nowrap;':'');
+                 
+
+
+                return WidgetParse.getNxWidget('Input',
+                                    p,
+                                    'div',
+                                    'background-color:transparent;border:1px solid #4B95FF;min-width:200px;min-height:40px;line-height:38px;margin:5px;padding:0 5px;border-radius:5px;overflow:hidden;cursor:auto;',
+                                    ['style','className','show','value']
+                                    );
+            },
+            Textarea:function(){
+
+            },
+            Switch:function(p){
+
+            } 
            
             //moreWiget...
         }

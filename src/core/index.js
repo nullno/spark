@@ -67,7 +67,7 @@ Spark.remove =function(target,deldom){
 }
 
 /*获取组件对象信息*/
-Spark.GetAddressData = GetAddressData;
+Spark.getWidget = GetAddressData;
 
 
 /*扩展组件*/

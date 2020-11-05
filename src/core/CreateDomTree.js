@@ -74,7 +74,7 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                               _this.renderComplete.call(_this,_this._rootAdress);
                               _this._clear();
                        
-                                 callback && callback();
+                              callback && callback();
                    
                              
                            });
@@ -259,8 +259,18 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                       if(node.child.length<=0)return;
                       return GetAddressData(node.child[index]);
                   };
-                
+                  
+                  node.rendered = true;
+                  
                   node.init && node.init();
+                  
+                /*  if(node.watch){
+                      SparkUtil.traverse(node.watch,function(key){
+                          node.watch[key].call(node,'',node.key);
+                      })
+                  }   */
+                    
+                  
                   if(node.child && node.child.length>0){
                      SparkUtil.traverse(node.child,function(nodeItem,index,end){
                        _this.renderComplete(nodeItem);

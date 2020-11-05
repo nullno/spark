@@ -14,7 +14,7 @@ export default {
               if (oval === nval)
                   return nval;
               /*变化监听*/
-              obj.watch && obj.watch['show'] && obj.watch['show'](tempOld, nval);
+              obj.watch && obj.watch['show'] && obj.watch['show'].call(obj,tempOld, nval);
               /*数据改变*/
              
             
@@ -73,16 +73,12 @@ export default {
               if (oval === nval)
                   return nval;
               /*变化监听*/
-              obj.watch && obj.watch['className'] && obj.watch['className'](tempOld, nval);
+              obj.watch && obj.watch['className'] && obj.watch['className'].call(obj,tempOld, nval);
               /*类名改变*/
               var nodeList = D.getElementsByClassName(obj.name);
               SparkUtil.traverse(nodeList.length,function(i,end){
                    nodeList[i].className = obj.className?nodeList[i].className.replace(tempOld,nval):nodeList[i].className+' '+nval;
               })
-              /* for (var i = 0; i < nodeList.length; i++) {
-                  nodeList[i].className = obj.className?nodeList[i].className.replace(tempOld,nval):nodeList[i].className+' '+nval;
-
-               } */
               }else{
                  return nval;
              
@@ -94,7 +90,7 @@ export default {
               if (oval === nval)
                   return nval;
               /*变化监听*/
-              obj.watch && obj.watch['text'] && obj.watch['text'](tempOld, nval);
+              obj.watch && obj.watch['text'] && obj.watch['text'].call(obj,tempOld, nval);
               /*数据改变*/
               var nodeList = D.getElementsByClassName(obj.name);
               SparkUtil.traverse(nodeList.length,function(i,end){
@@ -109,8 +105,23 @@ export default {
               if (JSON.stringify(oval)  === JSON.stringify(nval))
                   return nval;
               /*变化监听*/
-              obj.watch && obj.watch['child'] && obj.watch['child'](oval, nval);
+              obj.watch && obj.watch['child'] && obj.watch['child'].call(obj,oval, nval);
              
+              return nval;
+          },
+          value:function(oval, nval, obj){
+              var tempOld = oval;
+              if (oval === nval)
+                  return nval;
+              /*变化监听*/
+              obj.watch && obj.watch['value'] && obj.watch['value'].call(obj,tempOld, nval);
+              if(!obj.writing){
+                var nodeList = D.getElementsByClassName(obj.name);
+                SparkUtil.traverse(nodeList.length,function(i,end){
+                     nodeList[i].innerText = nval;
+                })
+              }
+
               return nval;
           }
      };

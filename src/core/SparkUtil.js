@@ -256,6 +256,12 @@ let SparkUtil = {
                    }     
             }
             if(_typeof(datas,'Object')){
+
+               for(var key in datas){
+                if(datas.hasOwnProperty(key)){
+                     callback(key)
+                }
+               }
               
             }
             if(_typeof(datas,'Number')){

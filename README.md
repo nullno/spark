@@ -10,11 +10,8 @@
 便捷易用的前端组件库，像堆积木一样简单的去创建页面，借鉴Flutter核心原则，`一切皆为widget`
 与其他各功能分离的框架不同，Spark一个对象模型即可包含样式、视图、控制器等功能；
 
-#### 解决了什么痛点？
 
 * 使用Spark前端编写页面，全程几乎都可以使用js代码去完成页面编写，不用同时去维护`*.css/*.html`文件；
-
-* 不使用编译工具，也可以进行Autoprefixer；
 
 * 更少体积的dom/style文件，加载更快；
 
@@ -29,6 +26,7 @@
 * 一些全栈开发者 ；
 
 ## 使用
+直接用 `<script>` 方式引入
 
 演示目录结构：
 ```text
@@ -47,13 +45,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SPARKJS</title>
+  <title>基础演示</title>
 </head>
 <body>
-  <script src="./js/spark.js"></script>
+ <script src="./js/spark.min.js"></script>
   <script>
-    var SparkApp = new Spark();
-      SparkApp.Render({name:'Home',path:'component/Home'});
+      Spark.Render({name:'Home',path:'component/Home'});
   </script>
 </body>
 </html>
@@ -63,7 +60,7 @@
 var Home={
  render:function(){
 
-    var Hi = SparkApp.Text('hello spark!',
+    var Hi = Spark.Text('hello spark!',
       {style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
       stopProp:true,
       on:{  
@@ -75,8 +72,8 @@ var Home={
           }
         }
       });
-    var Page = SparkApp.Page({
-        style:'width:100%;min-height:'+SparkApp.screen.height()+'px;background-color:#fff;color:#34495e;',
+    var Page = Spark.Page({
+        style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;',
         child:[
                  Hi
         ],
@@ -94,7 +91,7 @@ var Home={
         }
        })
 
-       SparkApp.module.Home =  Page;
+       Spark.module.Home =  Page;
   
   }
 
