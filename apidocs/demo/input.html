@@ -1,6 +1,14 @@
-  const Spark = require('../index.js');
-     
-     console.log(Spark)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>输入框</title>
+</head>
+<body>
+ <script src="./js/spark.min.js"></script>
+  <script>
+    
+          console.log(Spark)
 
     var title1 = Spark.Text('单行输入框：',{style:'padding:5px;'})
 
@@ -26,7 +34,6 @@
 
    
                  Text.getChild(0).text =this.value;
-                  Input3.enable=true
                      
                }
          },
@@ -58,7 +65,7 @@
                 init(){
                        
                        Input.value=8888;
-                       // Input.autofocus()
+                       Input.autofocus()
 
                        
                 }
@@ -71,4 +78,6 @@
        
    Spark.Render();
 
-
+  </script>
+</body>
+</html>

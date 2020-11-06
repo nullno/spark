@@ -1,5 +1,5 @@
 
-const Spark = require('../index.js');
+import Spark from '../index.js'
   
    
    console.log(Spark)

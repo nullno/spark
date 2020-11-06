@@ -262,7 +262,9 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                   
                   node.rendered = true;
                   
+                  node.$_init && node.$_init();
                   node.init && node.init();
+
                   
                 /*  if(node.watch){
                       SparkUtil.traverse(node.watch,function(key){

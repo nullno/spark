@@ -6,8 +6,6 @@ import Cache from './Cache.js'
 
 import WidgetOperate from './WidgetOperate.js'
 
-import UrlParamHandler from './UrlParamHandler.js'
-
 import SparkRender from './SparkRender.js'
 
 import WidgetManager from './WidgetManager.js'
@@ -17,6 +15,11 @@ import DefaultSetting from './DefaultSetting.js'
 import Extend from './Extend.js'
 
 import GetAddressData from './GetAddressData.js'
+
+import router from './Router.js'
+
+
+console.log(new router())
 
  /*移动端开启调试工具*/
 if(DefaultSetting.devTool===true && _typeof(DefaultSetting.devTool,'Boolean')){
@@ -32,14 +35,13 @@ const Spark = {
         moduleJs : null,
         env: SparkUtil.env,
         screen:SparkUtil.screen,
-        Util:SparkUtil,
-        urlParams:{
-          search: UrlParamHandler.getUrlSearchParam(),
-          hash: UrlParamHandler.getUrlHashParam()
-        }
+        Util:SparkUtil
     };
 
 Spark.Util._typeof = _typeof;
+
+/*获取组件对象信息*/
+Spark.getWidget = GetAddressData;
 
 /**
  * [addNext 向下添加组件]
@@ -65,9 +67,6 @@ Spark.remove =function(target,deldom){
   
   return WidgetOperate.remove(target,deldom)
 }
-
-/*获取组件对象信息*/
-Spark.getWidget = GetAddressData;
 
 
 /*扩展组件*/

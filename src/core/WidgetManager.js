@@ -125,12 +125,11 @@ const WidgetManager ={
                        multiline:false,
                        value:'',
                        style:'',
-                       autofocus:false,
-                       placeholder:'please input....',
+                       placeholder:'',
                        placeholderStyle:'color:#ccc;',
                        placeholderEnable:p.value!='',
                        onStyle:'color:#000;box-shadow:0 0 5px #4B95FF;',
-                       offStyle:'color:#000;box-shadow:none;'
+                       offStyle:'color:#ccc;box-shadow:none;'
                   }
 
                 
@@ -148,6 +147,7 @@ const WidgetManager ={
                           onkeydown:function(e){
 
                               if(!this.enable){
+                                e.cancelBubble=true;
                                  e.preventDefault();
                               }
                               if(e.keyCode == 13 && !this.multiline){
@@ -159,6 +159,9 @@ const WidgetManager ={
                           onblur:function(e){
                               
                               this.writing = false;
+                              if(!this.enable){
+                                return;
+                              }
                               if(this.value=='' || this.placeholderEnable){
                                  this.value = this.placeholder;
    
@@ -168,7 +171,14 @@ const WidgetManager ={
                               }
                             },
                           onfocus:function(e){
-                              this.style = this.onStyle;
+                               if(!this.enable){
+                                  e.preventDefault();
+                                  e.cancelBubble=true;
+                                  this.style='cursor:not-allowed;';
+                                  return;
+                                }
+
+                               this.style = this.onStyle+'cursor:auto;';
                              
                               if(this.placeholderEnable || this.value==this.placeholder){
                                   this.value='';
@@ -179,17 +189,26 @@ const WidgetManager ={
                           };
                   
                 
-                 p.attributes='contenteditable=true';
-                  
-
+                 
                  p.on=p.on?Object.assign(p.on,event):event;
                 
                  p = Object.assign(option,p);
-
-                 p.style += (!p.multiline?'white-space:nowrap;':'');
                  
+                 p.attributes = p.enable?'contenteditable=true':'';
+                  
+                 p.style += !p.multiline?'white-space:nowrap;':'';
 
-                 p.autofocus=function(){
+                 p.style +=!p.enable?'cursor:not-allowed;':'';
+
+                 p.style +=p.offStyle;
+
+                 if(p.value=='' && p.placeholderEnable){
+                    p.value = p.placeholder;
+                    p.style += p.placeholderStyle;
+                 }
+
+                 
+                  p.autofocus=function(){
                            var obj = this.$el;
                             if (window.getSelection) {
                                 obj.focus(); 
@@ -203,17 +222,14 @@ const WidgetManager ={
                                 range.collapse(false);
                                 range.select();
                             } 
-                        }
+                  }
         
                 return WidgetParse.getNxWidget('Input',
                                     p,
                                     'div',
                                     'background-color:transparent;border:1px solid #4B95FF;min-width:200px;min-height:40px;line-height:38px;margin:5px;padding:0 5px;border-radius:5px;overflow:hidden;cursor:auto;',
-                                    ['style','className','show','value']
+                                    ['style','className','show','value','enable']
                                     );
-            },
-            Textarea:function(){
-
             },
             Switch:function(p){
 

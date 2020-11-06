@@ -49,10 +49,24 @@ Spark.Image('img link',<options>)
 ## 输入框(Input)
 ```javascript
 Spark.Input({
-	//tag:'textarea',//默认input
-})
-```
+         on:{
+               inputing:function(e){
+                console.log(this.value)
+               }
+         },
+         value:'',//关键值
+         placeholder:'请输入...', //输入提示
+       //placeholderStyle:'color:#ccc;',//输入提示样式
+       //multiline:true, //是否多输入
+       //onStyle:'color:#000;box-shadow:0 0 5px #4B95FF;',//输入时样式
+       //offStyle:'color:#ccc;box-shadow:none;',//失去焦点时样式
+      
+    });
 
+```
+`Input.autofocus()` :自动获取焦点
+
+### <a href="/demo/input.html">[演示]</a>
  -------------------
 ## 容器(Box)
 ```javascript

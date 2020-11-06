@@ -128,5 +128,18 @@ export default {
               obj.watch && obj.watch['value'] && obj.watch['value'].call(obj,tempOld, nval);
 
               return nval;
+          },
+          enable:function(oval, nval, obj){
+              var tempOld = oval;
+              if (oval === nval)return nval;
+                
+                if(obj.$el){
+                      obj.$el.setAttribute('contenteditable', nval)
+                      obj.style = nval?'cursor:auto;':'cursor:not-allowed;';
+                }
+             
+              return nval;
           }
+
+          
      };
