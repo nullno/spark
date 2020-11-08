@@ -22,7 +22,7 @@ const WidgetOperate = {};
 WidgetOperate.clearWidget = function(_Widget){
     var _scope = this;
     if(!_typeof(_Widget.$el,'HTMLCollection') || (_typeof(_Widget.$el,'HTMLCollection') && _Widget.$el.length === 0)){
-         delete  this.WidgetCache[_Widget.name];
+         delete  GetAddressData(_Widget.name);
     }
     if(_Widget.child.length>0){
        SparkUtil.traverse(_Widget.child,function(item,index,end){
