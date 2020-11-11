@@ -4,15 +4,13 @@ import Spark from '../index.js'
    console.log(Spark)
 
 
-   Spark.Render_Test=function(){
-         
          if(Spark.vpage[0]){
              Spark.getWidget(Spark.vpage[0]).remove();
           }
          // 
 
         var Hi = Spark.Text('hello spark!',
-    	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
+    	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:300px;text-align:center;',
     	stopProp:true,
     	on:{  
 	     	  press(){
@@ -23,12 +21,12 @@ import Spark from '../index.js'
 	     	  }
 	     	}
     	});
-
+       
        Spark.Page({
        	    path:'page1',
-	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;',
+	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
 	     	child:[
-                 Hi
+                   Spark.Drag({style:Hi.style,child:[Hi]})
 	     	],
 	     	on:{
 	     		click(){
@@ -45,6 +43,6 @@ import Spark from '../index.js'
 	     })
          
           Spark.Render();
-       }
+
  
 	
