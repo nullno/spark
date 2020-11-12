@@ -21,6 +21,8 @@ import DefaultSetting from './DefaultSetting.js'
 
 import CSSManager from './CSSManager.js'
 
+import WidgetOperate from './WidgetOperate.js'
+
 export default function (_rootAdress,domTarget,init,addtype,callback){
      
         var _core = {
@@ -115,7 +117,7 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                          _this.renderComplete.call(_this,_this._rootAdress);
                          //如果是列表更新索引
                          if(domTarget.type==='List'){
-                            _scope.updateListIndex(domTarget)
+                            WidgetOperate.updateListIndex(domTarget)
                          }
                  
                          _this._clear();

@@ -9,7 +9,7 @@ function router(){
 window.addEventListener('hashchange',function(e){
   console.log(123)
 
-    Spark.Render_Test()
+    // Spark.Render_Test()
 })
 
 

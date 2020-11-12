@@ -8,7 +8,7 @@ import Spark from '../index.js'
              Spark.getWidget(Spark.vpage[0]).remove();
           }
          // 
-
+        
         var Hi = Spark.Text('hello spark!',
     	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:300px;text-align:center;',
     	stopProp:true,
@@ -23,10 +23,16 @@ import Spark from '../index.js'
     	});
        
        Spark.Page({
-       	    path:'page1',
+       	    //定义路由信息 
+       	    link:{
+       	    	name:'page1',
+       	    	path:'/',
+
+       	    },
 	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
 	     	child:[
-                   Spark.Drag({style:Hi.style,child:[Hi]})
+                   Spark.Drag({style:Hi.style,child:[Hi]}),
+                  
 	     	],
 	     	on:{
 	     		click(){
@@ -42,7 +48,17 @@ import Spark from '../index.js'
 	     	}
 	     })
          
-          Spark.Render();
+
+         Spark.Page({
+         	   //定义路由信息 
+       	    link:{
+       	    	name:'page2',
+       	    	path:'/',
+
+       	    },
+       	    style:'background:red;width:1000px;height:200px;'
+         }) 
+          // Spark.Render();
 
  
 	

@@ -18,8 +18,11 @@ import GetAddressData from './GetAddressData.js'
 
 import router from './Router.js'
 
+import axios from 'axios'
 
 console.log(new router())
+
+
 
  /*移动端开启调试工具*/
 if(DefaultSetting.devTool===true && _typeof(DefaultSetting.devTool,'Boolean')){
@@ -75,6 +78,7 @@ Spark.Extend=function(newWidget){
 }
 
 
+Spark.axios = axios;
 
 Object.assign(Spark,WidgetManager,Extend);
 

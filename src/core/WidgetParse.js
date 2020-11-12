@@ -318,10 +318,11 @@ const WidgetParse = {
                             if(this.type=='List'){
                                var tempDataArr=this.data;
                                    if(_typeof(this.data,'Number')){
-                                       tempDataArr=[];
+                                      tempDataArr = [];
                                        SparkUtil.traverse(this.data,function(index,end){
                                            tempDataArr.push(index)
                                        })
+                                       this.data = tempDataArr
                                    }
                                     /*jsonstr*/
                                     if(_typeof(this.data,'String')){

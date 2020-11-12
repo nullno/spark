@@ -31,7 +31,19 @@ const WidgetManager ={
                 return Cache.CSSCache[address];
             },
             Page: function(p) {
-  
+               
+               var option = {
+                           link:{
+                              name:'',
+                              path:'/',
+                           // redirect:'',
+                              meta:{}
+                          
+                            },
+               }
+
+               p = Object.assign(option,p);
+
               return WidgetParse.getNxWidget('Page',
                                     p,
                                     'div',
@@ -42,7 +54,8 @@ const WidgetManager ={
             Text: function(str, p) {
 
                 !p && (p = {});
-                 p.text=str;
+             
+                 p.text=str?str.toString():'';
 
                  return WidgetParse.getNxWidget('Text',
                                     p,
@@ -73,6 +86,13 @@ const WidgetManager ={
             },
 
             List:function(p){
+                !p && (p = {});
+
+                 var option={
+                    data:[],
+                    item:function(item,index){console.log('no data')}
+                   };
+                  p = Object.assign(option,p);
                return WidgetParse.getNxWidget('List',
                                     p,
                                     'ul',
