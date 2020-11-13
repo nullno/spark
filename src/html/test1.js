@@ -2,12 +2,12 @@ import Spark from '../index.js'
 	
    
    console.log(Spark)
+     
+      Spark.Link.setting({
+          a1:'/',
+          a2:'/'
+      })
 
-
-         if(Spark.vpage[0]){
-             Spark.getWidget(Spark.vpage[0]).remove();
-          }
-         // 
         
         var Hi = Spark.Text('hello spark!',
     	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:300px;text-align:center;',
@@ -53,12 +53,8 @@ import Spark from '../index.js'
          	   //定义路由信息 
        	    link:{
        	    	name:'page2',
-       	    	path:'/',
+       	    	path:'/page2/:id',
 
        	    },
        	    style:'background:red;width:1000px;height:200px;'
          }) 
-          // Spark.Render();
-
- 
-	

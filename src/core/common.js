@@ -4,6 +4,8 @@ export function _typeof(data,type){
 
 export const D = document;
 
+export const W = window;
+
 export function addEventListener(a,b,c,d){
           a && a.addEventListener(b, c, d || false);
   } 

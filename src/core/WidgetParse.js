@@ -17,6 +17,7 @@ import WidgetOperate from './WidgetOperate.js'
 
 import WidgetObserved from './WidgetObserved.js'
 
+import Router from './Router.js'
 
 const WidgetParse = {
             WidgetDefineProperty:function(obj, propertys) {
@@ -420,15 +421,19 @@ const WidgetParse = {
                  
                  Cache.WidgetCache[NEW_WIDGET.name] = NEW_WIDGET;
 
-                 /*数据变化监听*/
+                 /*指定参数变化监听*/
                  defineProperty && WidgetParse.setDefineProperty(NEW_WIDGET.name, defineProperty);
-              
-                  if(nxtype=='Page'){
+                  
+                 /*page->路由管理->渲染指定页面*/  
+                if(NEW_WIDGET.type === 'Page'){
+
                    Cache.PageCache.push(NEW_WIDGET.name);
+
+                    Router.read(NEW_WIDGET.name);
                   }
                 
 
-                     return NEW_WIDGET;
+                  return NEW_WIDGET;
 
             }
         };
