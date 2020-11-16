@@ -7,17 +7,26 @@ import Spark from '../index.js'
           a1:'/',
           a2:'/'
       })
-
+            
+            var ddd = Spark.Text('666',{
+                                    vif:false
+                                  })
         
         var Hi = Spark.Text('hello spark!',
     	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:300px;text-align:center;',
     	stopProp:true,
-    	on:{  
+    	on:{
+          click(){
+                // this.before(ddd);
+                ddd.vif=true
+          },  
 	     	  press(){
 	     			this.text = '不要摸我嘛~';
+
 	     	  },
 	     	  up(){
 	     	  	    this.text = '----SPARK----';
+
 	     	  }
 	     	}
     	});
@@ -27,21 +36,21 @@ import Spark from '../index.js'
        	    link:{
        	    	name:'page1',
        	    	path:'/',
-
        	    },
 	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
-	     	child:[
-                   Spark.Drag({style:Hi.style,child:[Hi]}),
-                  
-	     	],
+	     	child:[ddd,Hi],
 	     	on:{
 	     		click(){
+
 	     			if(Hi.text=='hello spark!'){
 	     				Hi.text = 'hello word!'
 	     				this.style='background-color:#34495e;color:#fff;'
+              // this.append(Hi)
 	     			}else{
 	     				Hi.text = 'hello spark!' 
 	     				this.style='background-color:#fff;color:#34495e;'
+
+              // Hi.remove()
 	     			}
 	     			
 	     		},

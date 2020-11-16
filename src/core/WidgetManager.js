@@ -36,19 +36,20 @@ const WidgetManager ={
                            link:{
                               name:'',
                               path:'/',
-                           // redirect:'',
-                              meta:{}
+                              redirect:'',
+                              meta:{},
+                              params:{}
                           
                             },
-               }
+                   }
 
-               p = Object.assign(option,p);
+               p.link = Object.assign(option.link,p.link);
 
               return WidgetParse.getNxWidget('Page',
                                     p,
                                     'div',
                                     'position:relative;',
-                                    ['style','child','className','show']
+                                    ['style','child','className','show','vif']
                                     );
             },
             Text: function(str, p) {
@@ -61,7 +62,7 @@ const WidgetManager ={
                                     p,
                                     'span',
                                     '',
-                                    ['text','style','className','show']
+                                    ['text','style','className','show','vif']
                                     );
             },
             Image: function(src,p) {
@@ -72,7 +73,7 @@ const WidgetManager ={
                                     p,
                                     'img',
                                     'border:0;',
-                                    ['style','className','show']
+                                    ['style','className','show','vif']
                                     );
             },
             Box: function(p) {
@@ -81,7 +82,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'background-color:transparent;',
-                                    ['style','child','className','show']
+                                    ['style','child','className','show','vif']
                                     );
             },
 
@@ -97,7 +98,7 @@ const WidgetManager ={
                                     p,
                                     'ul',
                                     '',
-                                    ['style','child','show','className']
+                                    ['style','child','show','className','vif']
                                     );
             },
             Drag:function(p) {
@@ -109,7 +110,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'position:fixed;background-color:#3D3F3F;',
-                                    ['style','show','className']
+                                    ['style','show','className','vif']
                                     );
             },
             Stack:function(p) {
@@ -117,7 +118,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'position:relative;background-color:#3D3F3F;',
-                                    ['style','show','className']
+                                    ['style','show','className','vif']
                                     );
             },
             Position:function(p) {
@@ -125,7 +126,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'position:absolute;background-color:#3D3F3F;',
-                                    ['style','show','className'] 
+                                    ['style','show','className','vif'] 
                                     );
             },
             Fixed:function(p) {
@@ -133,7 +134,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'position:fixed;background-color:#3D3F3F;',
-                                    ['style','show','className'] 
+                                    ['style','show','className','vif'] 
                                     );
             },
             Input:function(p){
@@ -248,7 +249,7 @@ const WidgetManager ={
                                     p,
                                     'div',
                                     'background-color:transparent;border:1px solid #4B95FF;min-width:200px;min-height:40px;line-height:38px;margin:5px;padding:0 5px;border-radius:5px;overflow:hidden;cursor:auto;',
-                                    ['style','className','show','value','enable']
+                                    ['style','className','show','value','enable','vif']
                                     );
             },
             Switch:function(p){

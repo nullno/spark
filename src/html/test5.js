@@ -57,6 +57,11 @@ import Spark from '../index.js'
         
 
         Spark.Page({
+        	 //定义路由信息 
+            link:{
+              name:'page1',
+              path:'/',
+            },
 	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
 	     	child:[List]
 	     })

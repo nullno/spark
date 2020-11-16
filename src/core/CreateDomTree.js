@@ -39,17 +39,26 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
             /*render them*/
             render: function() {
                 var _this = this;
-                var domData=GetAddressData(_this._rootAdress);
-                _this.readAdress(domData);
+                var domData = GetAddressData(_this._rootAdress);
+                 if(!domData.$el){
+                   _this.readAdress(domData);
+                }
 
                 //初始化渲染body
                 if(domData.type === 'Page' && init){
-
-                          
                           /*insert html*/
                           var AC = D.getElementById('spark-' + DefaultSetting.name);
                           var hasPage = D.getElementsByClassName(domData.name).length<=1;
-                                
+                              domData.parentName = 'spark-' + DefaultSetting.name;     
+
+                          if(domData.$el){
+                             console.log('had $el')
+                             AC.appendChild(domData.$el);
+                             
+                             domData.$_init && domData.$_init();
+                             domData.init && domData.init();
+                            return;
+                          }
                           if(!AC){
                              /*insert css*/
                               CSSManager.makeStyleTree(_this._css);
@@ -58,6 +67,10 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                               tempDom.innerHTML = this._html;
                               domTarget.insertBefore(tempDom, domTarget.firstChild);
                               tempDom=null;
+                              domData['$record']={
+                                 parentName:domData.parentName,
+                                 blongIndex:0
+                               };
 
                           }else if(hasPage){
                               CSSManager.makeNextStyleTree(_this._css,_this._rootAdress);
@@ -65,6 +78,10 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                                  tempDom.innerHTML = this._html;
                               AC.appendChild(tempDom.firstChild);
                               tempDom=null;
+                              domData['$record']={
+                                 parentName:domData.parentName,
+                                 blongIndex:AC.childNodes.length-1
+                               };
                           }else{
                             return;
                           }
@@ -84,17 +101,41 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                  
                 }else{
                    //后期渲染部分节点
-                
+                      
+                      // 如果已渲染过节点
+                      if(domData.$el){
+                           console.log('had $el')
+                           if(addtype=='after' || addtype == 'before'){
+                              var abTarget = domTarget;
+                              if(_typeof(domTarget.parentName,'String')) {
+                                        domTarget = GetAddressData(domTarget.parentName) 
+                                  }else{
+                                    console.warn('insert failed!')
+                                    return;
+                                  }
+                             _this.after_before(domTarget.$el,abTarget.$el,domData.$el,addtype,true)
+                           }
+
+                          if(addtype == 'append' || addtype == 'prepend'){
+                            _this.append_prepend(domTarget.$el,domData.$el,addtype,true)
+                           }
+                          
+                          domData.$_init && domData.$_init();
+                          domData.init && domData.init();
+                           return;
+                       }
+                   
+                     //新增节点
                      /*append css moveto pushcss()*/
                        CSSManager.makeNextStyleTree(_this._css,_this._rootAdress);
                  
                      /*append html*/
-
                         var tempDom = document.createElement("div");
                             tempDom.innerHTML = _this._html;
                             
                             if(addtype=='after' || addtype=='before'){
-                                   var abTarget= domTarget;
+                                   var abTarget = domTarget;
+
                                   if(_typeof(domTarget.parentName,'String')) {
                                         domTarget = GetAddressData(domTarget.parentName) 
                                   }else{
@@ -102,12 +143,12 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                                     return;
                                   }
 
-                                 _this.after_before(domTarget.$el,abTarget.$el,tempDom,addtype)
+                                 _this.after_before(domTarget.$el,abTarget.$el,tempDom,addtype,false)
                              } 
                              
 
                              if(addtype == 'append' || addtype == 'prepend'){
-                               _this.append_prepend(domTarget.$el,tempDom,addtype) 
+                               _this.append_prepend(domTarget.$el,tempDom,addtype,false) 
                              }
                      
                      /*append bind event*/
@@ -126,73 +167,129 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                   
             },
             /*add dom way 1 */
-            append_prepend:function(el,newel,type){
+            append_prepend:function(el,newel,type,hadel){
                    var _this = this;
                     if(_typeof(el,'HTMLCollection')){
                                     SparkUtil.traverse(el.length,function(index,end){
-                                      var tempDom = document.createElement("div");
-                                          tempDom.innerHTML = _this._html;
-                                        if(type == 'append'){
-                                             el[index].appendChild(tempDom.firstChild);
-                                            AddWidgetEvent(el[index].lastChild, _this._rootAdress);
-                                        }
-                                        if(type == 'prepend'){
-                                           el[index].insertBefore(tempDom.firstChild,el[index].firstChild);
-                                           AddWidgetEvent(el[index].firstChild, _this._rootAdress);
-                                        }
+                                        
+                                        if(!hadel){
+                                          var tempDom = document.createElement("div");
+                                              tempDom.innerHTML = _this._html;
+                                            if(type == 'append'){
+                                                 el[index].appendChild(tempDom.firstChild);
+                                                AddWidgetEvent(el[index].lastChild, _this._rootAdress);
+                                            }
+                                            if(type == 'prepend'){
+                                               el[index].insertBefore(tempDom.firstChild,el[index].firstChild);
+                                               AddWidgetEvent(el[index].firstChild, _this._rootAdress);
+                                            }
+                                         }else{
+                                             if(type == 'append'){
+                                               el[index].appendChild(newel);
+                                             }
+                                             if(type == 'prepend'){
+                                                el[index].insertBefore(newel,el[index].firstChild);
+                                             }
+
+                                         }
                                   })
                       }else{
-                         if(type == 'append'){
-                          el.appendChild(newel.firstChild);                          
-                          AddWidgetEvent(el.lastChild, _this._rootAdress); 
-                         }
-                        if(type == 'prepend'){
-                            el.insertBefore(newel.firstChild,el.firstChild);
-                            AddWidgetEvent(el.firstChild, _this._rootAdress);
-                        }
+
+                         if(!hadel){
+                             if(type == 'append'){
+                              el.appendChild(newel.firstChild);                          
+                              AddWidgetEvent(el.lastChild, _this._rootAdress); 
+                             }
+                            if(type == 'prepend'){
+                                el.insertBefore(newel.firstChild,el.firstChild);
+                                AddWidgetEvent(el.firstChild, _this._rootAdress);
+                            }
+                          }else{
+                              if(type == 'append'){
+                                       el.appendChild(newel);  
+                                }
+                              if(type == 'prepend'){
+                                       el.insertBefore(newel,el.firstChild);
+                              }
+                          }
                       }  
 
             },
              /*add dom way 2 */
-            after_before:function(el,abTarget,newel,type){
+            after_before:function(el,abTarget,newel,type,hadel){
                         var _this = this;
                         if(_typeof(el,'HTMLCollection')){
-                              SparkUtil.traverse(domTarget.$el.length,function(index,end){
+                              SparkUtil.traverse(el.length,function(index,end){
                           
-                                   var tempDom = document.createElement("div");
-                                       tempDom.innerHTML = _this._html;
-                                    var parentNode = abTarget[index].parentNode;   
+                                
+                                    var parentNode = abTarget[index].parentNode;  
+                                     if(!hadel){
+                                        var tempDom = document.createElement("div");
+                                           tempDom.innerHTML = _this._html; 
 
-                                    if(type == 'after'){
-                                      if(parentNode.lastChild == abTarget[index]){
-                                         parentNode.appendChild(tempDom.firstChild);
-                                       }else{
-                                         parentNode.insertBefore(tempDom.firstChild,abTarget[index].nextElementSibling);                          
-                                       }
-                                       AddWidgetEvent(abTarget[index].nextElementSibling, _this._rootAdress);
-                                     }
-                                     if(type == 'before'){
-                                        parentNode.insertBefore(tempDom.firstChild,abTarget[index])                               
-                                        AddWidgetEvent(abTarget[index].previousElementSibling, _this._rootAdress)
-                                     }
+                                        if(type == 'after'){
+
+                                          if(parentNode.lastChild == abTarget[index]){
+
+                                             parentNode.appendChild(tempDom.firstChild);
+                                           }else{
+                                             parentNode.insertBefore(tempDom.firstChild,abTarget[index].nextElementSibling);                          
+                                           }
+                                           AddWidgetEvent(abTarget[index].nextElementSibling, _this._rootAdress);
+                                         }
+                                         if(type == 'before'){
+                                            parentNode.insertBefore(tempDom.firstChild,abTarget[index])                               
+                                            AddWidgetEvent(abTarget[index].previousElementSibling, _this._rootAdress)
+                                         }
+                                      }else{
+
+                                          if(type == 'after'){
+                                              if(parentNode.lastChild == abTarget[index]){
+                                                 parentNode.appendChild(newel);
+                                               }else{
+                                                 parentNode.insertBefore(newel,abTarget[index].nextElementSibling);                          
+                                               }
+                                          }
+                                          if(type == 'before'){
+                                              parentNode.insertBefore(newel,abTarget[index])    
+                                          }
+
+                                      
+                                      }
 
                                })
                          }else{
                                      var parentNode = abTarget.parentNode;
+                                     if(!hadel){ 
+                                          if(type == 'after'){
+                                             if(parentNode.lastChild == abTarget){
 
-                                    if(type == 'after'){
-                                       if(parentNode.lastChild == abTarget){
-                                          parentNode.appendChild(newel.firstChild);
-                                       }else{
-                                          parentNode.insertBefore(newel.firstChild,abTarget.nextElementSibling);                         
-                                       }
-                                      AddWidgetEvent(abTarget.nextElementSibling, _this._rootAdress);
-                                    }  
+                                                parentNode.appendChild(newel.firstChild);
+                                             }else{
+                                                parentNode.insertBefore(newel.firstChild,abTarget.nextElementSibling);                         
+                                             }
+                                            AddWidgetEvent(abTarget.nextElementSibling, _this._rootAdress);
+                                          }  
 
-                                     if(type == 'before'){
-                                        parentNode.insertBefore(newel.firstChild,abTarget);                          
-                                        AddWidgetEvent(abTarget.previousElementSibling, _this._rootAdress);
-                                     }
+                                           if(type == 'before'){
+                                              parentNode.insertBefore(newel.firstChild,abTarget);                          
+                                              AddWidgetEvent(abTarget.previousElementSibling, _this._rootAdress);
+                                           }
+                                      }else{
+
+
+                                          if(type == 'after'){
+                                               if(parentNode.lastChild == abTarget){
+                                                parentNode.appendChild(newel);
+                                             }else{
+                                                parentNode.insertBefore(newel,abTarget.nextElementSibling);                         
+                                             }
+                                          }
+                                          if(type == 'before'){
+                                               parentNode.insertBefore(newel,abTarget);  
+                                          }
+
+                                      }     
                           }
                                
             },
@@ -209,6 +306,9 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                   if(node.show!=undefined && !node.show){
                       node.style='display:none;';
                   }
+                  if(!node.vif){
+                      node.remove();
+                  }
                
                   if(!init && node.parentName){
                     if(typeof node.parentName === 'object'){
@@ -216,8 +316,7 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                     }
                     if(typeof node.parentName === 'string'){
                         var tempParentName = node.parentName;
-                           node.parentName = [];
-                        
+                            node.parentName = [];
                             node.parentName = node.parentName.concat([tempParentName,domTarget.name])  
                              
                     } 

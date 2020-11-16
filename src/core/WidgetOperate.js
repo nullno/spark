@@ -20,7 +20,7 @@ const WidgetOperate = {};
  * @return    {[type]}                 [description]
  */
 WidgetOperate.clearWidget = function(_Widget){
-    var _scope = this;
+ /*   var _scope = this;
     if(!_typeof(_Widget.$el,'HTMLCollection') || (_typeof(_Widget.$el,'HTMLCollection') && _Widget.$el.length === 0)){
          delete  GetAddressData(_Widget.name);
     }
@@ -29,7 +29,7 @@ WidgetOperate.clearWidget = function(_Widget){
             _scope.clearWidget(GetAddressData(item))
        })
         
-    }
+    }*/
 }
 
 /**
@@ -161,7 +161,7 @@ WidgetOperate.remove = function(target,deldom){
 
          var tempChild=target.child.slice(0),
              blongIndex = SparkUtil.isInArray(target.child,{b:deldom.name});
- 
+  
         if(_typeof(deldom,'Object') && blongIndex!=-1){
                
 
@@ -229,9 +229,11 @@ WidgetOperate.remove = function(target,deldom){
         
         if(_typeof(deldom,'Number')){
             if(_typeof(target.$el,'HTMLCollection')){
+
                 SparkUtil.traverse(target.$el.length,function(index,end){
                         target.$el[index].childNodes[deldom] && target.$el[index].removeChild(target.$el[index].childNodes[deldom])
-                       })
+                       });
+
             }else{
                 target.$el.childNodes[deldom] && target.$el.removeChild(target.$el.childNodes[deldom])
             }

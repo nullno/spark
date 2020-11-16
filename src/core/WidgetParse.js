@@ -1,7 +1,7 @@
 /*
  WidgetParse 组件解析
  */
-import { _typeof } from './Common.js'
+import { _typeof,D } from './Common.js'
 
 import SparkUtil from './SparkUtil.js' 
 
@@ -45,7 +45,14 @@ const WidgetParse = {
                  if(!widgets)return [];
                 var addressArr = [];
                 SparkUtil.traverse(widgets,function(widgetItem,index,end){
+             
                    widgetItem['parentName']=parentName;
+                   widgetItem['$record']={
+                     parentName:parentName,
+                     blongIndex:index,
+                     prevName:widgets[index-1]?widgets[index-1].name:null,
+                     nextName:widgets[index+1]?widgets[index+1].name:null
+                   };
                    addressArr.push(widgetItem['name'])
                 })
                 return addressArr;
@@ -157,8 +164,8 @@ const WidgetParse = {
                                      noani?(delete _widget.showAni,_widget.style='animation:none;'):'';
                                      tempWidget.push(_widget);
                                   })
-
                                   this.data.splice.apply(this.data,[index, 0].concat(newdatas));
+                                  
                                   GetAddressData(this.child[index]).before(tempWidget);
                              }
                             
@@ -229,9 +236,9 @@ const WidgetParse = {
                             return WidgetOperate.addDom(this,newdoms,'before',set)    
                        },
                        remove:function(set,noani){
+
                           var tempWidget = this;
                           var aniSet = set ||  this.hideAni; 
-
                             if(_typeof(tempWidget.parentName,'Array')){
                                  var parentNames = tempWidget.parentName.slice(0);
                                  SparkUtil.traverse(parentNames,function(item,index){
@@ -250,7 +257,8 @@ const WidgetParse = {
                                  })
                                
                             }
-                            if(_typeof(tempWidget.parentName,'String')) {
+                            if(_typeof(tempWidget.parentName,'String') && !SparkUtil.includes(tempWidget.parentName,'spark-')) {
+
                                if(aniSet && aniSet.ani && !noani){
                                     tempWidget.style='animation:'+aniSet.ani+';';
                                     var removeTimer=setTimeout(function(){
@@ -262,6 +270,15 @@ const WidgetParse = {
                                          WidgetOperate.remove(GetAddressData(tempWidget.parentName),tempWidget)
                                 }
                             }
+                              
+                            if(tempWidget.parentName && tempWidget.$el && SparkUtil.includes(tempWidget.parentName,'spark-')){
+                                    
+                                    if(D.getElementsByClassName(tempWidget.name).length>=1){
+                                       D.getElementById(tempWidget.parentName).removeChild(tempWidget.$el);
+                                    }
+                                  
+
+                            } 
                 
                       // return this;
                     },
@@ -364,7 +381,8 @@ const WidgetParse = {
                 var p = !newparams?{}:newparams;
                 var NEW_WIDGET = {
                                  name:CreateWidgetName(nxtype),
-                                 show:true,
+                                 show:true,//显示或隐藏
+                                 vif:true,
                                  style:'',
                                  className:'',
                                  type:nxtype,//
@@ -413,8 +431,10 @@ const WidgetParse = {
                 }
 
                  /*指定元素插入*/
+                 if(NEW_WIDGET.type != 'Page'){
                   NEW_WIDGET.after = WidgetParse.getDomEvent.call(NEW_WIDGET,'after');
                   NEW_WIDGET.before = WidgetParse.getDomEvent.call(NEW_WIDGET,'before');
+                  }
                  /*删除元素*/
                   NEW_WIDGET.remove = WidgetParse.getDomEvent.call(NEW_WIDGET,'remove');
 
@@ -427,7 +447,7 @@ const WidgetParse = {
                  /*page->路由管理->渲染指定页面*/  
                 if(NEW_WIDGET.type === 'Page'){
 
-                   Cache.PageCache.push(NEW_WIDGET.name);
+                    Cache.PageCache.push(NEW_WIDGET.name);
 
                     Router.read(NEW_WIDGET.name);
                   }

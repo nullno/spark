@@ -143,8 +143,13 @@ import Spark from '../index.js'
              child:[option1,option2,option3,option4,option5,option6]
          }) 
          Spark.Page({
+           //定义路由信息 
+            link:{
+              name:'page1',
+              path:'/',
+            },
         style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;',
         child:[Modal1,Modal2,optionBox]
        })
        
-      Spark.Render();
+  

@@ -8,7 +8,37 @@ import SparkUtil from './SparkUtil.js'
     
 import CSSManager from './CSSManager.js'
 
+import GetAddressData from './GetAddressData.js'
+
 export default {
+          vif:function(oval, nval, obj) {
+               var tempOld = oval;
+              if (oval === nval)return nval;
+              
+              if(!nval){
+
+                 obj.remove();
+
+              }else{
+
+                 if(obj.type!='Page'){
+                  var W = GetAddressData(obj.$record.parentName),
+                      PW = GetAddressData(obj.$record.prevName),
+                      NW = GetAddressData(obj.$record.nextName);
+         
+                     if(PW){
+                        PW.after(obj);
+                     }else if(NW){
+                        NW.before(obj);
+                     }else if(W.child==0){
+                        W.append(obj);
+                     }
+                   
+                 }
+              }
+
+             return nval;   
+          },
           show:function(oval, nval, obj) {
               var tempOld = oval;
               if (oval === nval)

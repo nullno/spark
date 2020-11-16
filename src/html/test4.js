@@ -65,6 +65,11 @@
       });
    
    Spark.Page({
+     //定义路由信息 
+            link:{
+              name:'page1',
+              path:'/',
+            },
         style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#34495e;overflow:hidden;padding:20px;',
         child:[title1,Input,title1_1,Input2,title1_2,Input3,title2,Text]
        })
