@@ -96,19 +96,21 @@ const CSSManager = {
                 },
                /*修改*/ 
                modify: function(selector, cssStr) {
-                  cssStr = SparkUtil.trim(cssStr);
-                  /* try{
-                          if(!/^\.|#/.test(selector)){
-                             throw 'WARN: modify style selector must star" .|| #"}'
-                          }
-                          if(!/^\{.*\}$/.test(cssStr)){
-                            throw 'WARN: modify style cssstr must star"{" end "}"}'
-                           }
-                        }catch(error){
-                           console.warn(error)
-                        }*/
-                  _core.remove("[data-modifycss='" + selector + "']")
-                  _core.insert('data-modifycss', selector, cssStr)
+                  setTimeout(function(){
+                      cssStr = SparkUtil.trim(cssStr);
+                      /* try{
+                              if(!/^\.|#/.test(selector)){
+                                 throw 'WARN: modify style selector must star" .|| #"}'
+                              }
+                              if(!/^\{.*\}$/.test(cssStr)){
+                                throw 'WARN: modify style cssstr must star"{" end "}"}'
+                               }
+                            }catch(error){
+                               console.warn(error)
+                            }*/
+                        _core.remove("[data-modifycss='" + selector + "']")
+                       _core.insert('data-modifycss', selector, cssStr)
+                 })
                 },
                /*样式字符串转对象*/
                strStyleToObj:function(str){
@@ -172,7 +174,7 @@ const CSSManager = {
           
         var grayStr = DefaultSetting.gray==true?'html{ filter: grayscale(100%); -webkit-filter: grayscale(100%); -moz-filter: grayscale(100%); -ms-filter: grayscale(100%); -o-filter: grayscale(100%); filter: url("data:image/svg+xml;utf8,#grayscale"); filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1); -webkit-filter: grayscale(1);}':'';
 
-       return DefaultSetting.resetCss || 'html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;box-sizing:border-box;font-size:100%;vertical-align:baseline;background:transparent;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:"";content:none;}:focus{outline:0;}ins{text-decoration:none;}del{text-decoration:line-through;}table{border-collapse:collapse;border-spacing:0;}*{-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}::-webkit-scrollbar{width:5px;height:5px;position:absolute;}::-webkit-scrollbar-track{width:5px;background-color:rgba(0,0,0,0);-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb{background-color:rgba(61,63,63,.5);background-clip:padding-box;min-height:20px;-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb:hover{background-color:rgba(61,63,63,1)}'+grayStr;
+       return DefaultSetting.resetCss || 'html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;box-sizing:border-box;font-size:100%;vertical-align:baseline;background:transparent;}body{line-height:1;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:"";content:none;}:focus{outline:0;}ins{text-decoration:none;}del{text-decoration:line-through;}table{border-collapse:collapse;border-spacing:0;}*{-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}::-webkit-scrollbar{width:5px;height:5px;position:fixed;background-color:#F3F3F3;}::-webkit-scrollbar-track{width:5px;background-color:rgba(0,0,0,0);-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb{background-color:rgba(61,63,63,.5);background-clip:padding-box;min-height:20px;-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb:hover{background-color:rgba(61,63,63,1)}'+grayStr;
       
       },
       /* 初始化 style  */

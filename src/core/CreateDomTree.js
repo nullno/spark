@@ -40,7 +40,7 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
             render: function() {
                 var _this = this;
                 var domData = GetAddressData(_this._rootAdress);
-                 if(!domData.$el){
+                 if(!domData.$el || !domData.keepalive){
                    _this.readAdress(domData);
                 }
 
@@ -51,12 +51,11 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                           var hasPage = D.getElementsByClassName(domData.name).length<=1;
                               domData.parentName = 'spark-' + DefaultSetting.name;     
 
-                          if(domData.$el){
+                          if(domData.$el && domData.keepalive){
                              console.log('had $el')
                              AC.appendChild(domData.$el);
                              
-                             domData.$_init && domData.$_init();
-                             domData.init && domData.init();
+                             domData.activated && domData.activated();
                             return;
                           }
                           if(!AC){
@@ -103,7 +102,7 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                    //后期渲染部分节点
                       
                       // 如果已渲染过节点
-                      if(domData.$el){
+                      if(domData.$el && domData.keepalive){
                            console.log('had $el')
                            if(addtype=='after' || addtype == 'before'){
                               var abTarget = domTarget;
@@ -120,8 +119,8 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                             _this.append_prepend(domTarget.$el,domData.$el,addtype,true)
                            }
                           
-                          domData.$_init && domData.$_init();
-                          domData.init && domData.init();
+    
+                          domData.activated && domData.activated();
                            return;
                        }
                    
@@ -306,9 +305,9 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                   if(node.show!=undefined && !node.show){
                       node.style='display:none;';
                   }
-                  if(!node.vif){
-                      node.remove();
-                  }
+                  // if(!node.vif){
+                  //     node.remove();
+                  // }
                
                   if(!init && node.parentName){
                     if(typeof node.parentName === 'object'){
@@ -365,6 +364,8 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                   
                   node.$_init && node.$_init();
                   node.init && node.init();
+                  node.created && node.created();
+                  node.activated && node.activated();
 
                   
                 /*  if(node.watch){

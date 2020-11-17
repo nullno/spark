@@ -290,7 +290,7 @@ let SparkUtil = {
             }
 
         },
-        /*数组中是否存在元素,并返回索引
+        /*数组中是否存在元素,并返回索引 精确查找
          compare:{a:原数组key,b:值}
         */
         isInArray:function(arr,compare){

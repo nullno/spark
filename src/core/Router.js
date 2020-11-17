@@ -12,9 +12,8 @@ import Cache from './Cache.js'
 function Router(){
 
       this.name='hi router';
-
-
-    
+      this.Outed = {};
+      
 }
 
 //初始化
@@ -29,13 +28,8 @@ console.log('init router')
 //hash模式
 Router.prototype.hash = function(){
         
-    
-          // if(!location.hash){
-          //     location.hash = '/';  
-          // }
 
     return location.hash.slice(1);
-
 
 }
 
@@ -48,11 +42,11 @@ Router.prototype.setting = function(params){
 
 //进栈
 Router.prototype.read = function(pagename){
-    if(!this.hash()){
-       location.hash = '/'; 
-        return;
-    }
-	     const W = GetAddressData(pagename)
+        if(!this.hash()){
+           location.hash = '/'; 
+            return;
+        }
+	      const W = GetAddressData(pagename)
           
          if(D.getElementsByClassName(W.name).length>=1){
               W.remove();
@@ -75,21 +69,24 @@ Router.prototype.readPage = function(){
 }
 
 Router.prototype.change = function(link){
+   var _this = this;
       const path_hash = this.hash().replace(/\/$/,'');
-            link.path = link.path.replace(/\/$/,'');      
+      const link_path = link.path.replace(/\/$/,'');      
      
        //普通匹配 
-       if(link.path === path_hash){
+       if(link_path === path_hash){
           this.Render(link.address)
+          this.Outed = Object.assign(this.Outed,link);
+          this.Outed.path=this.hash();
           return;
         }    
 
        //带参数匹配
        if(SparkUtil.includes(link.path,':') && path_hash!='/'){
-          	  let prevpath = link.path.match(/(\S*):/)[1];
+          	  let prevpath = link_path.match(/(\S*):/)[1];
                
                const  HArr = path_hash.split('/');
-               const  PArr = link.path.split('/');
+               const  PArr = link_path.split('/');
    
                // console.log(HArr,PArr)
 
@@ -101,8 +98,11 @@ Router.prototype.change = function(link){
                    
     				        	}
     				        })
-                  // console.log(link) 
-                  this.Render(link.address)
+          
+                  this.Render(link.address);
+                  this.Outed = Object.assign(this.Outed,link);
+                  this.Outed.path = this.hash();
+                   
                   return;
 		          }  
         }
@@ -114,6 +114,45 @@ Router.prototype.change = function(link){
 Router.prototype.Render = function(pagename){
      CreateDomTree(pagename,D.body,true);
 }
+
+//路由操作
+Router.prototype.Out = function(){
+
+}
+
+Router.prototype.Out.push = function(p){
+     if(!p)return'';
+    if(_typeof(p,'String')){
+       location.hash = p
+    }
+    if(_typeof(p,'Object')){
+    
+      SparkUtil.traverse(Cache.PageCache,function(item,index,end){
+          const W = GetAddressData(item)
+             if(W.link.name === p.name){
+                 if(SparkUtil.includes(W.link.path,':') && _typeof(p.params,'Object')){
+                       console.log(W.link.path,p)
+                     SparkUtil.traverse(p.params,function(k){
+                         console.log(k)
+                     })
+                     // location.hash = ''
+                 }else{
+                     location.hash = W.link.path
+                 }
+                
+                  // console.log(W.link)
+                  return;
+             } 
+            
+      })
+      
+    }
+}
+
+Router.prototype.Out.replace = function(p){
+  
+}
+
 
 const  $router = new Router(); 
 

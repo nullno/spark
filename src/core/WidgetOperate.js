@@ -20,6 +20,9 @@ const WidgetOperate = {};
  * @return    {[type]}                 [description]
  */
 WidgetOperate.clearWidget = function(_Widget){
+     _Widget.rendered = false;
+     _Widget.deactivated && _Widget.deactivated();
+
  /*   var _scope = this;
     if(!_typeof(_Widget.$el,'HTMLCollection') || (_typeof(_Widget.$el,'HTMLCollection') && _Widget.$el.length === 0)){
          delete  GetAddressData(_Widget.name);

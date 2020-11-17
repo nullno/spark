@@ -53,7 +53,10 @@ const WidgetParse = {
                      prevName:widgets[index-1]?widgets[index-1].name:null,
                      nextName:widgets[index+1]?widgets[index+1].name:null
                    };
-                   addressArr.push(widgetItem['name'])
+                    if(widgetItem.vif){
+                      addressArr.push(widgetItem['name']);
+                     }
+                
                 })
                 return addressArr;
             },
@@ -275,6 +278,7 @@ const WidgetParse = {
                                     
                                     if(D.getElementsByClassName(tempWidget.name).length>=1){
                                        D.getElementById(tempWidget.parentName).removeChild(tempWidget.$el);
+                                       WidgetOperate.clearWidget(tempWidget);
                                     }
                                   
 
@@ -323,6 +327,10 @@ const WidgetParse = {
                                     tempStyleStr+='position:absolute;';
                                   }
                                  }
+
+                                  // if(this.show!=undefined && !this.show){
+                                  //     tempStyleStr+='display:none;';
+                                  // }
                                 
                                 
                              delete this.defaultcss;
@@ -383,6 +391,7 @@ const WidgetParse = {
                                  name:CreateWidgetName(nxtype),
                                  show:true,//显示或隐藏
                                  vif:true,
+                                 keepalive:true,
                                  style:'',
                                  className:'',
                                  type:nxtype,//
@@ -399,10 +408,14 @@ const WidgetParse = {
                        p.on={click:function(){}};
                      }
                 }
-               /*pulic type handler*/
 
+
+               /*pulic type handler*/
+                  
       
                 Object.assign(NEW_WIDGET, p); 
+
+             
                 
                 NEW_WIDGET.styleObj = CSSManager.cssParse.strStyleToObj(WidgetParse.getKeyValue.call(NEW_WIDGET,'style'));
 
