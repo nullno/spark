@@ -54,7 +54,6 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                           if(domData.$el && domData.keepalive){
                              console.log('had $el')
                              AC.appendChild(domData.$el);
-                             
                              domData.activated && domData.activated();
                             return;
                           }

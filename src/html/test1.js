@@ -14,20 +14,21 @@ import Spark from '../index.js'
     var nav = Spark.Fixed({
             style:'bottom:0;width:100%;height:100px;line-height:100px;color:#fff; background:blue;display:flex;justify-content:space-around;',
             stopProp:true,
-            diyfn(w){
+            diyfn(index){
                  Navcss.style='background:transparent';
-                 w.style='background:red;';
-                
-                   console.log(Spark)
+                 this.getChild(index).style='background:red;';
+                 // console.log(Spark.Linked)
+            },
+            init(){
+                this.diyfn(Spark.Linked.name=='page1'?0:1);
             },
             child:[
 
                  Spark.Text('PAGE-1',{
-                  style:'background:red;',
                   className:Navcss,
                   on:{
                     click(){
-                       nav.diyfn(this);
+                       nav.diyfn(0);
                        Spark.Link.push({name:'page1'});
                     }
                   }
@@ -36,8 +37,8 @@ import Spark from '../index.js'
                     className:Navcss,
                     on:{
                       click(){
-                        nav.diyfn(this);
-                        Spark.Link.push({name:'page2',params:{id:'22222'}});
+                        nav.diyfn(1);
+                        Spark.Link.push({name:'page2',params:{id:'22222',nid:'151'}});
 
                       }
                     }
@@ -123,18 +124,19 @@ import Spark from '../index.js'
          	   //定义路由信息 
        	    link:{
        	    	name:'page2',
-       	    	path:'/page2/:id',
+       	    	path:'/page2/:id/:nid',
 
        	    },
               style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#1FCBC6;color:#fff;',
             child:[Hi,nav],
-             created(){
+              created(){
+
                 console.log('page2 created')
               },
                activated(){
-                console.log('actived'+this)
+                // console.log('actived'+this)
               },
               deactivated(){
-                   console.log('deactivated')
+                   // console.log('deactivated')
               },
          }) 

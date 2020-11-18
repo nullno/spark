@@ -76,7 +76,7 @@ Spark.Extend=function(newWidget){
 Spark.axios = axios;
 
 //路由事件
-Spark.Link = Router.Out;
+Spark.Link = Router.operate;
 Spark.Linked = Router.Outed;
 
 Object.assign(Spark,WidgetManager,Extend);

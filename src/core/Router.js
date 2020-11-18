@@ -12,7 +12,8 @@ import Cache from './Cache.js'
 function Router(){
 
       this.name='hi router';
-      this.Outed = {};
+      this.Outed = {_origin:{}};
+      this.historyStack = [];
       
 }
 
@@ -39,7 +40,10 @@ Router.prototype.setting = function(params){
      Object.assign(this,params)
 
 }
-
+Router.prototype.setOuted=function(link){
+   this.Outed = Object.assign(this.Outed,link);
+   this.Outed.path=this.hash();
+}
 //进栈
 Router.prototype.read = function(pagename){
         if(!this.hash()){
@@ -51,7 +55,6 @@ Router.prototype.read = function(pagename){
          if(D.getElementsByClassName(W.name).length>=1){
               W.remove();
           }
-          
           
           W.link.address=pagename;
          
@@ -73,24 +76,25 @@ Router.prototype.change = function(link){
       const path_hash = this.hash().replace(/\/$/,'');
       const link_path = link.path.replace(/\/$/,'');      
      
+
+
        //普通匹配 
        if(link_path === path_hash){
-          this.Render(link.address)
-          this.Outed = Object.assign(this.Outed,link);
-          this.Outed.path=this.hash();
+          this.Render(link)
           return;
         }    
 
        //带参数匹配
        if(SparkUtil.includes(link.path,':') && path_hash!='/'){
-          	  let prevpath = link_path.match(/(\S*):/)[1];
-               
+
+
+          	  // let prevpath = link_path.match(/(\S*):/)[1];
+
                const  HArr = path_hash.split('/');
                const  PArr = link_path.split('/');
-   
-               // console.log(HArr,PArr)
+               const index = link_path.indexOf(':');
 
-               if(SparkUtil.includes('#'+path_hash,'#'+prevpath) && HArr.length==PArr.length){
+               if(link_path.slice(0,index)===path_hash.slice(0,index) && HArr.length==PArr.length){
     				        SparkUtil.traverse(PArr,function(item,index,end){
     				        	if(SparkUtil.includes(item,':') && HArr[index]!=''){
     				        		const name = item.slice(1)
@@ -98,11 +102,8 @@ Router.prototype.change = function(link){
                    
     				        	}
     				        })
-          
-                  this.Render(link.address);
-                  this.Outed = Object.assign(this.Outed,link);
-                  this.Outed.path = this.hash();
-                   
+            
+                  this.Render(link);
                   return;
 		          }  
         }
@@ -111,16 +112,18 @@ Router.prototype.change = function(link){
 
 
 //路由跳转
-Router.prototype.Render = function(pagename){
-     CreateDomTree(pagename,D.body,true);
+Router.prototype.Render = function(link){
+     this.setOuted(link);
+     this.historyStack.push(link);
+     console.log(this.historyStack)
+     CreateDomTree(link.address,D.body,true);
+     
 }
 
 //路由操作
-Router.prototype.Out = function(){
+Router.prototype.operate = function(){}
 
-}
-
-Router.prototype.Out.push = function(p){
+Router.prototype.operate.push = function(p){
      if(!p)return'';
     if(_typeof(p,'String')){
        location.hash = p
@@ -131,11 +134,17 @@ Router.prototype.Out.push = function(p){
           const W = GetAddressData(item)
              if(W.link.name === p.name){
                  if(SparkUtil.includes(W.link.path,':') && _typeof(p.params,'Object')){
-                       console.log(W.link.path,p)
+                      var path = W.link.path;
                      SparkUtil.traverse(p.params,function(k){
-                         console.log(k)
+                         path = path.replace(':'+k,p.params[k])
                      })
-                     // location.hash = ''
+                     if(!SparkUtil.includes(path,':')){
+
+                         location.hash = path
+                     }else{
+
+                     }
+                     
                  }else{
                      location.hash = W.link.path
                  }
@@ -149,23 +158,21 @@ Router.prototype.Out.push = function(p){
     }
 }
 
-Router.prototype.Out.replace = function(p){
+Router.prototype.operate.replace = function(p){
+  
+}
+Router.prototype.operate.go = function(p){
   
 }
 
 
-const  $router = new Router(); 
+const  myrouter = new Router(); 
 
 window.addEventListener(
     'hashchange',
     function (event) {
-
-        // const oldURL = event.oldURL; 
-        // const newURL = event.newURL; 
-        // console.log(newURL, oldURL);
-        // console.log($router.hash())
-
-       $router.readPage()
+       myrouter.Outed._origin=event;
+       myrouter.readPage(event)
                 
     },
     false
@@ -173,4 +180,4 @@ window.addEventListener(
 
 
 
-export default $router;
+export default myrouter;
