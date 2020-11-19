@@ -41,8 +41,8 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                 var _this = this;
                 var domData = GetAddressData(_this._rootAdress);
                  if(!domData.$el || !domData.keepalive){
-                   _this.readAdress(domData);
-                }
+                    _this.readAdress(domData);
+                 }
 
                 //初始化渲染body
                 if(domData.type === 'Page' && init){
@@ -52,9 +52,11 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                               domData.parentName = 'spark-' + DefaultSetting.name;     
 
                           if(domData.$el && domData.keepalive){
-                             console.log('had $el')
+                             // console.log('had $el')
                              AC.appendChild(domData.$el);
-                             domData.activated && domData.activated();
+                             _this.renderCompleteKeepAlive.call(_this,_this._rootAdress);
+                             
+                             callback && callback();
                             return;
                           }
                           if(!AC){
@@ -102,7 +104,7 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                       
                       // 如果已渲染过节点
                       if(domData.$el && domData.keepalive){
-                           console.log('had $el')
+                           // console.log('had $el')
                            if(addtype=='after' || addtype == 'before'){
                               var abTarget = domTarget;
                               if(_typeof(domTarget.parentName,'String')) {
@@ -118,8 +120,9 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                             _this.append_prepend(domTarget.$el,domData.$el,addtype,true)
                            }
                           
-    
-                          domData.activated && domData.activated();
+                           _this.renderCompleteKeepAlive.call(_this,_this._rootAdress);
+
+                            callback && callback();
                            return;
                        }
                    
@@ -290,6 +293,17 @@ export default function (_rootAdress,domTarget,init,addtype,callback){
                                       }     
                           }
                                
+            },
+            renderCompleteKeepAlive(address){
+                var _this = this;
+                var node = GetAddressData(address);
+                    node.rendered = true;
+                    node.activated && node.activated();
+                  if(node.child && node.child.length>0){
+                     SparkUtil.traverse(node.child,function(nodeItem,index,end){
+                       _this.renderCompleteKeepAlive(nodeItem);
+                     })
+                   }    
             },
             /*add render complete function*/
             renderComplete:function(address){

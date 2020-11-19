@@ -39,7 +39,6 @@ const WidgetManager ={
                               redirect:'',
                               meta:{},
                               params:{}
-                          
                             },
                    }
 
@@ -56,7 +55,7 @@ const WidgetManager ={
 
                 !p && (p = {});
              
-                 p.text=str?str.toString():'';
+                 p.text=str.toString()?str.toString():'';
 
                  return WidgetParse.getNxWidget('Text',
                                     p,

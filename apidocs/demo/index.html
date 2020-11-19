@@ -8,7 +8,46 @@
  <script src="./js/spark.min.js"></script>
   <script>
 		
-	    Spark.Render({name:'Home',path:'component/Home'});
+	 var Hi = Spark.Text('hello spark!',
+    	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
+    	stopProp:true,
+    	on:{  
+	     	  press(){
+	     			this.text = '不要摸我嘛~';
+	     	  },
+	     	  up(){
+	     	  	    this.text = '----SPARK----';
+	     	  }
+	     	}
+    	});
+
+    var Page = Spark.Page({
+    	 //定义路由信息 
+            link:{
+              name:'page1',
+              path:'/',
+            },  
+	     	style:'width:100%;min-height:'+Spark.screen.height()+'px;background-color:#fff;color:#7566F9;',
+	     	child:[
+                 Hi
+	     	],
+	     	state:0,
+	     	setColor(str,styleStr){
+	     		Hi.text = str
+	     		this.style = styleStr
+	     		this.state =! this.state
+	     	},
+	     	on:{
+	     		click(){
+	     			if(!this.state){
+	     				this.setColor('hello word!','background-color:#7566F9;color:#fff;')
+	     			}else{
+	     			    this.setColor('hello word!','background-color:#fff;color:#7566F9;')
+	     			}
+	     			
+	     		},
+	     	}
+	     })
   </script>
 </body>
 </html>

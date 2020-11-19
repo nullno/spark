@@ -10,11 +10,20 @@ import Cache from './Cache.js'
 
 //构造路由
 function Router(){
+      this.Outed = {
+                     _origin:{},
+                     start:true,
+                     end:true,
+                   };
+      this.hashStack = [];
 
-      this.name='hi router';
-      this.Outed = {_origin:{}};
-      this.historyStack = [];
-      
+      this.hashStackIndex = 0;
+
+      this.isback = false;
+
+      this.changeState = 1;
+
+      this.run = false;
 }
 
 //初始化
@@ -33,21 +42,54 @@ Router.prototype.hash = function(){
     return location.hash.slice(1);
 
 }
-
+Router.prototype.GoPage=function(p){
+    if(p && p != this.hash()){
+      location.hash = p
+    }else{
+      this.run = false
+    }
+}
 //设置
 Router.prototype.setting = function(params){
      
      Object.assign(this,params)
 
 }
+
 Router.prototype.setOuted=function(link){
+
    this.Outed = Object.assign(this.Outed,link);
    this.Outed.path=this.hash();
+   var linkstate = Object.assign({},this.Outed);
+    if(!this.isback){
+      if(this.changeState){
+        this.hashStack.push(linkstate);
+      }else{
+        this.hashStack.splice(this.hashStack.length-1,1,linkstate);
+      }
+      this.hashStackIndex = this.hashStack.length-1;
+    }
+   this.isback=false;
+   delete  linkstate._origin;
+   window.history.replaceState(linkstate, '', '');
 }
+
+
+//路由跳转
+Router.prototype.Render = function(link){
+    var _this =this;
+     this.setOuted(link);
+
+     CreateDomTree(link.address,D.body,true,'',function(){
+       _this.run = false
+     });
+     
+}
+
 //进栈
 Router.prototype.read = function(pagename){
         if(!this.hash()){
-           location.hash = '/'; 
+           this.GoPage('/')
             return;
         }
 	      const W = GetAddressData(pagename)
@@ -76,8 +118,6 @@ Router.prototype.change = function(link){
       const path_hash = this.hash().replace(/\/$/,'');
       const link_path = link.path.replace(/\/$/,'');      
      
-
-
        //普通匹配 
        if(link_path === path_hash){
           this.Render(link)
@@ -86,7 +126,6 @@ Router.prototype.change = function(link){
 
        //带参数匹配
        if(SparkUtil.includes(link.path,':') && path_hash!='/'){
-
 
           	  // let prevpath = link_path.match(/(\S*):/)[1];
 
@@ -111,62 +150,84 @@ Router.prototype.change = function(link){
 }
 
 
-//路由跳转
-Router.prototype.Render = function(link){
-     this.setOuted(link);
-     this.historyStack.push(link);
-     console.log(this.historyStack)
-     CreateDomTree(link.address,D.body,true);
-     
-}
 
 //路由操作
-Router.prototype.operate = function(){}
+Router.prototype.operate = function(p,t){
+              if(!p || this.run) return;
+              this.run=true;
+              this.changeState = t;
+              this.Outed.end = true;
+              this.Outed.start = false;
+
+
+              var newhash = '';
+                if(_typeof(p,'String')){
+                   newhash = p;
+                }
+                if(_typeof(p,'Object')){
+                  SparkUtil.traverse(Cache.PageCache,function(item,index,end){
+                      const W = GetAddressData(item)
+                         if(W.link.name === p.name){
+                             if(SparkUtil.includes(W.link.path,':') && _typeof(p.params,'Object')){
+                                  var path = W.link.path;
+                                 SparkUtil.traverse(p.params,function(k){
+                                     path = path.replace(':'+k,p.params[k])
+                                 })
+                                 if(!SparkUtil.includes(path,':')){
+                                     newhash = path;
+                                 }else{
+
+                                 }
+                                 
+                             }else{
+                                  newhash = W.link.path;
+                             } 
+                              return;
+                         }    
+                  })
+                  
+                }
+
+         this.GoPage(newhash)
+}
+
 
 Router.prototype.operate.push = function(p){
-     if(!p)return'';
-    if(_typeof(p,'String')){
-       location.hash = p
-    }
-    if(_typeof(p,'Object')){
-    
-      SparkUtil.traverse(Cache.PageCache,function(item,index,end){
-          const W = GetAddressData(item)
-             if(W.link.name === p.name){
-                 if(SparkUtil.includes(W.link.path,':') && _typeof(p.params,'Object')){
-                      var path = W.link.path;
-                     SparkUtil.traverse(p.params,function(k){
-                         path = path.replace(':'+k,p.params[k])
-                     })
-                     if(!SparkUtil.includes(path,':')){
 
-                         location.hash = path
-                     }else{
-
-                     }
-                     
-                 }else{
-                     location.hash = W.link.path
-                 }
-                
-                  // console.log(W.link)
-                  return;
-             } 
-            
-      })
-      
-    }
+   this.call(myrouter,p,1)
 }
 
 Router.prototype.operate.replace = function(p){
-  
+   this.call(myrouter,p,0)
 }
+
 Router.prototype.operate.go = function(p){
+   if(myrouter.run)return;
+
+    myrouter.isback = true;
+
+    myrouter.run=true;
+
+    var hashStack = myrouter.hashStack;
   
+    myrouter.hashStackIndex+=p;
+   
+    myrouter.Outed.end  = myrouter.Outed.start = false;
+
+    if(myrouter.hashStackIndex>=hashStack.length-1){
+       myrouter.hashStackIndex=hashStack.length-1;
+       myrouter.Outed.end = true;
+    }
+    if(myrouter.hashStackIndex<=0){
+      myrouter.hashStackIndex = 0;
+      myrouter.Outed.start = true;
+    }
+
+   myrouter.GoPage(hashStack[myrouter.hashStackIndex].path)
 }
 
 
-const  myrouter = new Router(); 
+const myrouter = new Router(); 
 
 window.addEventListener(
     'hashchange',
@@ -178,6 +239,14 @@ window.addEventListener(
     false
 );
 
+window.addEventListener('popstate',
+  function(event) {   
+    if(event.state){
+       myrouter.isback = true;
+       // location.reload();
+    }  
+
+},false);
 
 
 export default myrouter;
