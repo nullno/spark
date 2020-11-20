@@ -213,6 +213,7 @@ let SparkUtil = {
               
                 }
         },
+        /*数组匹配移除*/
         compareRemove:function(datas,compare){
           if(_typeof(datas,'Array') && compare ){
               for (var i = 0; i < datas.length; i++) {
@@ -223,12 +224,6 @@ let SparkUtil = {
                 　　}
                  })(i) 
                 }
-                /*for (var i = datas.length-1;i >= 0 ;i--) {
-                    if (datas[i] == delparam) {
-                        datas.splice(i,1);        //执行后datas.length会减一
-                    }
-                    callback(datas[i],i,i==0)  
-                }*/
             }
         },
         /*遍历  datas <Array> || <Number>*/

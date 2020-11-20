@@ -4,20 +4,13 @@
 
  -------------------
 
-#### Spark是什么？
+#### Spark是什么
 
+它就像乐高积木，可以拼凑出任何你想要的功能丰富的视图，降低代码维护的多样性，专注用最简单的方式去生产你的乐高玩具，Spark绽放思想的火花，去智造无限可能~
 
-便捷易用的前端组件库，像堆积木一样简单的去创建页面，借鉴Flutter核心原则，`一切皆为widget`
-与其他各功能分离的框架不同，Spark一个对象模型即可包含样式、视图、控制器等功能；
+#### 适用对象
 
-
-* 使用Spark前端编写页面，全程几乎都可以使用js代码去完成页面编写，不用同时去维护`*.css/*.html`文件；
-
-* 更少体积的dom/style文件，加载更快；
-
-#### 适用对象？
-
-* IOT设备界面显示/数据可视化平台
+* IOT设备界面显示/数据可视化平台；
 
 * 适用于提出不用html用纯js怎么做页面的这种问题的小伙伴；
 
@@ -51,21 +44,21 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8" />
-	<title>基础演示</title>
+	<title>Hello Spark</title>
 </head>
 <body>
  <script src="./js/spark.min.js"></script>
   <script>
 		
-	 var Hi = Spark.Text('hello spark!',
-    	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
+	 var Hi = Spark.Text('Hello Spark',
+    	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:bolder;',
     	stopProp:true,
     	on:{  
 	     	  press(){
-	     			this.text = '不要摸我嘛~';
+	     			this.text = 'Hello Spark';
 	     	  },
 	     	  up(){
-	     	  	    this.text = '----SPARK----';
+	     	  	    this.text = '绽放思想的火花，去智造无限可能';
 	     	  }
 	     	}
     	});
@@ -89,9 +82,9 @@
 	     	on:{
 	     		click(){
 	     			if(!this.state){
-	     				this.setColor('hello word!','background-color:#7566F9;color:#fff;')
+	     				this.setColor('Hello Spark','background-color:#7566F9;color:#fff;')
 	     			}else{
-	     			    this.setColor('hello word!','background-color:#fff;color:#7566F9;')
+	     			    this.setColor('Hello Spark','background-color:#fff;color:#7566F9;')
 	     			}
 	     			
 	     		},

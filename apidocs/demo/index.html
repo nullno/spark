@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8" />
-	<title>基础演示</title>
+	<title>Hello Spark</title>
 </head>
 <body>
  <script src="./js/spark.min.js"></script>
   <script>
 		
-	 var Hi = Spark.Text('hello spark!',
-    	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);',
+	 var Hi = Spark.Text('Hello Spark',
+    	{style:'font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:bolder;',
     	stopProp:true,
     	on:{  
 	     	  press(){
-	     			this.text = '不要摸我嘛~';
+	     			this.text = 'Hello Spark';
 	     	  },
 	     	  up(){
-	     	  	    this.text = '----SPARK----';
+	     	  	    this.text = '绽放思想的火花，去智造无限可能';
 	     	  }
 	     	}
     	});
@@ -40,9 +40,9 @@
 	     	on:{
 	     		click(){
 	     			if(!this.state){
-	     				this.setColor('hello word!','background-color:#7566F9;color:#fff;')
+	     				this.setColor('Hello Spark','background-color:#7566F9;color:#fff;')
 	     			}else{
-	     			    this.setColor('hello word!','background-color:#fff;color:#7566F9;')
+	     			    this.setColor('Hello Spark','background-color:#fff;color:#7566F9;')
 	     			}
 	     			
 	     		},

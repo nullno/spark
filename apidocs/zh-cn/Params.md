@@ -1,3 +1,4 @@
+# 参数
 ## widget.child
 > `Array`类型， 放置容器的子组件，`Image,Input`等没有此参数，`List` 设置此参数将会被`List.item()`模板覆盖
 ```
@@ -66,6 +67,13 @@ on:{
 ## widget.show
 > `Boolean`类型，设置元素是否显示
 
+## widget.vif
+> `Boolean`类型，设置元素是否显示，是否在dom文档中存在
+
+## widget.keepalive
+> `Boolean`类型，路由切换是否状态保留，默认true
+
+
 ## widget.showAni
 > 元素进场动画，使用css3 animate 动画，动画推荐使用 `animate.css`http://www.animate.net.cn;
 > 也可使用自定义css3动画
@@ -83,79 +91,7 @@ hideAni:{ani:'bounceOutRight 500ms both',time:500},
 ## widget.$el
 > 获取dom对象
 
-## widget.init()
-> 执行周期 dom渲染后执行
-```
- init:function(){
- 	console.log(this.$el)
- }
-```
-
-## widget.getChild()
-
-> 获取子组件信息
-```
- widget.getChild(0).style="color:red;"
-```
-
-## widget.prepend()
-> 从头部添加子组件`child`,支持批量添加
-```
- //单个添加
- widget.prepend(Spark.Text('node1'))
- //批量添加
- widget.prepend([Spark.Text('node1'),Spark.Text('node2')])
-
- //其他方法指定组件内添加
- Spark.prepend(targetContainer,node1);
-```
-## widget.append()
-> 从尾部添加子组件`child`,支持批量添加
-```
- //单个添加
- widget.append(Spark.Text('node1'))
-
- //批量添加
- widget.append([Spark.Text('node1'),Spark.Text('node2')])
-
-  //其他方法指定组件内添加
- Spark.prepend(targetContainer,node1);
-```
-## widget.before()
-> 在某一组件之前添加,支持批量添加
-## widget.after()
-> 在某一组件之后添加,支持批量添加
-
-## widget.remove()
-> 移除组件,设置`hideAni`可设置移除动画
-```
-方法1: widget.remove();
-方法2：Spark.remove(widgetParent,widget);
+## widget.stopProp
+> `Boolean`类型，开启阻止冒泡
 
 
-删除指定索引组件：Spark.remove(targetContainer,2);
-删除第一个:Spark.remove(targetContainer,'firstChild');
-删除最后一个：Spark.remove(targetContainer,'lastChild');
-```
-## widget.removeChild()
-> 移除子组件
-```
-targetWidget.removeChild(<Widget> | <Index> |<firstChild,lastChild>);
-
-```
-
-## widget.empty()
-
-> 清空子组件
-
-
-## widget.width()
-> 获取/设置组件宽度
-```
-    widget.width(100);//设置
-    widget.width();//获取
-```
-
-## widget.height()
-
-> 获取/设置组件高度

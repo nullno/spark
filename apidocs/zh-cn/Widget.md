@@ -3,6 +3,7 @@
 * Page组件是一个页面`root节点`，等同于一个html页面，渲染的必要组件不可缺少；
 * 多个Page组成多页面，会自动开启路由的方式访问页面 [#路由](zh-cn/more-pages.md)；
 * `link`配置路由信息，支持路由参数传递；
+### <a href="/demo/router.html">[演示]</a>
 ```javascript
 Spark.Page({
   link:{

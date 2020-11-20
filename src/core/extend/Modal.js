@@ -6,7 +6,7 @@ import { _typeof } from '../Common.js'
 import WidgetManager from '../WidgetManager.js'
 
 export default function(p) {
-    
+  
                var option = {
                     bgColor : 'rgba(0,0,0,0.5)',//
                     bgClose : false,
@@ -24,31 +24,34 @@ export default function(p) {
                    wrap:null,
                    inner:null,
                    set:function(m){
-                     var positionMargin = m.positionMargin;
+                    var _this = this;
+                       setTimeout(function(){
+                        var positionMargin = m.positionMargin;
                         switch(m.position){
                          case 'topcenter':
-                            this.inner.style = 'top:'+positionMargin+';left:50%;margin-left:-'+this.inner.width()/2+'px;margin-top:none;bottom:none;';
+                            m.style = 'top:'+positionMargin+';left:50%;margin-left:-'+m.width()/2+'px;margin-top:none;bottom:none;';
                          break;
                          case 'topleft':
-                            this.inner.style = 'top:'+positionMargin+';left:'+positionMargin+';margin-top:none;margin-left:none;bottom:none;';
+                            m.style = 'top:'+positionMargin+';left:'+positionMargin+';margin-top:none;margin-left:none;bottom:none;';
                          break;
                          case 'topright':
-                             this.inner.style = 'top:'+positionMargin+';right:'+positionMargin+';margin-top:none;margin-left:none;bottom:none;';
+                             m.style = 'top:'+positionMargin+';right:'+positionMargin+';margin-top:none;margin-left:none;bottom:none;';
                          break;
                          case 'bottomcenter':
-                           this.inner.style = 'bottom:'+positionMargin+';left:50%;margin-left:-'+this.inner.width()/2+'px;margin-top:none;top:none;';
+                             m.style = 'bottom:'+positionMargin+';left:50%;margin-left:-'+m.width()/2+'px;margin-top:none;top:none;';
                          break;
                          case 'bottomleft':
-                            this.inner.style = 'bottom:'+positionMargin+';left:'+positionMargin+';margin-top:none;margin-left:none;top:none;';
+                             m.style = 'bottom:'+positionMargin+';left:'+positionMargin+';margin-top:none;margin-left:none;top:none;';
                          break;
                          case 'bottomright':
-                           this.inner.style = 'bottom:'+positionMargin+';right:'+positionMargin+';margin-top:none;margin-left:none;top:none;';
+                             m.style = 'bottom:'+positionMargin+';right:'+positionMargin+';margin-top:none;margin-left:none;top:none;';
                          break;
                          default:
-                           this.inner.style = 'top:50%;left:50%;margin-left:-'+this.inner.width()/2+'px;margin-top:-'+this.inner.height()/2+'px;bottom:none;right:none;';
+                            m.style = 'top:50%;left:50%;margin-left:-'+m.width()/2+'px;margin-top:-'+m.height()/2+'px;bottom:none;right:none;';
                          break;
                         }
-                       this.autoClose(m);
+                       _this.autoClose(m);
+                     })
                     },
                     autoCloseTimer:null,
                     autoClose:function(m){
@@ -61,13 +64,14 @@ export default function(p) {
                        } 
                     },
                     con:function(){
-                      delete p.child;
-                      delete p.hideAni;
-                      delete p.showAni
-                      delete p.show;
-                      delete p.style;
-                      delete p.on;
-                      Object.assign(Modal.wrap,p);
+                      var o =  Object.assign({},p)
+                      delete o.child;
+                      delete o.hideAni;
+                      delete o.showAni
+                      delete o.show;
+                      delete o.style;
+                      delete o.on;
+                      Object.assign(Modal.wrap,o);
                     }
                };
 
@@ -80,8 +84,7 @@ export default function(p) {
                    p.open = function(){
                       if(Modal.inner.show)return;
                        Modal.inner.show = true;
-                       Modal.set(Modal.inner);
-                       // Modal.autoClose(Modal.inner);
+                         Modal.set(Modal.inner);
                    };
                  }
 
@@ -89,13 +92,6 @@ export default function(p) {
                         
                 Modal.inner = WidgetManager.Fixed(p);
 
-                // WidgetParse.getNxWidget('Modal',
-                //                     p,
-                //                     'div',
-                //                     'width:50px;height:50px;position:fixed;z-index:9999;background-color:#3D3F3F;cursor:auto;',
-                //                     ['style','show'] 
-                //                     );
-          
                 Modal.wrap = p.bgShow?WidgetManager.Fixed({
                         style:'top:0;left:0;right:0;width:100%;height:100%;background-color:'+p.bgColor+';z-index:9999;overflow:hidden;cursor:auto;',
                         child:[Modal.inner],
@@ -115,8 +111,8 @@ export default function(p) {
                         },
                         open:function(){
                          if(Modal.wrap.show)return;
-                          Modal.wrap.show = Modal.inner.show = true;
-                          Modal.set(Modal.wrap);
+                            Modal.wrap.show = Modal.inner.show = true;
+                            Modal.set(Modal.inner);
                         }
                         
                        }):null;
