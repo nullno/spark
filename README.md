@@ -1,14 +1,16 @@
-## Quickly create web pages by JavaScript
+# 🚀 Quickly create web pages by JavaScript
 
-#### What is Spark?
+## 🕵️ What is Spark?
 
-`Spark.js` is a lightweight JavaScript library that adopts Dart writing style. It is a three-free product: no need to package, no need to think about className, no need to write HTML, you only need to focus on writing js scripts to create pages, and built-in data binding , event monitoring, routing management, network request and other functions, more component functions will be enriched in the future;
+<font color=red>Spark.js</font> is a lightweight JavaScript library that adopts Dart writing style. It is a three-free product: no need to package, no need to think about className, no need to write HTML, you only need to focus on writing js scripts to create pages, and built-in data binding , event monitoring, routing management, network request and other functions, more component functions will be enriched in the future;
 
-Spark.js` 是一个轻量级的 JavaScript 库，采用 dart 编写风格，它是一个三无产品：无需打包、无需思考 className、无需编写 html，你只需要专注于编写 js 脚本创建页面即可，内置数据绑定，事件监听，路由管理，网络请求等功能，未来会丰富更多组件功能；
+<font color=red>Spark.js</font> 是一个轻量级的 JavaScript 库，采用 dart 编写风格，它是一个三无产品：无需打包、无需思考 className、无需编写 html，你只需要专注于编写 js 脚本创建页面即可，内置数据绑定，事件监听，路由管理，网络请求等功能，未来会丰富更多组件功能；
 
-## how to use?
+## 📕 how to use?
 
+```
 Import directly using `<script src="Spark.js"></script>`
+```
 
 ## DEMO
 
