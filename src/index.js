@@ -1,3 +1,2 @@
-import Spark from './core/index'
-
+import Spark from "./core/index";
 export default Spark;

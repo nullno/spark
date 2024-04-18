@@ -5,18 +5,16 @@
  * @param     {[type]}                 address [description]
  * @return    {[type]}                         [description]
  */
-import Cache from './Cache.js'
+import Cache from "./Cache.js";
 
-export default function(address) {
-        try {
-          
-            if (typeof address == 'string' && address.indexOf('Css') != -1) {
-                throw 'ERROR: Error useing Widget'
-            }
-
-        } catch (err) {
-            console.error(err);
-            return {}
-        }
-        return address && Cache.WidgetCache[address];
- }
+export default function (address) {
+  try {
+    if (typeof address == "string" && address.indexOf("Css") != -1) {
+      throw "ERROR: Error useing Widget";
+    }
+  } catch (err) {
+    console.error(err);
+    return {};
+  }
+  return address && Cache.WidgetCache[address];
+}

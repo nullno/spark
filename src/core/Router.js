@@ -1,252 +1,232 @@
-import { _typeof,D } from './Common.js'
+import { _typeof, D } from "./Common.js";
 
-import SparkUtil from './SparkUtil.js'
+import SparkUtil from "./SparkUtil.js";
 
-import GetAddressData from './GetAddressData.js'
+import GetAddressData from "./GetAddressData.js";
 
-import CreateDomTree  from './CreateDomTree.js'
+import CreateDomTree from "./CreateDomTree.js";
 
-import Cache from './Cache.js'
+import Cache from "./Cache.js";
 
 //构造路由
-function Router(){
-      this.Outed = {
-                     _origin:{},
-                     start:true,
-                     end:true,
-                   };
-      this.hashStack = [];
+function Router() {
+  this.Outed = {
+    _origin: {},
+    start: true,
+    end: true,
+  };
+  this.hashStack = [];
 
-      this.hashStackIndex = 0;
+  this.hashStackIndex = 0;
 
-      this.isback = false;
+  this.isback = false;
 
-      this.changeState = 1;
+  this.changeState = 1;
 
-      this.run = false;
+  this.run = false;
 }
 
 //初始化
-Router.prototype.test = function(){
-
-
-console.log('init router')
-
-
-}
+Router.prototype.test = function () {
+  console.log("init router");
+};
 
 //hash模式
-Router.prototype.hash = function(){
-        
-
-    return location.hash.slice(1);
-
-}
-Router.prototype.GoPage=function(p){
-    if(p && p != this.hash()){
-      location.hash = p
-    }else{
-      this.run = false
-    }
-}
+Router.prototype.hash = function () {
+  return location.hash.slice(1);
+};
+Router.prototype.GoPage = function (p) {
+  if (p && p != this.hash()) {
+    location.hash = p;
+  } else {
+    this.run = false;
+  }
+};
 //设置
-Router.prototype.setting = function(params){
-     
-     Object.assign(this,params)
+Router.prototype.setting = function (params) {
+  Object.assign(this, params);
+};
 
-}
-
-Router.prototype.setOuted=function(link){
-
-   this.Outed = Object.assign(this.Outed,link);
-   this.Outed.path=this.hash();
-   var linkstate = Object.assign({},this.Outed);
-    if(!this.isback){
-      if(this.changeState){
-        this.hashStack.push(linkstate);
-      }else{
-        this.hashStack.splice(this.hashStack.length-1,1,linkstate);
-      }
-      this.hashStackIndex = this.hashStack.length-1;
+Router.prototype.setOuted = function (link) {
+  this.Outed = Object.assign(this.Outed, link);
+  this.Outed.path = this.hash();
+  var linkstate = Object.assign({}, this.Outed);
+  if (!this.isback) {
+    if (this.changeState) {
+      this.hashStack.push(linkstate);
+    } else {
+      this.hashStack.splice(this.hashStack.length - 1, 1, linkstate);
     }
-   this.isback=false;
-   delete  linkstate._origin;
-   window.history.replaceState(linkstate, '', '');
-}
-
+    this.hashStackIndex = this.hashStack.length - 1;
+  }
+  this.isback = false;
+  delete linkstate._origin;
+  window.history.replaceState(linkstate, "", "");
+};
 
 //路由跳转
-Router.prototype.Render = function(link){
-    var _this =this;
-     this.setOuted(link);
+Router.prototype.Render = function (link) {
+  var _this = this;
+  this.setOuted(link);
 
-     CreateDomTree(link.address,D.body,true,'',function(){
-       _this.run = false
-     });
-     
-}
+  CreateDomTree(link.address, D.body, true, "", function () {
+    _this.run = false;
+  });
+};
 
 //进栈
-Router.prototype.read = function(pagename){
-        if(!this.hash()){
-           this.GoPage('/')
-            return;
-        }
-	      const W = GetAddressData(pagename)
-          
-         if(D.getElementsByClassName(W.name).length>=1){
-              W.remove();
-          }
-          
-          W.link.address=pagename;
-         
-          this.change(W.link)
+Router.prototype.read = function (pagename) {
+  if (!this.hash()) {
+    this.GoPage("/");
+    return;
+  }
+  const W = GetAddressData(pagename);
 
-}
+  if (D.getElementsByClassName(W.name).length >= 1) {
+    W.remove();
+  }
+
+  W.link.address = pagename;
+
+  this.change(W.link);
+};
 
 //  Cache.PageCache 读取到当前路径页面
-Router.prototype.readPage = function(){
+Router.prototype.readPage = function () {
   var _this = this;
-      SparkUtil.traverse(Cache.PageCache,function(item,index,end){
-            _this.read(item)
-      })
+  SparkUtil.traverse(Cache.PageCache, function (item, index, end) {
+    _this.read(item);
+  });
+};
 
-}
+Router.prototype.change = function (link) {
+  var _this = this;
+  const path_hash = this.hash().replace(/\/$/, "");
+  const link_path = link.path.replace(/\/$/, "");
 
-Router.prototype.change = function(link){
-   var _this = this;
-      const path_hash = this.hash().replace(/\/$/,'');
-      const link_path = link.path.replace(/\/$/,'');      
-     
-       //普通匹配 
-       if(link_path === path_hash){
-          this.Render(link)
-          return;
-        }    
+  //普通匹配
+  if (link_path === path_hash) {
+    this.Render(link);
+    return;
+  }
 
-       //带参数匹配
-       if(SparkUtil.includes(link.path,':') && path_hash!='/'){
+  //带参数匹配
+  if (SparkUtil.includes(link.path, ":") && path_hash != "/") {
+    // let prevpath = link_path.match(/(\S*):/)[1];
 
-          	  // let prevpath = link_path.match(/(\S*):/)[1];
+    const HArr = path_hash.split("/");
+    const PArr = link_path.split("/");
+    const index = link_path.indexOf(":");
 
-               const  HArr = path_hash.split('/');
-               const  PArr = link_path.split('/');
-               const index = link_path.indexOf(':');
-
-               if(link_path.slice(0,index)===path_hash.slice(0,index) && HArr.length==PArr.length){
-    				        SparkUtil.traverse(PArr,function(item,index,end){
-    				        	if(SparkUtil.includes(item,':') && HArr[index]!=''){
-    				        		const name = item.slice(1)
-    				        		link.params[name] = HArr[index];
-                   
-    				        	}
-    				        })
-            
-                  this.Render(link);
-                  return;
-		          }  
+    if (
+      link_path.slice(0, index) === path_hash.slice(0, index) &&
+      HArr.length == PArr.length
+    ) {
+      SparkUtil.traverse(PArr, function (item, index, end) {
+        if (SparkUtil.includes(item, ":") && HArr[index] != "") {
+          const name = item.slice(1);
+          link.params[name] = HArr[index];
         }
+      });
 
-}
-
-
+      this.Render(link);
+      return;
+    }
+  }
+};
 
 //路由操作
-Router.prototype.operate = function(p,t){
-              if(!p || this.run) return;
-              this.run=true;
-              this.changeState = t;
-              this.Outed.end = true;
-              this.Outed.start = false;
+Router.prototype.operate = function (p, t) {
+  if (!p || this.run) return;
+  this.run = true;
+  this.changeState = t;
+  this.Outed.end = true;
+  this.Outed.start = false;
 
+  var newhash = "";
+  if (_typeof(p, "String")) {
+    newhash = p;
+  }
+  if (_typeof(p, "Object")) {
+    SparkUtil.traverse(Cache.PageCache, function (item, index, end) {
+      const W = GetAddressData(item);
+      if (W.link.name === p.name) {
+        if (
+          SparkUtil.includes(W.link.path, ":") &&
+          _typeof(p.params, "Object")
+        ) {
+          var path = W.link.path;
+          SparkUtil.traverse(p.params, function (k) {
+            path = path.replace(":" + k, p.params[k]);
+          });
+          if (!SparkUtil.includes(path, ":")) {
+            newhash = path;
+          } else {
+          }
+        } else {
+          newhash = W.link.path;
+        }
+        return;
+      }
+    });
+  }
 
-              var newhash = '';
-                if(_typeof(p,'String')){
-                   newhash = p;
-                }
-                if(_typeof(p,'Object')){
-                  SparkUtil.traverse(Cache.PageCache,function(item,index,end){
-                      const W = GetAddressData(item)
-                         if(W.link.name === p.name){
-                             if(SparkUtil.includes(W.link.path,':') && _typeof(p.params,'Object')){
-                                  var path = W.link.path;
-                                 SparkUtil.traverse(p.params,function(k){
-                                     path = path.replace(':'+k,p.params[k])
-                                 })
-                                 if(!SparkUtil.includes(path,':')){
-                                     newhash = path;
-                                 }else{
+  this.GoPage(newhash);
+};
 
-                                 }
-                                 
-                             }else{
-                                  newhash = W.link.path;
-                             } 
-                              return;
-                         }    
-                  })
-                  
-                }
+Router.prototype.operate.push = function (p) {
+  this.call(myrouter, p, 1);
+};
 
-         this.GoPage(newhash)
-}
+Router.prototype.operate.replace = function (p) {
+  this.call(myrouter, p, 0);
+};
 
+Router.prototype.operate.go = function (p) {
+  if (myrouter.run) return;
 
-Router.prototype.operate.push = function(p){
+  myrouter.isback = true;
 
-   this.call(myrouter,p,1)
-}
+  myrouter.run = true;
 
-Router.prototype.operate.replace = function(p){
-   this.call(myrouter,p,0)
-}
+  var hashStack = myrouter.hashStack;
 
-Router.prototype.operate.go = function(p){
-   if(myrouter.run)return;
+  myrouter.hashStackIndex += p;
 
-    myrouter.isback = true;
+  myrouter.Outed.end = myrouter.Outed.start = false;
 
-    myrouter.run=true;
+  if (myrouter.hashStackIndex >= hashStack.length - 1) {
+    myrouter.hashStackIndex = hashStack.length - 1;
+    myrouter.Outed.end = true;
+  }
+  if (myrouter.hashStackIndex <= 0) {
+    myrouter.hashStackIndex = 0;
+    myrouter.Outed.start = true;
+  }
 
-    var hashStack = myrouter.hashStack;
-  
-    myrouter.hashStackIndex+=p;
-   
-    myrouter.Outed.end  = myrouter.Outed.start = false;
+  myrouter.GoPage(hashStack[myrouter.hashStackIndex].path);
+};
 
-    if(myrouter.hashStackIndex>=hashStack.length-1){
-       myrouter.hashStackIndex=hashStack.length-1;
-       myrouter.Outed.end = true;
-    }
-    if(myrouter.hashStackIndex<=0){
-      myrouter.hashStackIndex = 0;
-      myrouter.Outed.start = true;
-    }
-
-   myrouter.GoPage(hashStack[myrouter.hashStackIndex].path)
-}
-
-
-const myrouter = new Router(); 
+const myrouter = new Router();
 
 window.addEventListener(
-    'hashchange',
-    function (event) {
-       myrouter.Outed._origin=event;
-       myrouter.readPage(event)
-                
-    },
-    false
+  "hashchange",
+  function (event) {
+    myrouter.Outed._origin = event;
+    myrouter.readPage(event);
+  },
+  false
 );
 
-window.addEventListener('popstate',
-  function(event) {   
-    if(event.state){
-       myrouter.isback = true;
-       // location.reload();
-    }  
-
-},false);
-
+window.addEventListener(
+  "popstate",
+  function (event) {
+    if (event.state) {
+      myrouter.isback = true;
+      // location.reload();
+    }
+  },
+  false
+);
 
 export default myrouter;

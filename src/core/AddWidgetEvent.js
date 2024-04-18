@@ -1,126 +1,135 @@
-
-  /**
+/**
  * [addEvent 注册基本组件事件]
  * @AuthorHTL
  * @DateTime  2020-04-05T04:21:49+0800
  */
-import { D } from './Common.js'
+import { D } from "./Common.js";
 
-import { addEventListener } from './Common.js'
+import { addEventListener } from "./Common.js";
 
-import SparkUtil from './SparkUtil.js'
+import SparkUtil from "./SparkUtil.js";
 
-import GetAddressData from './GetAddressData.js'
+import GetAddressData from "./GetAddressData.js";
 
-import SpecialWidgetEvent from './SpecialWidgetEvent.js'
+import SpecialWidgetEvent from "./SpecialWidgetEvent.js";
 
-export default function(target, node) {
-        node = GetAddressData(node);
-        
-        if(!node.on)return;
+export default function (target, node) {
+  node = GetAddressData(node);
 
-        var spfn = SpecialWidgetEvent(node.type);
-        
+  if (!node.on) return;
 
-        if(node.on['click']){
-            addEventListener(target,'click',node.debounce ? SparkUtil.debounce(function() {
-                node.on['click'](node);
-            }, 100) : function(e){
-                 e.stopPropagation();
-                 node.on['click'].call(node,e);
+  var spfn = SpecialWidgetEvent(node.type);
 
-            },{capture:false,passive:true})
+  if (node.on["click"]) {
+    addEventListener(
+      target,
+      "click",
+      node.debounce
+        ? SparkUtil.debounce(function () {
+            node.on["click"](node);
+          }, 100)
+        : function (e) {
+            e.stopPropagation();
+            node.on["click"].call(node, e);
+          },
+      { capture: false, passive: true }
+    );
+  }
+  if (node.on["press"]) {
+    addEventListener(
+      target,
+      SparkUtil.env.isMobile ? "touchstart" : "mousedown",
+      function (e) {
+        e.stopPropagation();
+        if (node.type == "Drag" && spfn) {
+          var ev = e || window.event;
+          spfn.start.call(node, ev, target);
+        } else {
+          node.on["press"].call(node, e);
         }
-        if(node.on['press']){
+      },
+      { capture: true, passive: true }
+    );
+  }
+  if (node.on["move"] && node.type != "Drag") {
+    addEventListener(
+      target,
+      SparkUtil.env.isMobile ? "touchmove" : "mousemove",
+      function (e) {
+        e.stopPropagation();
 
-           addEventListener(target,SparkUtil.env.isMobile ? 'touchstart' : 'mousedown', function(e){
-                 e.stopPropagation();
-                 if(node.type == 'Drag' && spfn){
-                    var ev = e || window.event;
-                    spfn.start.call(node,ev,target)
-                 }else{
-                    node.on['press'].call(node,e);
-                 }
-            },{capture:true,passive:true});
-           
+        node.on["move"].call(node, e);
+      },
+      { capture: true, passive: true }
+    );
+  }
+  if (node.on["up"]) {
+    addEventListener(
+      target,
+      SparkUtil.env.isMobile ? "touchend" : "mouseup",
+      function (e) {
+        e.stopPropagation();
+        if (node.type == "Drag" && spfn) {
+          var ev = e || window.event;
+          spfn.end.call(node, ev, target);
+        } else {
+          node.on["up"].call(node, e);
         }
-        if(node.on['move'] && node.type != 'Drag'){
-         
-           addEventListener(target,SparkUtil.env.isMobile ? 'touchmove' : 'mousemove', function(e){
-                   e.stopPropagation();
+      },
+      { capture: true, passive: true }
+    );
+  }
 
-                   node.on['move'].call(node,e);
-              
-            },{capture:true,passive:true});
-           
-        }
-        if(node.on['up']){
-           addEventListener(target,SparkUtil.env.isMobile ? 'touchend' : 'mouseup', function(e){
-                 e.stopPropagation();
-                 if(node.type == 'Drag' && spfn){
-                    var ev = e || window.event;
-                    spfn.end.call(node,ev,target)
-                 }else{
-                    node.on['up'].call(node,e);
-                 }
-            },{capture:true,passive:true});
-          
-        }
+  if (node.on["hover"]) {
+    addEventListener(target, "mouseover", function (e) {
+      e.stopPropagation();
+      node.on["hover"].call(node, e);
+    });
+  }
 
-        if(node.on['hover']){
-           addEventListener(target,'mouseover', function(e){
-                 e.stopPropagation();
-                  node.on['hover'].call(node,e);
-            });
-        }
+  if (node.on["enter"]) {
+    addEventListener(target, "mouseenter", function (e) {
+      e.stopPropagation();
+      node.on["enter"].call(node, e);
+    });
+  }
 
-        if(node.on['enter']){
-           addEventListener(target,'mouseenter', function(e){
-                 e.stopPropagation();
-                  node.on['enter'].call(node,e);
-            });
-        }
+  if (node.on["out"]) {
+    addEventListener(target, "mouseout", function (e) {
+      e.stopPropagation();
+      node.on["out"].call(node, e);
+    });
+  }
 
-        if(node.on['out']){
-           addEventListener(target,'mouseout', function(e){
-                 e.stopPropagation();
-                  node.on['out'].call(node,e);
-            });
-        }
+  if (node.on["leave"]) {
+    addEventListener(target, "mouseleave", function (e) {
+      e.stopPropagation();
+      node.on["leave"].call(node, e);
+    });
+  }
 
-         if(node.on['leave']){
-           addEventListener(target,'mouseleave', function(e){
-                 e.stopPropagation();
-                  node.on['leave'].call(node,e);
-            });
-        }
-        
-         if(node.on['input']){
-           addEventListener(target,'input', function(e){
-                  e.stopPropagation();
-                  node.on['input'].call(node,e);
-            });
-        }
-        if(node.on['onkeydown']){ 
-           target.onkeydown = function(e) {
-                  e.stopPropagation();
-                  node.on['onkeydown'].call(node,e);
-            };
-        }
-         if(node.on['onblur']){ 
-           target.onblur = function(e) {
-                  e.stopPropagation();
-                  node.on['onblur'].call(node,e);
-            };
-        }
-        if(node.on['onfocus']){ 
-           target.onfocus = function(e) {
-                  e.stopPropagation();
-                  node.on['onfocus'].call(node,e);
-            };
-        }
-
-        
-        
-  
- }
+  if (node.on["input"]) {
+    addEventListener(target, "input", function (e) {
+      e.stopPropagation();
+      node.on["input"].call(node, e);
+    });
+  }
+  if (node.on["onkeydown"]) {
+    target.onkeydown = function (e) {
+      e.stopPropagation();
+      node.on["onkeydown"].call(node, e);
+    };
+  }
+  if (node.on["onblur"]) {
+    target.onblur = function (e) {
+      e.stopPropagation();
+      node.on["onblur"].call(node, e);
+    };
+  }
+  if (node.on["onfocus"]) {
+    target.onfocus = function (e) {
+      e.stopPropagation();
+      node.on["onfocus"].call(node, e);
+    };
+  }
+}

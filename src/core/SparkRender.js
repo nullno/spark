@@ -1,22 +1,17 @@
-import { _typeof,D } from './Common.js'
+import { _typeof, D } from "./Common.js";
 
-import SparkUtil from './SparkUtil.js'
+import SparkUtil from "./SparkUtil.js";
 
+import CreateDomTree from "./CreateDomTree.js";
 
-import CreateDomTree from './CreateDomTree.js'
+import Cache from "./Cache.js";
 
-import Cache from './Cache.js'
+import Router from "./Router.js";
 
-import Router from './Router.js'
+const SparkRender = function (address) {
+  const w = GetAddressData(address);
 
+  console.log(w);
+};
 
-const SparkRender = function(address){
-
-       const w = GetAddressData(address);
-       
-      
-      console.log(w)
-}
-
-
- export default SparkRender;
+export default SparkRender;
