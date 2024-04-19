@@ -35,6 +35,10 @@ Router.prototype.test = function () {
 Router.prototype.hash = function () {
   return location.hash.slice(1);
 };
+//query参数
+Router.prototype.query = function () {
+  return SparkUtil.urlQuery();
+};
 Router.prototype.GoPage = function (p) {
   if (p && p != this.hash()) {
     location.hash = p;
@@ -68,7 +72,6 @@ Router.prototype.setOuted = function (link) {
 Router.prototype.Render = function (link) {
   var _this = this;
   this.setOuted(link);
-
   CreateDomTree(link.address, D.body, true, "", function () {
     _this.run = false;
   });
@@ -87,23 +90,23 @@ Router.prototype.read = function (pagename) {
   }
 
   W.link.address = pagename;
-
   this.change(W.link);
 };
 
 //  Cache.PageCache 读取到当前路径页面
 Router.prototype.readPage = function () {
   var _this = this;
-  SparkUtil.traverse(Cache.PageCache, function (item, index, end) {
+  SparkUtil.traverse(Cache.PageCache, function (item) {
     _this.read(item);
   });
 };
 
 Router.prototype.change = function (link) {
   var _this = this;
-  const path_hash = this.hash().replace(/\/$/, "");
-  const link_path = link.path.replace(/\/$/, "");
-
+  const path_hash = this.hash().replace(/\?.*$/, "");
+  const link_path = link.path.replace(/\?.*$/, "");
+  const query = this.query();
+  link.query = query;
   //普通匹配
   if (link_path === path_hash) {
     this.Render(link);
@@ -143,35 +146,43 @@ Router.prototype.operate = function (p, t) {
   this.Outed.end = true;
   this.Outed.start = false;
 
-  var newhash = "";
+  var newPath = "";
   if (_typeof(p, "String")) {
-    newhash = p;
+    newPath = p;
   }
   if (_typeof(p, "Object")) {
-    SparkUtil.traverse(Cache.PageCache, function (item, index, end) {
-      const W = GetAddressData(item);
-      if (W.link.name === p.name) {
-        if (
-          SparkUtil.includes(W.link.path, ":") &&
-          _typeof(p.params, "Object")
-        ) {
-          var path = W.link.path;
-          SparkUtil.traverse(p.params, function (k) {
-            path = path.replace(":" + k, p.params[k]);
-          });
-          if (!SparkUtil.includes(path, ":")) {
-            newhash = path;
-          } else {
+    if (p.path) {
+      newPath = p.path;
+    } else {
+      p.name &&
+        SparkUtil.traverse(Cache.PageCache, function (item, index, end) {
+          const W = GetAddressData(item);
+          if (W.link.name === p.name) {
+            if (
+              SparkUtil.includes(W.link.path, ":") &&
+              _typeof(p.params, "Object")
+            ) {
+              var path = W.link.path;
+              SparkUtil.traverse(p.params, function (k) {
+                path = path.replace(":" + k, p.params[k]);
+              });
+              if (!SparkUtil.includes(path, ":")) {
+                newPath = path;
+              } else {
+              }
+            } else {
+              newPath = W.link.path;
+            }
+            return;
           }
-        } else {
-          newhash = W.link.path;
-        }
-        return;
-      }
-    });
+        });
+    }
+    if (p.query) {
+      newPath += SparkUtil.objectToQueryString(p.query);
+    }
   }
 
-  this.GoPage(newhash);
+  this.GoPage(newPath);
 };
 
 Router.prototype.operate.push = function (p) {

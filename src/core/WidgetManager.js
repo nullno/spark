@@ -37,6 +37,7 @@ const WidgetManager = {
         redirect: "",
         meta: {},
         params: {},
+        query: {},
       },
     };
 

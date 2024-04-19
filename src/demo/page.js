@@ -2,11 +2,6 @@ import Spark from "../index.js";
 
 console.log(Spark);
 
-// Spark.Link.setting({
-//     a1:'/',
-//     a2:'/'
-// })
-//
 var Navcss = Spark.Css(
   "width:50%;display:inline-block;background:transparent;text-align:center;"
 );
@@ -14,7 +9,7 @@ var Navcss = Spark.Css(
 var nextbtn = Spark.Text("前进", {
   on: {
     click() {
-      Spark.Link.go(1);
+      Spark.router.go(1);
     },
   },
 });
@@ -22,7 +17,7 @@ var nextbtn = Spark.Text("前进", {
 var backbtn = Spark.Text("返回", {
   on: {
     click() {
-      Spark.Link.go(-1);
+      Spark.router.go(-1);
     },
   },
 });
@@ -34,17 +29,18 @@ var nav = Spark.Fixed({
   diyfn(index) {
     Navcss.style = "background:transparent";
     this.getChild(index).style = "background:red;";
-    // console.log(Spark.Linked)
+    // console.log(Spark.route)
   },
   activated() {
-    this.diyfn(Spark.Linked.name == "page1" ? 0 : 1);
+    this.diyfn(Spark.route.name == "page1" ? 0 : 1);
   },
   child: [
     Spark.Text("PAGE-1", {
       className: Navcss,
       on: {
         click() {
-          Spark.Link.push({ name: "page1" });
+          // Spark.router.push({ name: "page1" });
+          Spark.router.push("/index?sss=2323"); //{ name: "page1" }
         },
       },
     }),
@@ -52,14 +48,23 @@ var nav = Spark.Fixed({
       className: Navcss,
       on: {
         click() {
-          Spark.Link.push({
+          // Spark.router.push("/page2/222/151");
+          // Spark.router.push({
+          //   path: "/page2/222/151",
+          //   query: { aaaaaa: "2323" },
+          // });
+          Spark.router.push({
             name: "page2",
             params: { id: "22222", nid: "151" },
+            query: { bbbb: "2323" },
           });
         },
       },
     }),
   ],
+  created() {
+    console.log("nav created", Spark.route);
+  },
 });
 
 var ddd = Spark.Text("666", {
@@ -71,6 +76,10 @@ var Hi = Spark.Text("hello spark!", {
   style:
     "font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:300px;text-align:center;",
   stopProp: true,
+  created() {
+    console.log("Hi->", Spark.route.query);
+    this.text = this.text + Spark.route.query.sss;
+  },
   on: {
     click() {
       // this.before(ddd);
@@ -102,7 +111,7 @@ Spark.Page({
   //定义路由信息
   link: {
     name: "page1",
-    path: "/",
+    path: "/index",
     meta: {
       title: "你好",
     },
@@ -114,6 +123,7 @@ Spark.Page({
   child: [Hi, ddd, scrollTop1, nav, backbtn],
   // keepalive:false,
   created() {
+    console.log(Spark.route.query);
     console.log("page1 created");
   },
   on: {
