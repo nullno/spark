@@ -1,7 +1,8 @@
 import Spark from "../index.js";
 
-console.log(Spark);
+window.Spark = Spark;
 
+console.log(window.Spark);
 var listStyle = Spark.Css(
   "background-color:#fff;margin:5px;padding:5px;line-height:50px;color:#666;overflow:hidden;border-radius:5px;box-shadow:0 0 5px #ccc;"
 );
@@ -26,7 +27,7 @@ var List = Spark.List({
           style: "float:right;",
           on: {
             click() {
-              template.remove({ ani: "bounceOutRight 500ms both", time: 500 });
+              template.remove(); //{ ani: "bounceOutRight 500ms both", time: 500 }
             },
           },
         }),
@@ -43,7 +44,7 @@ var List = Spark.List({
           alert(item.b);
         },
         hover() {
-          listStyle.style = "background-color:#fff;color:#666;";
+          // listStyle.style = "background-color:#fff;color:#666;";
           this.style = "background-color:#7566F9;color:#fff;";
         },
         leave() {
@@ -141,59 +142,59 @@ var OptionMenu = Spark.Fixed({
   child: [option1, option2, option3, option4, option5, option6, option7],
 });
 
-var List2 = Spark.List({
-  // data:[],
-  item(item, index) {
-    var template = Spark.Box({
-      tag: "li",
-      className: listStyle,
-      style: "background-color:#fff;",
-      showAni: { ani: "fadeInLeft 500ms  both" },
-      hideAni: { ani: "bounceOutRight 500ms both", time: 222 },
-      child: [
-        Spark.Text(index, { listIndex: true }),
-        Spark.Text(
-          "---<b>(" +
-            item.date +
-            ")</b> 最高温度:" +
-            item.tmp_max +
-            "°C-最底温度:" +
-            item.tmp_min +
-            "°C"
-        ),
-        Spark.Text("删除", {
-          style: "float:right;",
-          on: {
-            click() {
-              template.remove({ ani: "bounceOutRight 500ms both", time: 500 });
-            },
-          },
-        }),
-      ],
-      on: {
-        click() {
-          alert("天气状况：" + item.cond_txt_d);
-        },
-        hover() {
-          listStyle.style = "background-color:#fff;color:#666;";
-          this.style = "background-color:#7566F9;color:#fff;";
-        },
-        leave() {
-          this.style = "background-color:#fff;color:#666;";
-        },
-      },
-    });
+// var List2 = Spark.List({
+//   // data:[],
+//   item(item, index) {
+//     var template = Spark.Box({
+//       tag: "li",
+//       className: listStyle,
+//       // style: "background-color:#fff;",
+//       // showAni: { ani: "fadeInLeft 500ms  both" },
+//       // hideAni: { ani: "bounceOutRight 500ms both", time: 222 },
+//       child: [
+//         Spark.Text(index, { listIndex: true }),
+//         Spark.Text(
+//           "---<b>(" +
+//             item.date +
+//             ")</b> 最高温度:" +
+//             item.tmp_max +
+//             "°C-最底温度:" +
+//             item.tmp_min +
+//             "°C"
+//         ),
+//         Spark.Text("删除", {
+//           style: "float:right;",
+//           on: {
+//             click() {
+//               template.remove({ ani: "bounceOutRight 500ms both", time: 500 });
+//             },
+//           },
+//         }),
+//       ],
+//       on: {
+//         click() {
+//           alert("天气状况：" + item.cond_txt_d);
+//         },
+//         hover() {
+//           listStyle.style = "background-color:#fff;color:#666;";
+//           this.style = "background-color:#7566F9;color:#fff;";
+//         },
+//         leave() {
+//           this.style = "background-color:#fff;color:#666;";
+//         },
+//       },
+//     });
 
-    return template;
-  },
-  async init() {
-    const Res = await Spark.axios.get(
-      "https://www.hao123.com/api/getgoodthing?pageSize=3"
-    );
-    console.log(Res);
-    // this.insertLast(res.data.daily_forecast);
-  },
-});
+//     return template;
+//   },
+//   async init() {
+//     const Res = await Spark.axios.get(
+//       "https://www.hao123.com/api/getgoodthing?pageSize=3"
+//     );
+//     console.log(Res);
+//     // this.insertLast(res.data.daily_forecast);
+//   },
+// });
 
 Spark.Page({
   //定义路由信息
@@ -205,5 +206,5 @@ Spark.Page({
     "width:100%;min-height:" +
     Spark.screen.height() +
     "px;background-color:#fff;color:#34495e;overflow:hidden;",
-  child: [List, List2, OptionMenu],
+  child: [List, OptionMenu],
 });

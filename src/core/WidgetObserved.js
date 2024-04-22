@@ -71,8 +71,9 @@ export default {
       if (oval == nval) return nval;
       try {
         if (nval == "r_d_n") tempOld = tempOld.replace("display:none;", "");
+        // CSSManager.cssParse.strStyleToObj(tempOld)
         newStyleObj = Object.assign(
-          CSSManager.cssParse.strStyleToObj(tempOld),
+          {},
           CSSManager.cssParse.strStyleToObj(tempNewVal)
         );
 

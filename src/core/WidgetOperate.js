@@ -11,6 +11,10 @@ import GetAddressData from "./GetAddressData.js";
 
 import CreateDomTree from "./CreateDomTree.js";
 
+import CSSManager from "./CSSManager.js";
+
+import Cache from "./Cache.js";
+
 const WidgetOperate = {};
 /**
  * [clearWidget 删除清空组件]
@@ -21,17 +25,22 @@ const WidgetOperate = {};
 WidgetOperate.clearWidget = function (_Widget) {
   _Widget.rendered = false;
   _Widget.deactivated && _Widget.deactivated();
-
-  /*   var _scope = this;
-    if(!_typeof(_Widget.$el,'HTMLCollection') || (_typeof(_Widget.$el,'HTMLCollection') && _Widget.$el.length === 0)){
-         delete  GetAddressData(_Widget.name);
-    }
-    if(_Widget.child.length>0){
-       SparkUtil.traverse(_Widget.child,function(item,index,end){
-            _scope.clearWidget(GetAddressData(item))
-       })
-        
-    }*/
+  var _scope = this;
+  if (_Widget.name.indexOf("Page") > -1) {
+    return;
+  }
+  if (
+    !_typeof(_Widget.$el, "HTMLCollection") ||
+    (_typeof(_Widget.$el, "HTMLCollection") && _Widget.$el.length === 0)
+  ) {
+    CSSManager.removeStyleEl(_Widget.name);
+    delete Cache.WidgetCache[_Widget.name];
+  }
+  if (_Widget.child.length > 0) {
+    SparkUtil.traverse(_Widget.child, function (item, index, end) {
+      _scope.clearWidget(GetAddressData(item));
+    });
+  }
 };
 
 /**
@@ -147,50 +156,50 @@ WidgetOperate.addDom = function (target, newdoms, addtype, set) {
  * @AuthorHTL
  * @DateTime  2020-09-16T00:38:07+0800
  * @param     {[type]}                 target [description]
- * @param     {[type]}                 deldom [description]
+ * @param     {[type]}                 deleteDom [description]
  * @return    {[type]}                        [description]
  */
-WidgetOperate.remove = function (target, deldom) {
+WidgetOperate.remove = function (target, deleteDom) {
   var _scope = this;
   //三种删除方式
   // console.log('-----remove-----')
   if (!target) return;
-  if (!target.child || deldom == "[object Undefined]") {
+  if (!target.child || deleteDom == "[object Undefined]") {
     return target;
   }
   //非目标子集
 
   var tempChild = target.child.slice(0),
-    blongIndex = SparkUtil.isInArray(target.child, { b: deldom.name });
+    belongIndex = SparkUtil.isInArray(target.child, { b: deleteDom.name });
 
-  if (_typeof(deldom, "Object") && blongIndex != -1) {
-    SparkUtil.compareRemove(tempChild, { b: deldom.name });
-
+  if (_typeof(deleteDom, "Object") && belongIndex != -1) {
+    SparkUtil.compareRemove(tempChild, { b: deleteDom.name });
+    /*
     var delParentName = function () {
-      SparkUtil.compareRemove(deldom.parentName, { b: target.name });
-
-      // if(deldom.parentName.length==0){
-      //   delete deldom.parentName;
-      //   delete deldom.$el;
+      SparkUtil.compareRemove(deleteDom.parentName, { b: target.name });
+      // if(deleteDom.parentName.length==0){
+      //   delete deleteDom.parentName;
+      //   delete deleteDom.$el;
       // }
     };
+    */
     var delFn = function (targetEl) {
       /*List Data 处理*/
       if (target.type === "List") {
-        target.data.splice(blongIndex, 1);
+        target.data.splice(belongIndex, 1);
       }
-      if (_typeof(deldom.$el, "HTMLCollection")) {
-        for (var i = deldom.$el.length - 1; i >= 0; --i) {
-          if (deldom.$el[i].parentNode == targetEl) {
-            targetEl.removeChild(deldom.$el[i]);
+      if (_typeof(deleteDom.$el, "HTMLCollection")) {
+        for (var i = deleteDom.$el.length - 1; i >= 0; --i) {
+          if (deleteDom.$el[i].parentNode == targetEl) {
+            targetEl.removeChild(deleteDom.$el[i]);
           }
         }
-        SparkUtil.compareRemove(deldom.parentName, { b: target.name });
-      } else if (deldom.$el) {
-        targetEl.removeChild(deldom.$el);
+        SparkUtil.compareRemove(deleteDom.parentName, { b: target.name });
+      } else if (deleteDom.$el) {
+        targetEl.removeChild(deleteDom.$el);
 
-        // delete deldom.parentName;
-        // delete deldom.$el;
+        // delete deleteDom.parentName;
+        // delete deleteDom.$el;
       }
     };
 
@@ -202,31 +211,36 @@ WidgetOperate.remove = function (target, deldom) {
       delFn(target.$el);
     }
 
-    _scope.clearWidget(deldom);
+    _scope.clearWidget(deleteDom);
 
     target.child = tempChild;
   }
 
-  if (_typeof(deldom, "String")) {
-    if (deldom == "firstChild" || deldom == "lastChild") {
-      _scope.remove(target, deldom == "firstChild" ? 0 : tempChild.length - 1);
+  if (_typeof(deleteDom, "String")) {
+    if (deleteDom == "firstChild" || deleteDom == "lastChild") {
+      _scope.remove(
+        target,
+        deleteDom == "firstChild" ? 0 : tempChild.length - 1
+      );
     } else {
       console.warn("second<string>:firstChild || lastChild");
     }
   }
 
-  if (_typeof(deldom, "Number")) {
+  if (_typeof(deleteDom, "Number")) {
     if (_typeof(target.$el, "HTMLCollection")) {
       SparkUtil.traverse(target.$el.length, function (index, end) {
-        target.$el[index].childNodes[deldom] &&
-          target.$el[index].removeChild(target.$el[index].childNodes[deldom]);
+        target.$el[index].childNodes[deleteDom] &&
+          target.$el[index].removeChild(
+            target.$el[index].childNodes[deleteDom]
+          );
       });
     } else {
-      target.$el.childNodes[deldom] &&
-        target.$el.removeChild(target.$el.childNodes[deldom]);
+      target.$el.childNodes[deleteDom] &&
+        target.$el.removeChild(target.$el.childNodes[deleteDom]);
     }
 
-    var tempWidget = GetAddressData(tempChild[deldom]);
+    var tempWidget = GetAddressData(tempChild[deleteDom]);
     _scope.clearWidget(tempWidget);
 
     // if(!_typeof(tempWidget.$el,'HTMLCollection')){
@@ -234,7 +248,7 @@ WidgetOperate.remove = function (target, deldom) {
     //     delete tempWidget.$el;
     // }
 
-    tempChild.splice(deldom, 1);
+    tempChild.splice(deleteDom, 1);
 
     target.child = tempChild;
   }

@@ -54,8 +54,13 @@ const _core = {
   remove: function (dataTarget) {
     var delTarget = D.querySelector(dataTarget);
     if (delTarget) {
+      console.log(delTarget);
       D.head.removeChild(delTarget);
     }
+  },
+  getStyleEl(dataTarget) {
+    var el = D.querySelector(dataTarget);
+    return el;
   },
   autoprefixer: function (CssItem, tempObj) {
     var p = CssItem.split(":");
@@ -68,22 +73,22 @@ const _core = {
       });
     }
     /* xcss值兼容匹配
-                           var cssValue = this.autoprefixerConfig.value[value];
-                           var cssValue = '',cssValueKey='';
-                           for(var key in this.autoprefixerConfig.value){
-                            if(SparkUtil.includes(value,key)){
-                              cssValueKey = key;
-                              cssValue = this.autoprefixerConfig.value[key];
-                            }
-                           }
-                           if(cssValue){
-                              SparkUtil.traverse(cssValue,function(cssValueItem,index,end){
-                                tempObj[param] = cssValueItem;
-                                 tempObj[param] = value.replace(new RegExp(cssValueKey,'ig'),cssValueItem);
-                              })
-                            }
-                           str.replace(new RegExp('transition','ig'),'-webkit-transition');
-                         */
+       var cssValue = this.autoprefixerConfig.value[value];
+       var cssValue = '',cssValueKey='';
+       for(var key in this.autoprefixerConfig.value){
+        if(SparkUtil.includes(value,key)){
+          cssValueKey = key;
+          cssValue = this.autoprefixerConfig.value[key];
+        }
+       }
+       if(cssValue){
+          SparkUtil.traverse(cssValue,function(cssValueItem,index,end){
+            tempObj[param] = cssValueItem;
+             tempObj[param] = value.replace(new RegExp(cssValueKey,'ig'),cssValueItem);
+          })
+        }
+       str.replace(new RegExp('transition','ig'),'-webkit-transition');
+     */
   },
 };
 
@@ -99,18 +104,25 @@ const CSSManager = {
     modify: function (selector, cssStr) {
       setTimeout(function () {
         cssStr = SparkUtil.trim(cssStr);
-        /* try{
-                              if(!/^\.|#/.test(selector)){
-                                 throw 'WARN: modify style selector must star" .|| #"}'
-                              }
-                              if(!/^\{.*\}$/.test(cssStr)){
-                                throw 'WARN: modify style cssstr must star"{" end "}"}'
-                               }
-                            }catch(error){
-                               console.warn(error)
-                            }*/
-        _core.remove("[data-modifycss='" + selector + "']");
-        _core.insert("data-modifycss", selector, cssStr);
+        /*
+        try {
+        if (!/^\.|#/.test(selector)) {
+          throw 'WARN: modify style selector must star" .|| #"}';
+        }
+        if (!/^\{.*\}$/.test(cssStr)) {
+          throw 'WARN: modify style cssstr must star"{" end "}"}';
+        }
+        } catch (error) {
+          console.warn(error);
+        }
+        _core.remove('[data-modifycss="' + selector + '"]');
+        */
+        var StyleEl = _core.getStyleEl('[data-modifycss="' + selector + '"]');
+        if (StyleEl) {
+          StyleEl.innerText = "." + selector + cssStr;
+        } else {
+          _core.insert("data-modifycss", selector, cssStr);
+        }
       });
     },
     /*样式字符串转对象*/
@@ -169,7 +181,6 @@ const CSSManager = {
       return laststr;
     },
   },
-
   /*
    * [ResetCss 重置css]
    * @AuthorHTL
@@ -195,6 +206,17 @@ const CSSManager = {
   /* 新增dom style  */
   makeNextStyleTree: function (_cssStr, address) {
     _cssStr && this.cssParse.add("NextCss-" + address, _cssStr);
+  },
+  /*
+   * [removeStyleEl 移除样式]
+   * @AuthorHTL
+   * @DateTime  2024-04-22
+   */
+  removeStyleEl(name) {
+    if (!name) return;
+    _core.remove('[data-modifycss="' + name + '"]');
+    _core.remove('[data-style="' + name + '"]');
+    _core.remove('[data-style="NextCss-' + name + '"]');
   },
 };
 

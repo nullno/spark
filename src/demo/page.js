@@ -40,7 +40,7 @@ var nav = Spark.Fixed({
       on: {
         click() {
           // Spark.router.push({ name: "page1" });
-          Spark.router.push("/index?sss=2323"); //{ name: "page1" }
+          Spark.router.push("/?sss=2323"); //{ name: "page1" }
         },
       },
     }),
@@ -78,7 +78,10 @@ var Hi = Spark.Text("hello spark!", {
   stopProp: true,
   created() {
     console.log("Hi->", Spark.route.query);
-    this.text = this.text + Spark.route.query.sss;
+  },
+  activated() {
+    this.text = Spark.route.query.sss || this.text;
+    console.log("actived", this.$el);
   },
   on: {
     click() {
@@ -111,7 +114,7 @@ Spark.Page({
   //定义路由信息
   link: {
     name: "page1",
-    path: "/index",
+    path: "/",
     meta: {
       title: "你好",
     },
@@ -157,9 +160,11 @@ Spark.Page({
     console.log("page2 created");
   },
   activated() {
-    // console.log('actived'+this)
+    // console.log("actived" + this);
   },
   deactivated() {
     // console.log('deactivated')
   },
 });
+
+// Spark.router.push("/index");
