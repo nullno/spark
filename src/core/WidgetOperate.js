@@ -113,10 +113,10 @@ WidgetOperate.addDom = function (target, newdoms, addtype, set) {
       //remove 后可以复用
       _scope.WidgetCache[item.name] = item;
     }
-    var aniSet = set || item.showAni;
-    if (aniSet && aniSet.ani) {
-      item.style = "animation:" + aniSet.ani + ";";
-    }
+    // var aniSet = set || item.showAni;
+    // if (aniSet && aniSet.ani) {
+    //   item.style = "animation:" + aniSet.ani + ";";
+    // }
 
     if (addtype == "append") {
       tempChild.push(item.name);

@@ -19,11 +19,9 @@ const WidgetManager = {
     !p && (p = "");
     var obj = { type: "Css" },
       address = CreateWidgetName("Css");
-
     obj.name = address;
     obj.styleObj = CSSManager.cssParse.strStyleToObj(p);
     obj.style = CSSManager.cssParse.objStyleToStr(obj.styleObj);
-
     Cache.CSSCache[address] = obj;
     WidgetParse.setDefineProperty(address, ["style"]);
 

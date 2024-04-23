@@ -1,8 +1,8 @@
 import Spark from "../index.js";
 
-window.Spark = Spark;
+Spark.setting({ name: "codeList" });
 
-console.log(window.Spark);
+console.log(Spark);
 var listStyle = Spark.Css(
   "background-color:#fff;margin:5px;padding:5px;line-height:50px;color:#666;overflow:hidden;border-radius:5px;box-shadow:0 0 5px #ccc;"
 );
@@ -19,7 +19,7 @@ var List = Spark.List({
       className: listStyle,
       style: "background-color:#fff;",
       showAni: { ani: "fadeInLeft 500ms  both" },
-      hideAni: { ani: "bounceOutRight 500ms both", time: 222 },
+      hideAni: { ani: "bounceOutRight 500ms both", time: 500 },
       child: [
         Spark.Text(index, { listIndex: true }),
         Spark.Text("---" + item.b),

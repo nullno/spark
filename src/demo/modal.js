@@ -111,7 +111,7 @@ var option6 = Spark.Text("弹窗6(自动关闭2000ms)", {
       Modal2.autoClose = 2000;
       Modal2.position = "topcenter";
       Modal2.open();
-      Modal2.autoClose = false;
+      // Modal2.autoClose = false;
     },
   },
 });

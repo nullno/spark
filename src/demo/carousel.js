@@ -12,7 +12,7 @@ var Carousel = Spark.Carousel({
     // allowTouchMove:false
   },
   onInit: function () {
-    console.log("当前帧：" + this.activeIndex);
+    console.log(this.activeIndex);
   },
   on: {
     slideStart: function () {
@@ -77,7 +77,7 @@ var Carousel = Spark.Carousel({
 });
 
 var btncss = Spark.Css(
-  "background:#7566F9;color:#fff;border-radius:5px;padding:20px 10px;margin:5px;"
+  "background:#9300FF;color:#fff;border-radius:5px;padding:20px 10px;margin:5px;"
 );
 
 var option1 = Spark.Text("上一个", {
@@ -130,7 +130,10 @@ var option5 = Spark.Text("头部添加", {
   on: {
     click() {
       Carousel.prependSlide(
-        Spark.Box({ style: "background:#7566F9;", child: [Spark.Text("新增")] })
+        Spark.Box({
+          style: "background:#9300FF;",
+          child: [Spark.Text("新增")],
+        })
       );
     },
   },

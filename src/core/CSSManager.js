@@ -54,7 +54,6 @@ const _core = {
   remove: function (dataTarget) {
     var delTarget = D.querySelector(dataTarget);
     if (delTarget) {
-      console.log(delTarget);
       D.head.removeChild(delTarget);
     }
   },
@@ -102,6 +101,7 @@ const CSSManager = {
     },
     /*修改*/
     modify: function (selector, cssStr) {
+      _core.remove('[data-modifycss="' + selector + '"]');
       setTimeout(function () {
         cssStr = SparkUtil.trim(cssStr);
         /*
@@ -115,14 +115,15 @@ const CSSManager = {
         } catch (error) {
           console.warn(error);
         }
-        _core.remove('[data-modifycss="' + selector + '"]');
+     
         */
-        var StyleEl = _core.getStyleEl('[data-modifycss="' + selector + '"]');
-        if (StyleEl) {
-          StyleEl.innerText = "." + selector + cssStr;
-        } else {
-          _core.insert("data-modifycss", selector, cssStr);
-        }
+        _core.insert("data-modifycss", selector, cssStr);
+        // var StyleEl = _core.getStyleEl('[data-modifycss="' + selector + '"]');
+        // if (StyleEl) {
+        //   StyleEl.innerText = "." + selector + cssStr;
+        // } else {
+        //   _core.insert("data-modifycss", selector, cssStr);
+        // }
       });
     },
     /*样式字符串转对象*/

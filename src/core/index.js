@@ -20,14 +20,6 @@ import Router from "./Router.js";
 
 import axios from "axios";
 
-/*移动端开启调试工具*/
-if (
-  DefaultSetting.devTool === true &&
-  _typeof(DefaultSetting.devTool, "Boolean")
-) {
-  SparkUtil.devTool();
-}
-
 const Spark = {
   vcss: Cache.CSSCache,
   vdom: Cache.WidgetCache,
@@ -38,9 +30,13 @@ const Spark = {
   env: SparkUtil.env,
   screen: SparkUtil.screen,
   Util: SparkUtil,
+  setting: DefaultSetting,
 };
 
 Spark.Util._typeof = _typeof;
+
+/*页面基本配置*/
+Spark.setting = DefaultSetting._update;
 
 /*获取组件对象信息*/
 Spark.getWidget = GetAddressData;

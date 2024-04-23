@@ -269,8 +269,8 @@ const WidgetParse = {
               tempWidget.style = "animation:" + aniSet.ani + ";";
               var removeTimer = setTimeout(function () {
                 clearTimeout(removeTimer);
+                // tempWidget.style = "animation:none;";
                 WidgetOperate.remove(GetAddressData(item), tempWidget);
-                tempWidget.style = "animation:none;";
               }, aniSet.time);
             } else {
               WidgetOperate.remove(GetAddressData(item), tempWidget);
@@ -285,11 +285,11 @@ const WidgetParse = {
             tempWidget.style = "animation:" + aniSet.ani + ";";
             var removeTimer = setTimeout(function () {
               clearTimeout(removeTimer);
+              // tempWidget.style = "animation:none;";
               WidgetOperate.remove(
                 GetAddressData(tempWidget.parentName),
                 tempWidget
               );
-              tempWidget.style = "animation:none;";
             }, aniSet.time);
           } else {
             WidgetOperate.remove(

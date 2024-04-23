@@ -2,7 +2,7 @@
  * [createDomTree description]
  * @AuthorHTL
  * @DateTime  2020-08-21T13:50:05+0800
- * @param     {[type]}                 _rootAdress [description]
+ * @param     {[type]}                 _rootAddress [description]
  * @param     {[type]}                 domTarget   [description]
  * @param     {[type]}                 DF          [DocumentFragment]
  * @param     {Function}               callback    [description]
@@ -21,15 +21,16 @@ import DefaultSetting from "./DefaultSetting.js";
 import CSSManager from "./CSSManager.js";
 
 import WidgetOperate from "./WidgetOperate.js";
+import Cache from "./Cache.js";
 
-export default function (_rootAdress, domTarget, init, addtype, callback) {
+export default function (_rootAddress, domTarget, init, addType, callback) {
   var _core = {
     // df: document.createDocumentFragment(),
     _html: null,
     _css: "",
     _eventQueue: [], //leave
-    _rootAdress: _rootAdress,
-    _lastAdress: null,
+    _rootAddress: _rootAddress,
+    _lastAddress: null,
     _clear: function () {
       this._eventQueue = [];
       this._html = null;
@@ -37,9 +38,9 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
     /*render them*/
     render: function () {
       var _this = this;
-      var domData = GetAddressData(_this._rootAdress);
+      var domData = GetAddressData(_this._rootAddress);
       if (!domData.$el || !domData.keepalive) {
-        _this.readAdress(domData);
+        _this.readAddress(domData);
       }
 
       //初始化渲染body
@@ -50,14 +51,14 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
         domData.parentName = "spark-" + DefaultSetting.name;
 
         if (domData.$el && domData.keepalive) {
-          // console.log('had $el')
           AC.appendChild(domData.$el);
-          _this.renderCompleteKeepAlive.call(_this, _this._rootAdress);
+          _this.renderCompleteKeepAlive.call(_this, _this._rootAddress);
 
           callback && callback();
           return;
         }
         if (!AC) {
+          _this.pushCommonCss();
           /*insert css*/
           CSSManager.makeStyleTree(_this._css);
           var tempDom = D.createElement("div");
@@ -70,7 +71,7 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
             blongIndex: 0,
           };
         } else if (hasPage) {
-          CSSManager.makeNextStyleTree(_this._css, _this._rootAdress);
+          CSSManager.makeNextStyleTree(_this._css, _this._rootAddress);
           var tempDom = D.createElement("div");
           tempDom.innerHTML = this._html;
           AC.appendChild(tempDom.firstChild);
@@ -87,7 +88,7 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
         var tempTimer = setTimeout(function () {
           clearTimeout(tempTimer);
           _this.initPushEvent.call(_this, true);
-          _this.renderComplete.call(_this, _this._rootAdress);
+          _this.renderComplete.call(_this, _this._rootAddress);
           _this._clear();
 
           callback && callback();
@@ -98,7 +99,7 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
         // 如果已渲染过节点
         if (domData.$el && domData.keepalive) {
           // console.log('had $el')
-          if (addtype == "after" || addtype == "before") {
+          if (addType == "after" || addType == "before") {
             var abTarget = domTarget;
             if (_typeof(domTarget.parentName, "String")) {
               domTarget = GetAddressData(domTarget.parentName);
@@ -110,16 +111,16 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
               domTarget.$el,
               abTarget.$el,
               domData.$el,
-              addtype,
+              addType,
               true
             );
           }
 
-          if (addtype == "append" || addtype == "prepend") {
-            _this.append_prepend(domTarget.$el, domData.$el, addtype, true);
+          if (addType == "append" || addType == "prepend") {
+            _this.append_prepend(domTarget.$el, domData.$el, addType, true);
           }
 
-          _this.renderCompleteKeepAlive.call(_this, _this._rootAdress);
+          _this.renderCompleteKeepAlive.call(_this, _this._rootAddress);
 
           callback && callback();
           return;
@@ -127,13 +128,13 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
 
         //新增节点
         /*append css moveto pushcss()*/
-        CSSManager.makeNextStyleTree(_this._css, _this._rootAdress);
+        CSSManager.makeNextStyleTree(_this._css, _this._rootAddress);
 
         /*append html*/
         var tempDom = document.createElement("div");
         tempDom.innerHTML = _this._html;
 
-        if (addtype == "after" || addtype == "before") {
+        if (addType == "after" || addType == "before") {
           var abTarget = domTarget;
 
           if (_typeof(domTarget.parentName, "String")) {
@@ -147,20 +148,20 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
             domTarget.$el,
             abTarget.$el,
             tempDom,
-            addtype,
+            addType,
             false
           );
         }
 
-        if (addtype == "append" || addtype == "prepend") {
-          _this.append_prepend(domTarget.$el, tempDom, addtype, false);
+        if (addType == "append" || addType == "prepend") {
+          _this.append_prepend(domTarget.$el, tempDom, addType, false);
         }
 
         /*append bind event*/
         var tempTimer = setTimeout(function () {
           clearTimeout(tempTimer);
           _this.initPushEvent.call(_this); //子节点事件
-          _this.renderComplete.call(_this, _this._rootAdress);
+          _this.renderComplete.call(_this, _this._rootAddress);
           //如果是列表更新索引
           if (domTarget.type === "List") {
             WidgetOperate.updateListIndex(domTarget);
@@ -171,20 +172,20 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
       }
     },
     /*add dom way 1 */
-    append_prepend: function (el, newel, type, hadel) {
+    append_prepend: function (el, newel, type, handel) {
       var _this = this;
       if (_typeof(el, "HTMLCollection")) {
         SparkUtil.traverse(el.length, function (index, end) {
-          if (!hadel) {
+          if (!handel) {
             var tempDom = document.createElement("div");
             tempDom.innerHTML = _this._html;
             if (type == "append") {
               el[index].appendChild(tempDom.firstChild);
-              AddWidgetEvent(el[index].lastChild, _this._rootAdress);
+              AddWidgetEvent(el[index].lastChild, _this._rootAddress);
             }
             if (type == "prepend") {
               el[index].insertBefore(tempDom.firstChild, el[index].firstChild);
-              AddWidgetEvent(el[index].firstChild, _this._rootAdress);
+              AddWidgetEvent(el[index].firstChild, _this._rootAddress);
             }
           } else {
             if (type == "append") {
@@ -196,14 +197,14 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
           }
         });
       } else {
-        if (!hadel) {
+        if (!handel) {
           if (type == "append") {
             el.appendChild(newel.firstChild);
-            AddWidgetEvent(el.lastChild, _this._rootAdress);
+            AddWidgetEvent(el.lastChild, _this._rootAddress);
           }
           if (type == "prepend") {
             el.insertBefore(newel.firstChild, el.firstChild);
-            AddWidgetEvent(el.firstChild, _this._rootAdress);
+            AddWidgetEvent(el.firstChild, _this._rootAddress);
           }
         } else {
           if (type == "append") {
@@ -216,12 +217,12 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
       }
     },
     /*add dom way 2 */
-    after_before: function (el, abTarget, newel, type, hadel) {
+    after_before: function (el, abTarget, newel, type, handel) {
       var _this = this;
       if (_typeof(el, "HTMLCollection")) {
         SparkUtil.traverse(el.length, function (index, end) {
           var parentNode = abTarget[index].parentNode;
-          if (!hadel) {
+          if (!handel) {
             var tempDom = document.createElement("div");
             tempDom.innerHTML = _this._html;
 
@@ -236,14 +237,14 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
               }
               AddWidgetEvent(
                 abTarget[index].nextElementSibling,
-                _this._rootAdress
+                _this._rootAddress
               );
             }
             if (type == "before") {
               parentNode.insertBefore(tempDom.firstChild, abTarget[index]);
               AddWidgetEvent(
                 abTarget[index].previousElementSibling,
-                _this._rootAdress
+                _this._rootAddress
               );
             }
           } else {
@@ -264,7 +265,7 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
         });
       } else {
         var parentNode = abTarget.parentNode;
-        if (!hadel) {
+        if (!handel) {
           if (type == "after") {
             if (parentNode.lastChild == abTarget) {
               parentNode.appendChild(newel.firstChild);
@@ -274,12 +275,12 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
                 abTarget.nextElementSibling
               );
             }
-            AddWidgetEvent(abTarget.nextElementSibling, _this._rootAdress);
+            AddWidgetEvent(abTarget.nextElementSibling, _this._rootAddress);
           }
 
           if (type == "before") {
             parentNode.insertBefore(newel.firstChild, abTarget);
-            AddWidgetEvent(abTarget.previousElementSibling, _this._rootAdress);
+            AddWidgetEvent(abTarget.previousElementSibling, _this._rootAddress);
           }
         } else {
           if (type == "after") {
@@ -369,8 +370,16 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
         }
       };
       node.getChild = function (index) {
-        if (node.child.length <= 0) return;
-        return GetAddressData(node.child[index]);
+        if (node.child && node.child.length <= 0) return;
+        if (_typeof(index, "Number")) {
+          return GetAddressData(node.child[index]);
+        } else {
+          var child = [];
+          SparkUtil.traverse(node.child, function (e, index, end) {
+            child.push(GetAddressData(e));
+          });
+          return child;
+        }
       };
 
       node.rendered = true;
@@ -397,7 +406,14 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
       var _this = this;
       _this._html = !_this._html
         ? _this.RegExp(parent, child, nowaddress)
-        : _this.RegExp(_this._html, child, _this._lastAdress);
+        : _this.RegExp(_this._html, child, _this._lastAddress);
+    },
+    pushCommonCss: function () {
+      var cssStr = "";
+      for (var key in Cache.CSSCache) {
+        cssStr += "." + key + "{" + Cache.CSSCache[key].style + "}";
+      }
+      this._css += cssStr;
     },
     /*css tree*/
     pushCss: function (_node) {
@@ -481,7 +497,7 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
       _this._eventQueue = SparkUtil.unique(_this._eventQueue);
 
       SparkUtil.traverse(_this._eventQueue, function (nodeName, index, end) {
-        if (_this._rootAdress != nodeName || noIgnoreRootAdress) {
+        if (_this._rootAddress != nodeName || noIgnoreRootAdress) {
           var nodeList = document.getElementsByClassName(nodeName);
           SparkUtil.traverse(nodeList.length, function (index, end) {
             AddWidgetEvent(nodeList[index], nodeName);
@@ -495,11 +511,11 @@ export default function (_rootAdress, domTarget, init, addtype, callback) {
     handelQueue: function (queue) {
       var _this = this;
       queue.forEach(function (address) {
-        _this._lastAdress = address;
-        _this.readAdress(GetAddressData(address));
+        _this._lastAddress = address;
+        _this.readAddress(GetAddressData(address));
       });
     },
-    readAdress: function (_node) {
+    readAddress: function (_node) {
       var _this = this;
       var tempParentHtml = _node.html,
         tempChildHtml = "",

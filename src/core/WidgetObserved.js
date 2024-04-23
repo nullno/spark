@@ -73,15 +73,13 @@ export default {
         if (nval == "r_d_n") tempOld = tempOld.replace("display:none;", "");
         // CSSManager.cssParse.strStyleToObj(tempOld)
         newStyleObj = Object.assign(
-          {},
+          CSSManager.cssParse.strStyleToObj(tempOld),
           CSSManager.cssParse.strStyleToObj(tempNewVal)
         );
 
         obj.styleObj = newStyleObj;
 
         nval = CSSManager.cssParse.objStyleToStr(newStyleObj);
-
-        // console.log(newStyleObj);
 
         CSSManager.cssParse.modify(obj.name, "{" + nval + "}");
 

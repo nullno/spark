@@ -2,8 +2,8 @@ import Spark from "../index.js";
 
 console.log(Spark);
 
-var Navcss = Spark.Css(
-  "width:50%;display:inline-block;background:transparent;text-align:center;"
+var NavCss = Spark.Css(
+  "width:50%;display:inline-block;background:transparent;text-align:center;animation:none;"
 );
 
 var nextbtn = Spark.Text("前进", {
@@ -26,26 +26,33 @@ var nav = Spark.Fixed({
   style:
     "bottom:0;width:100%;height:100px;line-height:100px;color:#fff; background:blue;display:flex;justify-content:space-around;",
   stopProp: true,
-  diyfn(index) {
-    Navcss.style = "background:transparent";
+  selectMenu(index) {
+    NavCss.style = "background:transparent";
+    console.log(this.getChild());
     this.getChild(index).style = "background:red;";
-    // console.log(Spark.route)
   },
   activated() {
-    this.diyfn(Spark.route.name == "page1" ? 0 : 1);
+    // this.selectMenu(Spark.route.name == "page1" ? 0 : 1);
   },
   child: [
     Spark.Text("PAGE-1", {
-      className: Navcss,
+      className: NavCss,
       on: {
         click() {
           // Spark.router.push({ name: "page1" });
           Spark.router.push("/?sss=2323"); //{ name: "page1" }
         },
       },
+      activated() {
+        console.log(Spark.route.name);
+        this.style =
+          Spark.route.name == "page1"
+            ? "background:red;"
+            : "background:transparent;";
+      },
     }),
     Spark.Text("PAGE-2", {
-      className: Navcss,
+      className: NavCss,
       on: {
         click() {
           // Spark.router.push("/page2/222/151");
@@ -60,10 +67,17 @@ var nav = Spark.Fixed({
           });
         },
       },
+      activated() {
+        console.log(Spark.route.name);
+        this.style =
+          Spark.route.name == "page2"
+            ? "background:red;font-size:50px;"
+            : "background:transparent;";
+      },
     }),
   ],
   created() {
-    console.log("nav created", Spark.route);
+    // console.log("nav created", Spark.route);
   },
 });
 
@@ -81,7 +95,7 @@ var Hi = Spark.Text("hello spark!", {
   },
   activated() {
     this.text = Spark.route.query.sss || this.text;
-    console.log("actived", this.$el);
+    // console.log("actived", this.$el);
   },
   on: {
     click() {
@@ -166,5 +180,3 @@ Spark.Page({
     // console.log('deactivated')
   },
 });
-
-// Spark.router.push("/index");
