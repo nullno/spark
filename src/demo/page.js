@@ -119,7 +119,11 @@ var scrollTop1 = Spark.Fixed({
   child: [Spark.Text("回到<br>顶部")],
   on: {
     click: function () {
-      Spark.scrollTop(0, 500);
+      Spark.scrollTop(0, 500, (val) => {
+        console.log("scroll->", val);
+      }).then((val) => {
+        console.log("scroll over", val);
+      });
     },
   },
 });
@@ -136,8 +140,8 @@ Spark.Page({
   style:
     "width:100%;min-height:" +
     Spark.screen.height() +
-    "px;background-color:#fff;color:#34495e;",
-  child: [Hi, ddd, scrollTop1, nav, backbtn],
+    "px;height:10000px; background-color:#fff;color:#34495e;",
+  child: [Hi, ddd, nav, backbtn, scrollTop1],
   // keepalive:false,
   created() {
     console.log(Spark.route.query);

@@ -2,8 +2,9 @@
 
 import SparkUtil from "../SparkUtil.js";
 
-export default function (val, time) {
+export default function (val, time, callback) {
   var scrollTop = SparkUtil.screen.scrollTop();
+  var complete = null;
   time = time ? time : 500;
   val = val ? val : 0;
   val =
@@ -35,6 +36,7 @@ export default function (val, time) {
         if (scrollTop <= val) {
           clearTimeout(Timer);
           scrollTop = val;
+          complete && complete(scrollTop);
         }
       } else {
         if (val > scrollTop) {
@@ -43,10 +45,18 @@ export default function (val, time) {
         if (scrollTop >= val) {
           clearTimeout(Timer);
           scrollTop = val;
+          complete && complete(scrollTop);
         }
       }
       document.body.scrollTop = document.documentElement.scrollTop = scrollTop;
+      callback && callback(scrollTop);
     }, stime);
   };
   run();
+
+  return {
+    then: function (fn) {
+      complete = fn;
+    },
+  };
 }

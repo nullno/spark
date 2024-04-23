@@ -1,1 +1,1 @@
-import "./carousel.js";
+import "./page.js";
