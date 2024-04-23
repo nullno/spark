@@ -101,7 +101,6 @@ const CSSManager = {
     },
     /*修改*/
     modify: function (selector, cssStr) {
-      _core.remove('[data-modifycss="' + selector + '"]');
       setTimeout(function () {
         cssStr = SparkUtil.trim(cssStr);
         /*
@@ -115,8 +114,8 @@ const CSSManager = {
         } catch (error) {
           console.warn(error);
         }
-     
         */
+        _core.remove('[data-modifycss="' + selector + '"]');
         _core.insert("data-modifycss", selector, cssStr);
         // var StyleEl = _core.getStyleEl('[data-modifycss="' + selector + '"]');
         // if (StyleEl) {

@@ -10,7 +10,7 @@ const webpackConfig = {
   },
   output: {
     filename: "[name].min.js",
-    path: path.resolve(__dirname, "release/version@1.1"),
+    path: path.resolve(__dirname, "release/version@1.0.2"),
     library: "Spark",
     libraryTarget: "umd",
     globalObject: "this",

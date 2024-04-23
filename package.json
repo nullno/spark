@@ -1,11 +1,11 @@
 {
   "name": "spark",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Quickly create web pages by JavaScript",
   "main": "./src/index.js",
   "scripts": {
     "dev": "webpack-dev-server --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js && cp release/version@1.1/spark.min.js apidocs/demo/js && cp release/version@1.1/spark.min.js examples"
+    "build": "webpack --config webpack.prod.js && cp release/version@1.0.2/spark.min.js apidocs/demo/js && cp release/version@1.0.2/spark.min.js examples"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,6 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "axios": "^0.21.0",
-    "loadsh": "^0.0.4"
+    "axios": "^0.21.0"
   }
 }
