@@ -24,6 +24,12 @@ function Router() {
   this.changeState = 1;
 
   this.run = false;
+
+  this.noPage = null;
+
+  this.hitHash = false;
+
+  this.timer = null;
 }
 
 //初始化
@@ -72,43 +78,56 @@ Router.prototype.setOuted = function (link) {
 Router.prototype.Render = function (link) {
   var _this = this;
   this.setOuted(link);
+  if (link.meta && link.meta.title) {
+    document.title = link.meta.title;
+  }
   CreateDomTree(link.address, D.body, true, "", function () {
     _this.run = false;
   });
 };
 
 //进栈
-Router.prototype.read = function (pagename) {
+Router.prototype.read = function (pageName) {
+  var _this = this;
+  this.timer && clearTimeout(this.timer);
   if (!this.hash()) {
+    this.hitHash = true;
     this.GoPage("/");
     return;
   }
-  const W = GetAddressData(pagename);
-
-  if (D.getElementsByClassName(W.name).length >= 1) {
-    W.remove();
+  var W = GetAddressData(pageName);
+  D.getElementsByClassName(W.name).length >= 1 && W.remove();
+  W.link.address = pageName;
+  if (W.link.path === "*") {
+    this.noPage = W.link;
   }
-
-  W.link.address = pagename;
-  this.change(W.link);
+  !this.hitHash && this.change(W.link);
+  // Event queuing last
+  this.timer = setTimeout(function () {
+    if (!_this.hitHash && _this.noPage) {
+      _this.Render(_this.noPage);
+    }
+  });
 };
 
 //  Cache.PageCache 读取到当前路径页面
 Router.prototype.readPage = function () {
   var _this = this;
+  this.hitHash = false;
   SparkUtil.traverse(Cache.PageCache, function (item) {
     _this.read(item);
   });
 };
 
 Router.prototype.change = function (link) {
-  var _this = this;
   const path_hash = this.hash().replace(/\?.*$/, "");
   const link_path = link.path.replace(/\?.*$/, "");
   const query = this.query();
   link.query = query;
+
   //普通匹配
   if (link_path === path_hash) {
+    this.hitHash = true;
     this.Render(link);
     return;
   }
@@ -131,7 +150,7 @@ Router.prototype.change = function (link) {
           link.params[name] = HArr[index];
         }
       });
-
+      this.hitHash = true;
       this.Render(link);
       return;
     }
@@ -145,7 +164,6 @@ Router.prototype.operate = function (p, t) {
   this.changeState = t;
   this.Outed.end = true;
   this.Outed.start = false;
-
   var newPath = "";
   if (_typeof(p, "String")) {
     newPath = p;

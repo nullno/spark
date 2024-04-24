@@ -526,7 +526,6 @@ const WidgetParse = {
     /*page->路由管理->渲染指定页面*/
     if (NEW_WIDGET.type === "Page") {
       Cache.PageCache.push(NEW_WIDGET.name);
-
       Router.read(NEW_WIDGET.name);
     }
 

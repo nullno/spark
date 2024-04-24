@@ -44,7 +44,7 @@ var nav = Spark.Fixed({
         },
       },
       activated() {
-        console.log(Spark.route.name);
+        // console.log(Spark.route.name);
         this.style =
           Spark.route.name == "page1"
             ? "background:red;"
@@ -68,7 +68,7 @@ var nav = Spark.Fixed({
         },
       },
       activated() {
-        console.log(Spark.route.name);
+        // console.log(Spark.route.name);
         this.style =
           Spark.route.name == "page2"
             ? "background:red;font-size:50px;"
@@ -91,10 +91,10 @@ var Hi = Spark.Text("hello spark!", {
     "font-size:50px;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);min-width:300px;text-align:center;",
   stopProp: true,
   created() {
-    console.log("Hi->", Spark.route.query);
+    // console.log("Hi->", Spark.route.query);
   },
   activated() {
-    this.text = Spark.route.query.sss || this.text;
+    // this.text = Spark.route.query.sss || this.text;
     // console.log("actived", this.$el);
   },
   on: {
@@ -129,12 +129,25 @@ var scrollTop1 = Spark.Fixed({
 });
 
 Spark.Page({
+  link: {
+    name: "no-page",
+    path: "*",
+    meta: {
+      title: "404 Not Found",
+    },
+  },
+  keepalive: true,
+  style: "color:#34495e;text-align:center;line-height:100px;font-size:30px;",
+  child: [Spark.Text("404 Not Found")],
+});
+
+Spark.Page({
   //定义路由信息
   link: {
     name: "page1",
     path: "/",
     meta: {
-      title: "你好",
+      title: "page1",
     },
   },
   style:
@@ -142,10 +155,10 @@ Spark.Page({
     Spark.screen.height() +
     "px;height:10000px; background-color:#fff;color:#34495e;",
   child: [Hi, ddd, nav, backbtn, scrollTop1],
-  // keepalive:false,
+  keepalive: true,
   created() {
     console.log(Spark.route.query);
-    console.log("page1 created");
+    // console.log("page1 created");
   },
   on: {
     click() {
@@ -168,6 +181,9 @@ Spark.Page({
   link: {
     name: "page2",
     path: "/page2/:id/:nid",
+    meta: {
+      title: "page2",
+    },
   },
   style:
     "width:100%;min-height:" +
