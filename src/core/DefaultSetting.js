@@ -11,6 +11,7 @@ const DefaultSetting = {
   scene: "pc", //mobile,pc,mp
   devTool: false,
   gray: false,
+  resetCss: "",
   _update: function (params) {
     params = params || {};
     delete params._update;
