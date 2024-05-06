@@ -36,6 +36,8 @@ const WidgetManager = {
         meta: {},
         params: {},
         query: {},
+        scrollTop: 0,
+        recordLastPosition: true,
       },
     };
 

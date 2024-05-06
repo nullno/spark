@@ -155,7 +155,7 @@ Spark.Page({
     Spark.screen.height() +
     "px;height:10000px; background-color:#fff;color:#34495e;",
   child: [Hi, ddd, nav, backbtn, scrollTop1],
-  keepalive: true,
+  // keepalive: false,
   created() {
     console.log(Spark.route.query);
     // console.log("page1 created");
@@ -184,9 +184,10 @@ Spark.Page({
     meta: {
       title: "page2",
     },
+    recordLastPosition: false,
   },
   style:
-    "width:100%;min-height:" +
+    "width:100%;height:5000px;min-height:" +
     Spark.screen.height() +
     "px;background-color:#1FCBC6;color:#fff;",
   child: [Hi, nav, backbtn],

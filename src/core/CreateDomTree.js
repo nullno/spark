@@ -54,7 +54,7 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
           AC.appendChild(domData.$el);
           _this.renderCompleteKeepAlive.call(_this, _this._rootAddress);
 
-          callback && callback();
+          callback && setTimeout(() => callback(), 10);
           return;
         }
         if (!AC) {
@@ -91,7 +91,7 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
           _this.renderComplete.call(_this, _this._rootAddress);
           _this._clear();
 
-          callback && callback();
+          callback && setTimeout(() => callback(), 10);
         });
       } else {
         //后期渲染部分节点
@@ -122,7 +122,7 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
 
           _this.renderCompleteKeepAlive.call(_this, _this._rootAddress);
 
-          callback && callback();
+          callback && setTimeout(() => callback(), 10);
           return;
         }
 

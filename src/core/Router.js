@@ -19,7 +19,7 @@ function Router() {
 
   this.hashStackIndex = 0;
 
-  this.isback = false;
+  this.isBack = false;
 
   this.changeState = 1;
 
@@ -60,18 +60,23 @@ Router.prototype.setting = function (params) {
 Router.prototype.setOuted = function (link) {
   this.Outed = Object.assign(this.Outed, link);
   this.Outed.path = this.hash();
-  var linkstate = Object.assign({}, this.Outed);
-  if (!this.isback) {
+  var linkState = Object.assign({}, this.Outed);
+  if (!this.isBack) {
     if (this.changeState) {
-      this.hashStack.push(linkstate);
+      this.hashStack.push(linkState);
     } else {
-      this.hashStack.splice(this.hashStack.length - 1, 1, linkstate);
+      link.scrollTop = 0;
+      this.hashStack.splice(this.hashStack.length - 1, 1, linkState);
     }
     this.hashStackIndex = this.hashStack.length - 1;
   }
-  this.isback = false;
-  delete linkstate._origin;
-  window.history.replaceState(linkstate, "", "");
+  this.isBack = false;
+  delete linkState._origin;
+  if (this.changeState) {
+    window.history.pushState(linkState, "", location.href);
+  } else {
+    window.history.replaceState(linkState, "", location.href);
+  }
 };
 
 //路由跳转
@@ -81,8 +86,11 @@ Router.prototype.Render = function (link) {
   if (link.meta && link.meta.title) {
     document.title = link.meta.title;
   }
+
   CreateDomTree(link.address, D.body, true, "", function () {
     _this.run = false;
+    document.body.scrollTop = document.documentElement.scrollTop =
+      link.recordLastPosition ? link.scrollTop || 0 : 0;
   });
 };
 
@@ -96,7 +104,11 @@ Router.prototype.read = function (pageName) {
     return;
   }
   var W = GetAddressData(pageName);
-  D.getElementsByClassName(W.name).length >= 1 && W.remove();
+
+  if (D.getElementsByClassName(W.name).length >= 1) {
+    W.link.scrollTop = SparkUtil.screen.scrollTop();
+    W.remove();
+  }
   W.link.address = pageName;
   if (W.link.path === "*") {
     this.noPage = W.link;
@@ -204,45 +216,45 @@ Router.prototype.operate = function (p, t) {
 };
 
 Router.prototype.operate.push = function (p) {
-  this.call(myrouter, p, 1);
+  this.call(myRouter, p, 1);
 };
 
 Router.prototype.operate.replace = function (p) {
-  this.call(myrouter, p, 0);
+  this.call(myRouter, p, 0);
 };
 
 Router.prototype.operate.go = function (p) {
-  if (myrouter.run) return;
+  if (myRouter.run) return;
 
-  myrouter.isback = true;
+  myRouter.isBack = true;
 
-  myrouter.run = true;
+  myRouter.run = true;
 
-  var hashStack = myrouter.hashStack;
+  var hashStack = myRouter.hashStack;
 
-  myrouter.hashStackIndex += p;
+  myRouter.hashStackIndex += p;
 
-  myrouter.Outed.end = myrouter.Outed.start = false;
+  myRouter.Outed.end = myRouter.Outed.start = false;
 
-  if (myrouter.hashStackIndex >= hashStack.length - 1) {
-    myrouter.hashStackIndex = hashStack.length - 1;
-    myrouter.Outed.end = true;
+  if (myRouter.hashStackIndex >= hashStack.length - 1) {
+    myRouter.hashStackIndex = hashStack.length - 1;
+    myRouter.Outed.end = true;
   }
-  if (myrouter.hashStackIndex <= 0) {
-    myrouter.hashStackIndex = 0;
-    myrouter.Outed.start = true;
+  if (myRouter.hashStackIndex <= 0) {
+    myRouter.hashStackIndex = 0;
+    myRouter.Outed.start = true;
   }
 
-  myrouter.GoPage(hashStack[myrouter.hashStackIndex].path);
+  myRouter.GoPage(hashStack[myRouter.hashStackIndex].path);
 };
 
-const myrouter = new Router();
+const myRouter = new Router();
 
 window.addEventListener(
   "hashchange",
   function (event) {
-    myrouter.Outed._origin = event;
-    myrouter.readPage(event);
+    myRouter.Outed._origin = event;
+    myRouter.readPage(event);
   },
   false
 );
@@ -251,11 +263,11 @@ window.addEventListener(
   "popstate",
   function (event) {
     if (event.state) {
-      myrouter.isback = true;
+      myRouter.isBack = true;
       // location.reload();
     }
   },
   false
 );
 
-export default myrouter;
+export default myRouter;
