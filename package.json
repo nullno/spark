@@ -1,6 +1,6 @@
 {
   "name": "spark",
-  "version": "1.0.2",
+  "version": "0.1.2",
   "description": "Quickly create web pages by JavaScript",
   "main": "./src/index.js",
   "scripts": {

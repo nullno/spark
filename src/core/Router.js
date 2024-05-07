@@ -72,11 +72,7 @@ Router.prototype.setOuted = function (link) {
   }
   this.isBack = false;
   delete linkState._origin;
-  if (this.changeState) {
-    window.history.pushState(linkState, "", location.href);
-  } else {
-    window.history.replaceState(linkState, "", location.href);
-  }
+  window.history.replaceState(linkState, "", "");
 };
 
 //路由跳转
