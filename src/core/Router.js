@@ -218,30 +218,36 @@ Router.prototype.operate.push = function (p) {
 Router.prototype.operate.replace = function (p) {
   this.call(myRouter, p, 0);
 };
-
+Router.prototype.operate.back = function () {
+  window.history.back();
+};
+Router.prototype.operate.forward = function () {
+  window.history.forward();
+};
 Router.prototype.operate.go = function (p) {
-  if (myRouter.run) return;
+  window.history.go(p);
+  // if (myRouter.run) return;
 
-  myRouter.isBack = true;
+  // myRouter.isBack = true;
 
-  myRouter.run = true;
+  // myRouter.run = true;
 
-  var hashStack = myRouter.hashStack;
+  // var hashStack = myRouter.hashStack;
 
-  myRouter.hashStackIndex += p;
+  // myRouter.hashStackIndex += p;
 
-  myRouter.Outed.end = myRouter.Outed.start = false;
+  // myRouter.Outed.end = myRouter.Outed.start = false;
 
-  if (myRouter.hashStackIndex >= hashStack.length - 1) {
-    myRouter.hashStackIndex = hashStack.length - 1;
-    myRouter.Outed.end = true;
-  }
-  if (myRouter.hashStackIndex <= 0) {
-    myRouter.hashStackIndex = 0;
-    myRouter.Outed.start = true;
-  }
+  // if (myRouter.hashStackIndex >= hashStack.length - 1) {
+  //   myRouter.hashStackIndex = hashStack.length - 1;
+  //   myRouter.Outed.end = true;
+  // }
+  // if (myRouter.hashStackIndex <= 0) {
+  //   myRouter.hashStackIndex = 0;
+  //   myRouter.Outed.start = true;
+  // }
 
-  myRouter.GoPage(hashStack[myRouter.hashStackIndex].path);
+  // myRouter.GoPage(hashStack[myRouter.hashStackIndex].path);
 };
 
 const myRouter = new Router();

@@ -3,6 +3,8 @@ const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
+const Package = require("./package.json");
+
 const webpackConfig = {
   mode: "production",
   entry: {
@@ -10,7 +12,7 @@ const webpackConfig = {
   },
   output: {
     filename: "[name].min.js",
-    path: path.resolve(__dirname, "release/version@0.1.2"),
+    path: path.resolve(__dirname, "release/version@" + Package.version + "/"),
     library: "Spark",
     libraryTarget: "umd",
     globalObject: "this",
