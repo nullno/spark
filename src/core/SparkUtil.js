@@ -292,7 +292,7 @@ let SparkUtil = {
         }
       } else {
         // 多数据切片
-        setTimeout(function ArrayHander() {
+        var ArrayHandle = function () {
           for (
             var i = currentIndex;
             i < currentIndex + maxEveryLength && i < allLength;
@@ -302,10 +302,10 @@ let SparkUtil = {
           }
           currentIndex = i;
           if (currentIndex < allLength) {
-            // console.log(55)
-            setTimeout(ArrayHander, 0);
+            ArrayHandle();
           }
-        }, 0);
+        };
+        ArrayHandle();
       }
     }
     if (_typeof(datas, "Object")) {
@@ -325,7 +325,7 @@ let SparkUtil = {
         }
       } else {
         // 数字切片
-        setTimeout(function NumberHander() {
+        var NumberHandle = function () {
           for (
             var i = currentIndex;
             i < currentIndex + maxEveryLength && i < allLength;
@@ -335,10 +335,10 @@ let SparkUtil = {
           }
           currentIndex = i;
           if (currentIndex < allLength) {
-            console.log(66);
-            setTimeout(NumberHander, 0);
+            NumberHandle();
           }
-        }, 0);
+        };
+        NumberHandle();
       }
     }
   },
