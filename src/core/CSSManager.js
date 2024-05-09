@@ -153,8 +153,15 @@ const CSSManager = {
     },
     /*样式对象转字符串*/
     objStyleToStr: function (obj) {
-      var t = JSON.stringify(obj);
-      if (!_typeof(obj, "Object") || t == "{}") {
+      if (!_typeof(obj, "Object")) {
+        return "";
+      }
+      var newObj = {};
+      for (var key in obj) {
+        newObj[key.replace(/([A-Z])/g, "-$1").toLowerCase()] = obj[key];
+      }
+      var t = JSON.stringify(newObj);
+      if (t == "{}") {
         return "";
       }
 
@@ -164,7 +171,6 @@ const CSSManager = {
         .replace(new RegExp('"', "ig"), "")
         .replace(new RegExp("{"), "")
         .replace(new RegExp("}"), ";");
-
       return CssStr;
     },
     /*样式合并处理*/

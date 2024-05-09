@@ -150,10 +150,20 @@ Spark.Page({
       title: "page1",
     },
   },
-  style:
-    "width:100%;min-height:" +
-    Spark.screen.height() +
-    "px;height:10000px; background-color:#fff;color:#34495e;",
+  style: {
+    width: "100%",
+    minHeight: Spark.screen.height() + "px",
+    height: "10000px",
+    backgroundColor: "red",
+    boxShadow: "0 0 5px #FFFF",
+  },
+  shover: {
+    backgroundColor: "blue",
+  },
+  // style:
+  //   "width:100%;min-height:" +
+  //   Spark.screen.height() +
+  //   "px;height:10000px; background-color:#fff;color:#34495e;",
   child: [Hi, ddd, nav, backbtn, scrollTop1],
   // keepalive: false,
   created() {

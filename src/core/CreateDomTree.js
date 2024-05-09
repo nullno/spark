@@ -417,19 +417,14 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
     },
     /*css tree*/
     pushCss: function (_node) {
+      // console.log(_node.style, _typeof(_node.style, "Object"));
+      // console.log(_node.shover, _typeof(_node.shover, "Object"));
       var _this = this;
       var pointer = "cursor:pointer;";
-      var className = _typeof(_node.style, "Object")
-          ? _node.style["name"]
-          : _node.name,
-        cssStr = _typeof(_node.style, "Object")
-          ? _node.style["style"]
-          : _node.style,
-        hclassName = _typeof(_node.shover, "Object")
-          ? _node.shover["name"]
-          : _node.name,
+      var className = _node.name,
+        cssStr = _node.style,
         hcssStr = _typeof(_node.shover, "Object")
-          ? _node.shover["style"]
+          ? CSSManager.cssParse.objStyleToStr(_node.shover)
           : _node.shover;
 
       /*去重处理*/
@@ -458,9 +453,8 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
             : ""
           : "";
       var h =
-        _node.shover &&
-        !SparkUtil.includes(_this._css, "." + hclassName + ":hover")
-          ? "." + hclassName + ":hover" + hcssStr
+        hcssStr && !SparkUtil.includes(_this._css, "." + className + ":hover")
+          ? "." + className + ":hover" + hcssStr
           : "";
 
       if (
@@ -477,11 +471,11 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
             className
           );
         }
-        if (SparkUtil.includes(_this._css, hcssStr)) {
+        if (hcssStr && SparkUtil.includes(_this._css, hcssStr)) {
           _this._css = CSSManager.cssParse.strStyleHandle(
             _this._css,
             hcssStr,
-            hclassName + ":hover"
+            className + ":hover"
           );
         }
       } else {

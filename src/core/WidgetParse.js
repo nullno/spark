@@ -64,10 +64,10 @@ const WidgetParse = {
         : param && typeof param.className === "string"
         ? param.className + ""
         : "";
-    names +=
-      param && typeof param.shover === "object"
-        ? param.shover["name"] + " "
-        : "";
+    // names +=
+    //   param && typeof param.shover === "object"
+    //     ? param.shover["name"] + " "
+    //     : "";
     return names;
   },
   getDomEvent: function (type) {
@@ -363,7 +363,13 @@ const WidgetParse = {
         if (_typeof(this.className, "Object")) {
           tempStyleStr += this.className.style;
         }
-        tempStyleStr += this.defaultcss + (this.style ? this.style : "");
+
+        if (_typeof(this.style, "Object")) {
+          tempStyleStr +=
+            this.defaultcss + CSSManager.cssParse.objStyleToStr(this.style);
+        } else {
+          tempStyleStr += this.defaultcss + this.style;
+        }
 
         if (_typeof(this.showAni, "Object")) {
           tempStyleStr += "animation:" + this.showAni.ani + ";";
