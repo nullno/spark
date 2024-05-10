@@ -413,7 +413,7 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
       for (var key in Cache.CSSCache) {
         cssStr += "." + key + "{" + Cache.CSSCache[key].style + "}";
       }
-      this._css += cssStr;
+      this._css = cssStr + this._css;
     },
     /*css tree*/
     pushCss: function (_node) {
@@ -448,7 +448,7 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
 
       var c =
         cssStr != "{}"
-          ? !SparkUtil.includes(_this._css, className)
+          ? !SparkUtil.includes(_this._css, className + "{")
             ? "." + className + cssStr
             : ""
           : "";
@@ -457,21 +457,19 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
           ? "." + className + ":hover" + hcssStr
           : "";
 
-      if (
-        SparkUtil.includes(_this._css, cssStr) ||
-        SparkUtil.includes(_this._css, hcssStr)
-      ) {
-        if (
-          SparkUtil.includes(_this._css, cssStr) &&
-          !SparkUtil.includes(_this._css, className)
-        ) {
+      if (SparkUtil.includes(_this._css, cssStr)) {
+        if (!SparkUtil.includes(_this._css, className + "{")) {
           _this._css = CSSManager.cssParse.strStyleHandle(
             _this._css,
             cssStr,
             className
           );
         }
-        if (hcssStr && SparkUtil.includes(_this._css, hcssStr)) {
+      } else {
+        _this._css += SparkUtil.trim(c);
+      }
+      if (hcssStr && SparkUtil.includes(_this._css, hcssStr)) {
+        if (!SparkUtil.includes(_this._css, className + ":hover")) {
           _this._css = CSSManager.cssParse.strStyleHandle(
             _this._css,
             hcssStr,
@@ -479,7 +477,7 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
           );
         }
       } else {
-        _this._css += SparkUtil.trim(c + h);
+        _this._css += SparkUtil.trim(h);
       }
     },
     /*default add event*/

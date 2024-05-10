@@ -1,1 +1,1 @@
-import "./page.js";
+import "./list.js";

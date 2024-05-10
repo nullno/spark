@@ -4,22 +4,24 @@ Spark.setting({ name: "codeList" });
 
 console.log(Spark);
 var listStyle = Spark.Css(
-  "background-color:#fff;margin:5px;padding:5px;line-height:50px;color:#666;overflow:hidden;border-radius:5px;box-shadow:0 0 5px #ccc;"
+  "background-color:#fff;margin:5px;padding:5px;line-height:50px;color:red;overflow:hidden;border-radius:5px;box-shadow:0 0 5px #ccc;"
 );
 
 var List = Spark.List({
   data: [
-    { a: "item", b: "hello world" },
-    { a: "item", b: "hello spark" },
-    { a: "item", b: "hello CS" },
+    { a: "item", b: "hello world", color: "red" },
+    { a: "item", b: "hello spark", color: "blue" },
+    { a: "item", b: "hello CS", color: "yellow" },
   ],
   item(item, index) {
+    const str = `background-color:#fff;color:${item.color};`;
     var template = Spark.Box({
       tag: "li",
       className: listStyle,
-      style: "background-color:#fff;",
+      style: str,
       showAni: { ani: "fadeInLeft 500ms  both" },
       hideAni: { ani: "bounceOutRight 500ms both", time: 500 },
+      shover: "background-color:#7566F9;color:#fff;",
       child: [
         Spark.Text(index, { listIndex: true }),
         Spark.Text("---" + item.b),
@@ -43,13 +45,13 @@ var List = Spark.List({
         click() {
           alert(item.b);
         },
-        hover() {
-          // listStyle.style = "background-color:#fff;color:#666;";
-          this.style = "background-color:#7566F9;color:#fff;";
-        },
-        leave() {
-          this.style = "background-color:#fff;color:#666;";
-        },
+        // hover() {
+        //   // listStyle.style = "background-color:#fff;color:#666;";
+        //   this.style = "background-color:#7566F9;color:#fff;";
+        // },
+        // leave() {
+        //   this.style = "background-color:#fff;color:#666;";
+        // },
       },
     });
 

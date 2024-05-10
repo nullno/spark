@@ -5,6 +5,7 @@
  * * 路由，页面，文本，图片，视频，音频，容器，拖动容器，画布，文字按钮，文字图标，列表，
     横向排列，纵向排列,局部滚动容器，弹窗，swiper(需要引入swiper)
  */
+import { _typeof } from "./Common.js";
 
 import Cache from "./Cache.js";
 
@@ -20,6 +21,9 @@ const WidgetManager = {
     var obj = { type: "Css" },
       address = CreateWidgetName("Css");
     obj.name = address;
+    if (_typeof(p, "Object")) {
+      p = CSSManager.cssParse.objStyleToStr(p);
+    }
     obj.styleObj = CSSManager.cssParse.strStyleToObj(p);
     obj.style = CSSManager.cssParse.objStyleToStr(obj.styleObj);
     Cache.CSSCache[address] = obj;

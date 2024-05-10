@@ -183,7 +183,6 @@ const CSSManager = {
           className +
           laststr.substring(_insertIndex, laststr.length);
       }
-
       return laststr;
     },
   },

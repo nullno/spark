@@ -6,8 +6,6 @@ import Cache from "./Cache.js";
 
 import WidgetOperate from "./WidgetOperate.js";
 
-// import SparkRender from './SparkRender.js'
-
 import WidgetManager from "./WidgetManager.js";
 
 import DefaultSetting from "./DefaultSetting.js";
@@ -24,7 +22,6 @@ const Spark = {
   vcss: Cache.CSSCache,
   vdom: Cache.WidgetCache,
   vpage: Cache.PageCache,
-  // Render: SparkRender,
   module: {},
   moduleJs: null,
   env: SparkUtil.env,
