@@ -316,11 +316,11 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
       node.$el = nodeList.length > 1 ? nodeList : nodeList[0];
 
       // set hide
-      if (node.show != undefined && !node.show) {
-        node.style = "display:none;";
-      }
-      // if(!node.vif){
-      //     node.remove();
+      // if (node.show != undefined && !node.show) {
+      //   node.$el.style.display = "none";
+      // }
+      // if (!node.vif) {
+      //   node.remove();
       // }
 
       if (!init && node.parentName) {

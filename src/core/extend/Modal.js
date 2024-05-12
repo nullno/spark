@@ -2,8 +2,8 @@
  * 模态框
  */
 import { _typeof } from "../Common.js";
-
 import WidgetManager from "../WidgetManager.js";
+import CSSManager from "../CSSManager.js";
 
 export default function (p) {
   var option = {
@@ -24,68 +24,67 @@ export default function (p) {
     inner: null,
     set: function (m) {
       var _this = this;
-      setTimeout(function () {
-        var positionMargin = m.positionMargin;
-        switch (m.position) {
-          case "topcenter":
-            m.style =
-              "top:" +
-              positionMargin +
-              ";left:50%;margin-left:-" +
-              m.width() / 2 +
-              "px;margin-top:none;bottom:none;";
-            break;
-          case "topleft":
-            m.style =
-              "top:" +
-              positionMargin +
-              ";left:" +
-              positionMargin +
-              ";margin-top:none;margin-left:none;bottom:none;";
-            break;
-          case "topright":
-            m.style =
-              "top:" +
-              positionMargin +
-              ";right:" +
-              positionMargin +
-              ";margin-top:none;margin-left:none;bottom:none;";
-            break;
-          case "bottomcenter":
-            m.style =
-              "bottom:" +
-              positionMargin +
-              ";left:50%;margin-left:-" +
-              m.width() / 2 +
-              "px;margin-top:none;top:none;";
-            break;
-          case "bottomleft":
-            m.style =
-              "bottom:" +
-              positionMargin +
-              ";left:" +
-              positionMargin +
-              ";margin-top:none;margin-left:none;top:none;";
-            break;
-          case "bottomright":
-            m.style =
-              "bottom:" +
-              positionMargin +
-              ";right:" +
-              positionMargin +
-              ";margin-top:none;margin-left:none;top:none;";
-            break;
-          default:
-            m.style =
-              "top:50%;left:50%;margin-left:-" +
-              m.width() / 2 +
-              "px;margin-top:-" +
-              m.height() / 2 +
-              "px;bottom:none;right:none;";
-            break;
-        }
-        _this.autoClose(m);
-      });
+
+      var positionMargin = m.positionMargin;
+      switch (m.position) {
+        case "topcenter":
+          m.style =
+            "top:" +
+            positionMargin +
+            ";left:50%;margin-left:-" +
+            m.width() / 2 +
+            "px;margin-top:unset;bottom:unset;";
+          break;
+        case "topleft":
+          m.style =
+            "top:" +
+            positionMargin +
+            ";left:" +
+            positionMargin +
+            ";margin-top:unset;margin-left:unset;bottom:unset;";
+          break;
+        case "topright":
+          m.style =
+            "top:" +
+            positionMargin +
+            ";right:" +
+            positionMargin +
+            ";margin-top:unset;margin-left:unset;bottom:unset;";
+          break;
+        case "bottomcenter":
+          m.style =
+            "bottom:" +
+            positionMargin +
+            ";left:50%;margin-left:-" +
+            m.width() / 2 +
+            "px;margin-top:unset;top:unset;";
+          break;
+        case "bottomleft":
+          m.style =
+            "bottom:" +
+            positionMargin +
+            ";left:" +
+            positionMargin +
+            ";margin-top:unset;margin-left:unset;top:unset;";
+          break;
+        case "bottomright":
+          m.style =
+            "bottom:" +
+            positionMargin +
+            ";right:" +
+            positionMargin +
+            ";margin-top:unset;margin-left:unset;top:unset;";
+          break;
+        default:
+          m.style =
+            "top:50%;left:50%;margin-left:-" +
+            m.width() / 2 +
+            "px;margin-top:-" +
+            m.height() / 2 +
+            "px;bottom:unset;right:unset;";
+          break;
+      }
+      _this.autoClose(m);
     },
     autoCloseTimer: null,
     autoClose: function (m) {
@@ -126,6 +125,9 @@ export default function (p) {
       Modal.inner.show = true;
       Modal.set(Modal.inner);
     };
+  }
+  if (_typeof(p.style, "Object")) {
+    p.style = CSSManager.cssParse.objStyleToStr(p.style);
   }
 
   p.style = p.style

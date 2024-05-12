@@ -41,20 +41,20 @@ export default {
 
     /*数据改变*/
     var aniSet = obj.hideAni;
-
     if (!nval && aniSet && aniSet.ani) {
       obj.style = "animation:" + aniSet.ani;
       var removeTimer = setTimeout(function () {
         clearTimeout(removeTimer);
-        obj.style = "display:none;animation:none;";
+        obj.style = "animation:unset;";
+        obj.$el.style.display = "none";
       }, aniSet.time);
     } else if (nval && obj.showAni) {
-      obj.style = "animation:" + obj.showAni + ";";
-      obj.style = "r_d_n";
+      obj.style = "animation:" + obj.showAni.ani + ";";
+      obj.$el.style.display = "";
     } else if (nval) {
-      obj.style = "r_d_n";
+      obj.$el.style.display = "";
     } else if (!nval) {
-      obj.style = "display:none;";
+      obj.$el.style.display = "none";
     }
     /*变化监听*/
     obj.watch &&
@@ -66,12 +66,10 @@ export default {
     var tempOld = oval;
     if (typeof nval === "string") {
       nval = SparkUtil.trim(nval);
-      var tempNewVal = nval == "r_d_n" ? "" : nval;
+      var tempNewVal = nval;
       var newStyleObj = {};
       if (oval == nval) return nval;
       try {
-        if (nval == "r_d_n") tempOld = tempOld.replace("display:none;", "");
-        // CSSManager.cssParse.strStyleToObj(tempOld)
         newStyleObj = Object.assign(
           CSSManager.cssParse.strStyleToObj(tempOld),
           CSSManager.cssParse.strStyleToObj(tempNewVal)

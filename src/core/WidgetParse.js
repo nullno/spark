@@ -328,6 +328,10 @@ const WidgetParse = {
         var idName = this.idName ? "id=" + this.idName : "";
         var className = WidgetParse.getClassName(this) + this.name;
         var attributes = this.attributes || "";
+        var attributes = this.attributes || "";
+        if (!this.show) {
+          attributes += ' style="display:none;"';
+        }
 
         var content =
           this.text || this.value

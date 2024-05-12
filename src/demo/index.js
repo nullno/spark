@@ -1,1 +1,1 @@
-import "./list.js";
+import "./modal.js";

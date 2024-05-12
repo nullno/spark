@@ -142,6 +142,8 @@ var OptionMenu = Spark.Fixed({
   style:
     "width:100%;display:flex;justify-content:center;bottom:3%;background:transparent;",
   child: [option1, option2, option3, option4, option5, option6, option7],
+  // show: false,
+
 });
 
 // var List2 = Spark.List({
