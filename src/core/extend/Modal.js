@@ -15,6 +15,7 @@ export default function (p) {
     positionMargin: "3%",
     autoClose: false,
     position: "center",
+    onClose: function () {},
   };
   p = Object.assign(option, p);
   p.show = false;
@@ -156,9 +157,11 @@ export default function (p) {
           if (Modal.inner.hideAni && Modal.inner.hideAni.time) {
             setTimeout(function () {
               Modal.wrap.show = false;
+              p.onClose && p.onClose();
             }, Modal.inner.hideAni.time);
           } else {
             Modal.wrap.show = false;
+            p.onClose && p.onClose();
           }
           clearTimeout(Modal.autoCloseTimer);
         },
