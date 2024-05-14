@@ -34,13 +34,14 @@ let SparkUtil = {
       );
     },
     resize: function (callback) {
-      window.onresize = function () {
+      var resize = function () {
         callback({
           width: SparkUtil.screen.width(),
           height: SparkUtil.screen.height(),
         });
       };
-      window.onresize();
+      resize();
+      window.addEventListener("resize", resize);
     },
   },
   /*包含字符串*/
