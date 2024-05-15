@@ -29,6 +29,9 @@ const WidgetParse = {
 
         Object.defineProperty(obj, a, {
           get: function () {
+            if (obj.type === "Input") {
+              tempVal = tempVal;
+            }
             return tempVal;
           },
           set: function (newval) {
@@ -333,10 +336,9 @@ const WidgetParse = {
           attributes += ' style="display:none;"';
         }
 
-        var content =
-          this.text || this.value
-            ? (this.text || this.value) + "[[" + this.name + "]]"
-            : "[[" + this.name + "]]";
+        var content = this.text
+          ? this.text + "[[" + this.name + "]]"
+          : "[[" + this.name + "]]";
 
         return this.type == "Image"
           ? "<img " +

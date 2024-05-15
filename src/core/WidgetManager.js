@@ -159,6 +159,7 @@ const WidgetManager = {
       writing: false,
       multiline: false,
       value: "",
+      text: "",
       style: "",
       placeholder: "",
       placeholderStyle: "color:#ccc;",
@@ -188,6 +189,7 @@ const WidgetManager = {
         if (e.keyCode == 13 && !this.multiline) {
           e.cancelBubble = true;
           e.preventDefault();
+          this.on["keyEnter"] && this.on["keyEnter"].call(this, e);
         }
       },
       onblur: function (e) {
@@ -210,9 +212,7 @@ const WidgetManager = {
           this.style = "cursor:not-allowed;";
           return;
         }
-
         this.style = this.onStyle + "cursor:auto;";
-
         if (this.placeholderEnable || this.value == this.placeholder) {
           this.value = "";
         }
@@ -232,7 +232,7 @@ const WidgetManager = {
     p.style += p.offStyle;
 
     if (p.value == "" && p.placeholderEnable) {
-      p.value = p.placeholder;
+      p.text = p.placeholder;
       p.style += p.placeholderStyle;
     }
 

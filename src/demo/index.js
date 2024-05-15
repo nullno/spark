@@ -1,1 +1,1 @@
-import "./modal.js";
+import "./proxyInput.js";

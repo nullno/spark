@@ -126,7 +126,6 @@ export default {
     return nval;
   },
   child: function (oval, nval, obj) {
-    // console.log(tempOld)
     if (JSON.stringify(oval) === JSON.stringify(nval)) return nval;
     /*变化监听*/
     obj.watch && obj.watch["child"] && obj.watch["child"].call(obj, oval, nval);
@@ -135,16 +134,19 @@ export default {
   },
   value: function (oval, nval, obj) {
     var tempOld = oval;
-    if (oval === nval) return nval;
-    if (nval != "") {
-      obj.placeholderEnable = false;
-    }
+    // if (oval === nval) return nval;
 
-    if (!obj.writing) {
-      var nodeList = D.getElementsByClassName(obj.name);
-      SparkUtil.traverse(nodeList.length, function (i, end) {
-        nodeList[i].innerText = nval;
-      });
+    if (obj.type === "Input") {
+      if (nval != "") {
+        obj.placeholderEnable = false;
+      }
+
+      if (!obj.writing) {
+        var nodeList = D.getElementsByClassName(obj.name);
+        SparkUtil.traverse(nodeList.length, function (i, end) {
+          nodeList[i].innerText = nval;
+        });
+      }
     }
 
     /*变化监听*/

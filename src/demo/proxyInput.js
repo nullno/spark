@@ -25,8 +25,11 @@ var Input2 = Spark.Input({
       Text.getChild(0).text = this.value;
       Input3.enable = true;
     },
+    keyEnter() {
+      console.log(this.value);
+    },
   },
-  placeholder: "请输入...",
+  placeholder: "请输入...1212",
   multiline: true,
 });
 
@@ -50,7 +53,9 @@ var Text = Spark.Box({
   child: [Spark.Text("---")],
 
   init() {
-    Input.value = 8888;
+    // Input.value = Input2.value;
+    console.log(Input2.value);
+  
     // Input.autofocus()
   },
 });
