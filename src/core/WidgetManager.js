@@ -198,12 +198,15 @@ const WidgetManager = {
           return;
         }
         if (this.value == "" || this.placeholderEnable) {
-          this.value = this.placeholder;
-
+          // this.value = this.placeholder;
+          this.placeholderEnable = true;
+          p.text = p.placeholder;
+          this.value = "";
           this.style = this.offStyle + this.placeholderStyle;
         } else {
           this.style = this.offStyle;
         }
+        this.on["blur"] && this.on["blur"].call(this, e);
       },
       onfocus: function (e) {
         if (!this.enable) {
@@ -212,10 +215,14 @@ const WidgetManager = {
           this.style = "cursor:not-allowed;";
           return;
         }
+
         this.style = this.onStyle + "cursor:auto;";
         if (this.placeholderEnable || this.value == this.placeholder) {
+          this.placeholderEnable = false;
+          p.text = "";
           this.value = "";
         }
+        this.on["focus"] && this.on["focus"].call(this, e);
       },
     };
 

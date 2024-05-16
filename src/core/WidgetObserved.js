@@ -41,6 +41,7 @@ export default {
 
     /*数据改变*/
     var aniSet = obj.hideAni;
+    if (!obj.$el) return nval;
     if (!nval && aniSet && aniSet.ani) {
       obj.style = "animation:" + aniSet.ani;
       var removeTimer = setTimeout(function () {
@@ -137,14 +138,11 @@ export default {
     // if (oval === nval) return nval;
 
     if (obj.type === "Input") {
-      if (nval != "") {
-        obj.placeholderEnable = false;
-      }
-
+      // obj.placeholderEnable = nval == "";
       if (!obj.writing) {
         var nodeList = D.getElementsByClassName(obj.name);
         SparkUtil.traverse(nodeList.length, function (i, end) {
-          nodeList[i].innerText = nval;
+          nodeList[i].innerText = obj.placeholderEnable ? obj.text : nval;
         });
       }
     }
