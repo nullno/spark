@@ -138,11 +138,16 @@ export default {
     // if (oval === nval) return nval;
 
     if (obj.type === "Input") {
-      // obj.placeholderEnable = nval == "";
+      obj.placeholderEnable = nval == "";
+      if (obj.isFocus) {
+        obj.placeholderEnable = false;
+      }
       if (!obj.writing) {
         var nodeList = D.getElementsByClassName(obj.name);
         SparkUtil.traverse(nodeList.length, function (i, end) {
-          nodeList[i].innerText = obj.placeholderEnable ? obj.text : nval;
+          nodeList[i].innerText = obj.placeholderEnable
+            ? obj.placeholder
+            : nval;
         });
       }
     }

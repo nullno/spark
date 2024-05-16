@@ -162,6 +162,7 @@ const WidgetManager = {
       text: "",
       style: "",
       placeholder: "",
+      isFocus: false,
       placeholderStyle: "color:#ccc;",
       placeholderEnable: p.value != "",
       onStyle: "color:#000;box-shadow:0 0 5px #4B95FF;",
@@ -171,17 +172,22 @@ const WidgetManager = {
     var event = {
       input: function (e) {
         this.writing = true;
+        this.isFocus = true;
         this.value = this.$el.innerText.replace(
           /<[\/\s]*(?:(?!div|br)[^>]*)>/g,
           ""
         );
-        // console.log(this.value)
+        if (e.inputType == "insertFromPaste") {
+          this.$el.innerText = this.value;
+        }
         if (this.value != "") {
           this.placeholderEnable = false;
         }
+
         this.on["inputing"] && this.on["inputing"].call(this, e);
       },
       onkeydown: function (e) {
+        this.isFocus = false;
         if (!this.enable) {
           e.cancelBubble = true;
           e.preventDefault();
@@ -189,23 +195,26 @@ const WidgetManager = {
         if (e.keyCode == 13 && !this.multiline) {
           e.cancelBubble = true;
           e.preventDefault();
+          this.$el && this.$el.blur();
           this.on["keyEnter"] && this.on["keyEnter"].call(this, e);
         }
       },
       onblur: function (e) {
         this.writing = false;
+        this.isFocus = false;
         if (!this.enable) {
           return;
         }
+
         if (this.value == "" || this.placeholderEnable) {
-          // this.value = this.placeholder;
+          // this.text = this.placeholder;
           this.placeholderEnable = true;
-          p.text = p.placeholder;
           this.value = "";
           this.style = this.offStyle + this.placeholderStyle;
         } else {
           this.style = this.offStyle;
         }
+
         this.on["blur"] && this.on["blur"].call(this, e);
       },
       onfocus: function (e) {
@@ -217,9 +226,9 @@ const WidgetManager = {
         }
 
         this.style = this.onStyle + "cursor:auto;";
+        this.isFocus = true;
         if (this.placeholderEnable || this.value == this.placeholder) {
           this.placeholderEnable = false;
-          p.text = "";
           this.value = "";
         }
         this.on["focus"] && this.on["focus"].call(this, e);

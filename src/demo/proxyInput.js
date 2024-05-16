@@ -10,6 +10,7 @@ var Input = Spark.Input({
       !this.placeholderEnable && (Text.getChild(0).text = n);
     },
   },
+  placeholder: "请输入...",
   on: {
     press() {
       Input3.enable = false;
@@ -50,6 +51,11 @@ var Input3 = Spark.Input({
 
 var title2 = Spark.Text("输出框：", {
   style: "padding:20px 5px 5px;display:block;",
+  on: {
+    click() {
+      Input.value = "";
+    },
+  },
 });
 var Text = Spark.Box({
   style: Input.style + "color:#4B95FF;border:0;margin:0;",
