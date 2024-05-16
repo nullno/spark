@@ -170,6 +170,12 @@ const WidgetManager = {
     };
 
     var event = {
+      paste: function (e) {
+        console.log(e);
+        setTimeout(() => {
+          this.$el.selectionStart = this.$el.selectionEnd = this.value.length;
+        }, 10);
+      },
       input: function (e) {
         this.writing = true;
         this.isFocus = true;
@@ -179,6 +185,7 @@ const WidgetManager = {
         );
         if (e.inputType == "insertFromPaste") {
           this.$el.innerText = this.value;
+          this.autofocus();
         }
         if (this.value != "") {
           this.placeholderEnable = false;
