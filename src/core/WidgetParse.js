@@ -63,7 +63,7 @@ const WidgetParse = {
     var names = "";
     names +=
       param && typeof param.className === "object"
-        ? param.className["name"] + " "
+        ? param.className["name"]
         : param && typeof param.className === "string"
         ? param.className + ""
         : "";
@@ -71,7 +71,7 @@ const WidgetParse = {
     //   param && typeof param.shover === "object"
     //     ? param.shover["name"] + " "
     //     : "";
-    return names;
+    return names ? names + " " : "";
   },
   getDomEvent: function (type) {
     var DomEvent = {
