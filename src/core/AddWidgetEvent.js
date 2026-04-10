@@ -3,9 +3,9 @@
  * @AuthorHTL
  * @DateTime  2020-04-05T04:21:49+0800
  */
-import { D } from "./Common.js";
+import { D } from "./common.js";
 
-import { addEventListener } from "./Common.js";
+import { addEventListener } from "./common.js";
 
 import SparkUtil from "./SparkUtil.js";
 
@@ -34,6 +34,12 @@ export default function (target, node) {
           },
       { capture: false, passive: true }
     );
+  }
+  if (node.on["dblclick"]) {
+    addEventListener(target, "dblclick", function (e) {
+      e.stopPropagation();
+      node.on["dblclick"].call(node, e);
+    });
   }
   if (node.on["press"]) {
     addEventListener(
@@ -108,28 +114,50 @@ export default function (target, node) {
     });
   }
 
+  if (node.on["scroll"]) {
+    addEventListener(target, "scroll", function (e) {
+      node.on["scroll"].call(node, e);
+    }, { passive: true });
+  }
+
   if (node.on["input"]) {
     addEventListener(target, "input", function (e) {
       e.stopPropagation();
       node.on["input"].call(node, e);
     });
   }
-  if (node.on["onkeydown"]) {
-    target.onkeydown = function (e) {
+  if (node.on["change"]) {
+    addEventListener(target, "change", function (e) {
       e.stopPropagation();
-      node.on["onkeydown"].call(node, e);
-    };
+      node.on["change"].call(node, e);
+    });
   }
-  if (node.on["onblur"]) {
-    target.onblur = function (e) {
+  if (node.on["onkeydown"] || node.on["keydown"]) {
+    var keydownFn = node.on["onkeydown"] || node.on["keydown"];
+    addEventListener(target, "keydown", function (e) {
       e.stopPropagation();
-      node.on["onblur"].call(node, e);
-    };
+      keydownFn.call(node, e);
+    });
   }
-  if (node.on["onfocus"]) {
-    target.onfocus = function (e) {
+  if (node.on["onkeyup"] || node.on["keyup"]) {
+    var keyupFn = node.on["onkeyup"] || node.on["keyup"];
+    addEventListener(target, "keyup", function (e) {
       e.stopPropagation();
-      node.on["onfocus"].call(node, e);
-    };
+      keyupFn.call(node, e);
+    });
+  }
+  if (node.on["onblur"] || node.on["blur"]) {
+    var blurFn = node.on["onblur"] || node.on["blur"];
+    addEventListener(target, "blur", function (e) {
+      e.stopPropagation();
+      blurFn.call(node, e);
+    });
+  }
+  if (node.on["onfocus"] || node.on["focus"]) {
+    var focusFn = node.on["onfocus"] || node.on["focus"];
+    addEventListener(target, "focus", function (e) {
+      e.stopPropagation();
+      focusFn.call(node, e);
+    });
   }
 }

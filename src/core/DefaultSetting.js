@@ -3,7 +3,7 @@
  * @type {Object}
  */
 import SparkUtil from "./SparkUtil.js";
-import { _typeof } from "./Common.js";
+import { _typeof } from "./common.js";
 
 const DefaultSetting = {
   name: "web",

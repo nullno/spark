@@ -1,20 +1,17 @@
 /**
  * [getAddressData 通过地址获取组件所有信息]
- * @AuthorHTL
- * @DateTime  2020-04-01T05:25:07+0800
- * @param     {[type]}                 address [description]
- * @return    {[type]}                         [description]
+ * @param  {String} address  组件地址
+ * @return {Object}          组件对象
  */
 import Cache from "./Cache.js";
 
 export default function (address) {
-  try {
-    if (typeof address == "string" && address.indexOf("Css") != -1) {
-      throw "ERROR: Error useing Widget";
-    }
-  } catch (err) {
-    console.error(err);
-    return {};
+  if (!address || typeof address !== "string") {
+    return null;
   }
-  return address && Cache.WidgetCache[address];
+  if (address.indexOf("Css") !== -1) {
+    console.error("Spark: Cannot use Css widget as a child component. Address: " + address);
+    return null;
+  }
+  return Cache.WidgetCache[address] || null;
 }

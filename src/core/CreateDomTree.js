@@ -8,7 +8,7 @@
  * @param     {Function}               callback    [description]
  * @return    {[type]}                             [description]
  */
-import { _typeof, D } from "./Common.js";
+import { _typeof, D } from "./common.js";
 
 import SparkUtil from "./SparkUtil.js";
 
@@ -85,14 +85,11 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
         }
 
         /*default bind event && el && init*/
-        var tempTimer = setTimeout(function () {
-          clearTimeout(tempTimer);
-          _this.initPushEvent.call(_this, true);
-          _this.renderComplete.call(_this, _this._rootAddress);
-          _this._clear();
+        _this.initPushEvent.call(_this, true);
+        _this.renderComplete.call(_this, _this._rootAddress);
+        _this._clear();
 
-          callback && setTimeout(() => callback(), 0);
-        });
+        callback && setTimeout(() => callback(), 0);
       } else {
         //后期渲染部分节点
 
@@ -158,17 +155,14 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
         }
 
         /*append bind event*/
-        var tempTimer = setTimeout(function () {
-          clearTimeout(tempTimer);
-          _this.initPushEvent.call(_this); //子节点事件
-          _this.renderComplete.call(_this, _this._rootAddress);
-          //如果是列表更新索引
-          if (domTarget.type === "List") {
-            WidgetOperate.updateListIndex(domTarget);
-          }
+        _this.initPushEvent.call(_this); //子节点事件
+        _this.renderComplete.call(_this, _this._rootAddress);
+        //如果是列表更新索引
+        if (domTarget.type === "List") {
+          WidgetOperate.updateListIndex(domTarget);
+        }
 
-          _this._clear();
-        });
+        _this._clear();
       }
     },
     /*add dom way 1 */
@@ -311,7 +305,9 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
     renderComplete: function (address) {
       var _this = this;
       var node = GetAddressData(address);
+      if (!node) return;
       var nodeList = D.getElementsByClassName(address);
+      if (!nodeList || nodeList.length === 0) return;
 
       node.$el = nodeList.length > 1 ? nodeList : nodeList[0];
 
@@ -370,13 +366,15 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
         }
       };
       node.getChild = function (index) {
-        if (node.child && node.child.length <= 0) return;
+        if (!node.child || node.child.length <= 0) return _typeof(index, "Number") ? null : [];
         if (_typeof(index, "Number")) {
-          return GetAddressData(node.child[index]);
+          var addr = node.child[index];
+          return addr ? GetAddressData(addr) : null;
         } else {
           var child = [];
           SparkUtil.traverse(node.child, function (e, index, end) {
-            child.push(GetAddressData(e));
+            var c = GetAddressData(e);
+            if (c) child.push(c);
           });
           return child;
         }
@@ -529,6 +527,7 @@ export default function (_rootAddress, domTarget, init, addType, callback) {
 
       while (_node.child && _node.child[i]) {
         var nw = GetAddressData(_node.child[i]);
+        if (!nw) { i++; continue; }
         nw.child && queue.push(nw.name);
         tempChildHtml += nw.html;
         _this.pushCss(nw);

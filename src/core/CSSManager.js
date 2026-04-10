@@ -1,223 +1,106 @@
-/*[cssParse  样式解析注入 STYLE web版]*/
-
-import { _typeof, D } from "./Common.js";
-
+import { _typeof, D } from "./common.js";
 import SparkUtil from "./SparkUtil.js";
-
 import DefaultSetting from "./DefaultSetting.js";
 
 const _core = {
-  autoprefixerConfig: {
-    param: {
-      transition: ["-webkit-", "-moz-", "-ms-", "-o-"],
-      transform: ["-webkit-", "-moz-", "-ms-", "-o-"],
-      animation: ["-webkit-", "-moz-", "-ms-", "-o-"],
-      "animation-name": ["-webkit-", "-moz-", "-ms-", "-o-"],
-      "user-select": ["-webkit-", "-moz-", "-ms-", "-o-"],
-      "border-radius": ["-webkit-", "-moz-", "-ms-"],
-      "border-top-colors": ["-moz-"],
-      "border-right-colors": ["-moz-"],
-      "border-bottom-colors": ["-moz-"],
-      "border-left-colors": ["-moz-"],
-      "box-shadow": ["-webkit-", "-moz-"],
-      "backface-visibility": ["-webkit-", "-moz-", "-ms-"],
-      "flex-direction": ["-webkit-", "-moz-", "-ms-", "-o-"],
-      flex: ["-prefix-box", "-webkit-box-", "-moz-box-", "-webkit-", "-ms-"],
-      order: ["box-order", "-webkit-box-", "-moz-box-", "-webkit-"],
-      "justify-content": ["-webkit-", "-moz-", "-ms-", "-o-"],
-      "align-items": ["-webkit-", "-moz-", "-ms-", "-o-"],
-      "flex-wrap": ["-webkit-", "-moz-", "-ms-", "-o-"],
-      "flex-flow": ["-webkit-", "-moz-"],
-      "background-size": ["-webkit-"],
-      "box-sizing": ["-webkit-", "-moz-"],
-    },
-    value: {
-      grid: ["-ms-grid"],
-      flex: ["box", "-webkit-box", "-ms-flexbox", "-moz-box", "-webkit-flex"],
-      "linear-gradient": [
-        "-webkit-linear-gradient",
-        "-moz-linear-gradient",
-        "-ms-linear-gradient",
-        "-o-linear-gradient",
-      ],
-      calc: ["-webkit-calc"],
-    },
+  prefixMap: {
+    transition: ["-webkit-"],
+    transform: ["-webkit-"],
+    animation: ["-webkit-"],
+    "animation-name": ["-webkit-"],
+    "user-select": ["-webkit-", "-moz-"],
+    "backface-visibility": ["-webkit-"],
+    "flex-direction": ["-webkit-"],
+    flex: ["-webkit-"],
+    "justify-content": ["-webkit-"],
+    "align-items": ["-webkit-"],
+    "flex-wrap": ["-webkit-"],
   },
-  insert: function (Attribute, AttributeVal, cssStr) {
-    var newStyle = D.createElement("style");
-    newStyle.type = "text/css";
-    newStyle.setAttribute(Attribute, AttributeVal);
-    newStyle.innerText +=
-      (/modifycss/.test(Attribute) ? "." + AttributeVal : "") + cssStr;
-    D.head.insertBefore(newStyle, D.head.lastChild);
+  insert: function(attr, val, css) {
+    var s = D.createElement("style");
+    s.type = "text/css";
+    s.setAttribute(attr, val);
+    s.innerText += (/modifycss/.test(attr) ? "." + val : "") + css;
+    D.head.insertBefore(s, D.head.lastChild);
   },
-  remove: function (dataTarget) {
-    var delTarget = D.querySelector(dataTarget);
-    if (delTarget) {
-      D.head.removeChild(delTarget);
+  remove: function(sel) {
+    var el = D.querySelector(sel);
+    if (el) D.head.removeChild(el);
+  },
+  getStyleEl: function(sel) { return D.querySelector(sel); },
+  autoprefixer: function(item, obj) {
+    var p = item.split(":");
+    var param = SparkUtil.trim(p[0]), value = SparkUtil.trim(p[1]);
+    var prefixes = this.prefixMap[param];
+    if (prefixes) {
+      for (var i = 0; i < prefixes.length; i++) obj[prefixes[i] + param] = value;
     }
-  },
-  getStyleEl(dataTarget) {
-    var el = D.querySelector(dataTarget);
-    return el;
-  },
-  autoprefixer: function (CssItem, tempObj) {
-    var p = CssItem.split(":");
-    var param = SparkUtil.trim(p[0]),
-      value = SparkUtil.trim(p[1]);
-    var cssParam = this.autoprefixerConfig.param[param];
-    if (cssParam) {
-      SparkUtil.traverse(cssParam, function (cssParamItem, index, end) {
-        tempObj[cssParamItem + param] = value;
-      });
-    }
-    /* xcss值兼容匹配
-       var cssValue = this.autoprefixerConfig.value[value];
-       var cssValue = '',cssValueKey='';
-       for(var key in this.autoprefixerConfig.value){
-        if(SparkUtil.includes(value,key)){
-          cssValueKey = key;
-          cssValue = this.autoprefixerConfig.value[key];
-        }
-       }
-       if(cssValue){
-          SparkUtil.traverse(cssValue,function(cssValueItem,index,end){
-            tempObj[param] = cssValueItem;
-             tempObj[param] = value.replace(new RegExp(cssValueKey,'ig'),cssValueItem);
-          })
-        }
-       str.replace(new RegExp('transition','ig'),'-webkit-transition');
-     */
   },
 };
 
 const CSSManager = {
   cssParse: {
-    /*追加*/
-    add: function (id, cssStr) {
-      cssStr = cssStr && SparkUtil.trim(cssStr);
+    add: function(id, css) {
+      css = css && SparkUtil.trim(css);
       _core.remove("[data-style='" + id + "']");
-      _core.insert("data-style", id, cssStr);
+      _core.insert("data-style", id, css);
     },
-    /*修改*/
-    modify: function (selector, cssStr) {
-      setTimeout(function () {
-        cssStr = SparkUtil.trim(cssStr);
-        /*
-        try {
-        if (!/^\.|#/.test(selector)) {
-          throw 'WARN: modify style selector must star" .|| #"}';
-        }
-        if (!/^\{.*\}$/.test(cssStr)) {
-          throw 'WARN: modify style cssstr must star"{" end "}"}';
-        }
-        } catch (error) {
-          console.warn(error);
-        }
-        */
-        _core.remove('[data-modifycss="' + selector + '"]');
-        _core.insert("data-modifycss", selector, cssStr);
-        // var StyleEl = _core.getStyleEl('[data-modifycss="' + selector + '"]');
-        // if (StyleEl) {
-        //   StyleEl.innerText = "." + selector + cssStr;
-        // } else {
-        //   _core.insert("data-modifycss", selector, cssStr);
-        // }
+    modify: function(selector, css) {
+      css = SparkUtil.trim(css);
+      var el = _core.getStyleEl('[data-modifycss="' + selector + '"]');
+      if (el) { el.textContent = "." + selector + css; }
+      else { _core.insert("data-modifycss", selector, css); }
+    },
+    strStyleToObj: function(str) {
+      var obj = {};
+      if (!_typeof(str, "String")) return obj;
+      var urls = [];
+      var safe = SparkUtil.trim(str).replace(/url\s*\([^)]*\)/gi, function(m) {
+        urls.push(m); return "__URL_" + (urls.length - 1) + "__";
       });
-    },
-    /*样式字符串转对象*/
-    strStyleToObj: function (str) {
-      var tempObj = {};
-      // typeof str !='string'
-      if (!_typeof(str, "String")) {
-        return tempObj;
-      }
-
-      var CssArr = SparkUtil.trim(str)
-        .replace(new RegExp("http:", "ig"), "")
-        .replace(new RegExp("https:", "ig"), "")
-        .replace(new RegExp('"', "ig"), "")
-        .replace(new RegExp("'", "ig"), "")
-        .split(";");
-
-      SparkUtil.traverse(CssArr, function (CssItem, index, end) {
-        if (CssItem) {
-          var tempCssItem = CssItem;
-          var p = CssItem.split(":");
-          tempObj[SparkUtil.trim(p[0])] = SparkUtil.trim(p[1]);
-          _core.autoprefixer(tempCssItem, tempObj);
+      var arr = safe.replace(/"/g, "").replace(/'/g, "").split(";");
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i]) {
+          var item = arr[i];
+          for (var j = 0; j < urls.length; j++) item = item.replace("__URL_" + j + "__", urls[j]);
+          var ci = item.indexOf(":");
+          if (ci !== -1) {
+            obj[SparkUtil.trim(item.substring(0, ci))] = SparkUtil.trim(item.substring(ci + 1));
+            _core.autoprefixer(item, obj);
+          }
         }
-      });
-
-      return tempObj;
+      }
+      return obj;
     },
-    /*样式对象转字符串*/
-    objStyleToStr: function (obj) {
-      if (!_typeof(obj, "Object")) {
-        return "";
-      }
-      var newObj = {};
-      for (var key in obj) {
-        newObj[key.replace(/([A-Z])/g, "-$1").toLowerCase()] = obj[key];
-      }
-      var t = JSON.stringify(newObj);
-      if (t == "{}") {
-        return "";
-      }
-
-      var CssStr = t
-        .replace(new RegExp('\\","', "ig"), ";")
-        .replace(new RegExp('\\":"', "ig"), ":")
-        .replace(new RegExp('"', "ig"), "")
-        .replace(new RegExp("{"), "")
-        .replace(new RegExp("}"), ";");
-      return CssStr;
+    objStyleToStr: function(obj) {
+      if (!_typeof(obj, "Object")) return "";
+      var o = {};
+      for (var k in obj) o[k.replace(/([A-Z])/g, "-$1").toLowerCase()] = obj[k];
+      var t = JSON.stringify(o);
+      if (t === "{}") return "";
+      return t.replace(/","/g, ";").replace(/":"/g, ":").replace(/"/g, "").replace("{", "").replace("}", ";");
     },
-    /*样式合并处理*/
-    strStyleHandle: function (laststr, nextstr, className) {
-      var _insertIndex = laststr.indexOf(nextstr);
-      if (_insertIndex != -1) {
-        laststr =
-          laststr.substring(0, _insertIndex) +
-          ",." +
-          className +
-          laststr.substring(_insertIndex, laststr.length);
-      }
-      return laststr;
+    strStyleHandle: function(last, next, cls) {
+      var idx = last.indexOf(next);
+      if (idx !== -1) last = last.substring(0, idx) + ",." + cls + last.substring(idx);
+      return last;
     },
   },
-  /*
-   * [ResetCss 重置css]
-   * @AuthorHTL
-   * @DateTime  2020-04-02T22:18:59+0800
-   */
-  ResetCss: function (cssStr) {
-    var grayStr =
-      DefaultSetting.gray == true
-        ? 'html{ filter: grayscale(100%); -webkit-filter: grayscale(100%); -moz-filter: grayscale(100%); -ms-filter: grayscale(100%); -o-filter: grayscale(100%); filter: url("data:image/svg+xml;utf8,#grayscale"); filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1); -webkit-filter: grayscale(1);}'
-        : "";
-
-    return (
-      DefaultSetting.resetCss ||
-      'html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;box-sizing:border-box;vertical-align:baseline;background:transparent;}ol,ul{list-style:none;}blockquote,q{quotes:none;}blockquote:before,blockquote:after,q:before,q:after{content:"";content:none;}:focus{outline:0;}ins{text-decoration:none;}del{text-decoration:line-through;}table{border-collapse:collapse;border-spacing:0;}*{-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}::-webkit-scrollbar{width:5px;height:5px;position:fixed;background-color:#F3F3F3;}::-webkit-scrollbar-track{width:5px;background-color:rgba(0,0,0,0);-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb{background-color:rgba(61,63,63,.5);background-clip:padding-box;min-height:20px;-webkit-border-radius:2em;-moz-border-radius:2em;border-radius:2em}::-webkit-scrollbar-thumb:hover{background-color:rgba(61,63,63,1)}' +
-        grayStr
-    );
+  ResetCss: function() {
+    var gray = DefaultSetting.gray
+      ? 'html{filter:grayscale(100%);-webkit-filter:grayscale(100%);}'
+      : "";
+    return (DefaultSetting.resetCss ||
+      'html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;box-sizing:border-box;vertical-align:baseline;background:transparent;}ol,ul{list-style:none;}blockquote,q{quotes:none;}:focus{outline:0;}ins{text-decoration:none;}del{text-decoration:line-through;}table{border-collapse:collapse;border-spacing:0;}*{-webkit-tap-highlight-color:rgba(0,0,0,0);}::-webkit-scrollbar{width:5px;height:5px;background-color:#F3F3F3;}::-webkit-scrollbar-track{width:5px;background-color:rgba(0,0,0,0);border-radius:2em;}::-webkit-scrollbar-thumb{background-color:rgba(61,63,63,.5);background-clip:padding-box;min-height:20px;border-radius:2em;}::-webkit-scrollbar-thumb:hover{background-color:rgba(61,63,63,1);}') + gray;
   },
-  /* 初始化 style  */
-  makeStyleTree: function (_cssStr) {
-    var cssStr = this.ResetCss() + _cssStr;
-    cssStr && this.cssParse.add("MainCss", cssStr);
+  makeStyleTree: function(css) {
+    var full = this.ResetCss() + css;
+    if (full) this.cssParse.add("MainCss", full);
   },
-  /* 新增dom style  */
-  makeNextStyleTree: function (_cssStr, address) {
-    _cssStr && this.cssParse.add("NextCss-" + address, _cssStr);
+  makeNextStyleTree: function(css, addr) {
+    if (css) this.cssParse.add("NextCss-" + addr, css);
   },
-  /*
-   * [removeStyleEl 移除样式]
-   * @AuthorHTL
-   * @DateTime  2024-04-22
-   */
-  removeStyleEl(name) {
+  removeStyleEl: function(name) {
     if (!name) return;
     _core.remove('[data-modifycss="' + name + '"]');
     _core.remove('[data-style="' + name + '"]');

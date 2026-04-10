@@ -12,11 +12,10 @@ const webpackConfig = {
     path: path.resolve(__dirname, "./dist"),
     library: "Spark",
     libraryTarget: "umd",
+    libraryExport: "default",
     globalObject: "this",
-    // libraryExport: 'default',
   },
   devServer: {
-    disableHostCheck: true,
     compress: true,
     port: 3000,
   },

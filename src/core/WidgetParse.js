@@ -1,7 +1,7 @@
 /*
  WidgetParse 组件解析
  */
-import { _typeof, D } from "./Common.js";
+import { _typeof, D, escapeHtml } from "./common.js";
 
 import SparkUtil from "./SparkUtil.js";
 
@@ -22,6 +22,7 @@ import Router from "./Router.js";
 const WidgetParse = {
   WidgetDefineProperty: function (obj, propertys) {
     var lastV = {};
+    obj._defining = true;
     SparkUtil.traverse(propertys, function (propertyItem, index, end) {
       lastV[propertyItem] = obj[propertyItem];
       (function (a) {
@@ -29,18 +30,21 @@ const WidgetParse = {
 
         Object.defineProperty(obj, a, {
           get: function () {
-            if (obj.type === "Input") {
-              tempVal = tempVal;
-            }
             return tempVal;
           },
           set: function (newval) {
-            tempVal = lastV[a] = WidgetObserved[a]([lastV[a]][0], newval, obj);
+            var handler = WidgetObserved[a];
+            if (handler) {
+              tempVal = lastV[a] = handler([lastV[a]][0], newval, obj);
+            } else {
+              tempVal = lastV[a] = newval;
+            }
           },
         });
         obj[a] = lastV[a];
       })(propertyItem);
     });
+    obj._defining = false;
   },
   getAddress: function (widgets, parentName) {
     if (!widgets) return [];
@@ -331,13 +335,13 @@ const WidgetParse = {
         var idName = this.idName ? "id=" + this.idName : "";
         var className = WidgetParse.getClassName(this) + this.name;
         var attributes = this.attributes || "";
-        var attributes = this.attributes || "";
         if (!this.show) {
-          attributes += ' style="display:none;"';
+          attributes += ' style=\"display:none;\"';
         }
 
-        var content = this.text
-          ? this.text + "[[" + this.name + "]]"
+        var safeText = this.text ? escapeHtml(this.text) : "";
+        var content = safeText
+          ? safeText + "[[" + this.name + "]]"
           : "[[" + this.name + "]]";
 
         return this.type == "Image"
@@ -430,7 +434,7 @@ const WidgetParse = {
           }
         } else {
           SparkUtil.traverse(this.child, function (widget, index, end) {
-            if (_typeof(widget, "Object") && widget.name) {
+            if (widget && _typeof(widget, "Object") && widget.name) {
               _tempChild.push(widget);
             }
           });

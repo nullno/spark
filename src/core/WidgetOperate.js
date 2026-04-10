@@ -3,7 +3,7 @@
  * @AuthorHTL
  * @DateTime  2020-08-21T12:14:58+0800
  */
-import { _typeof } from "./Common.js";
+import { _typeof } from "./common.js";
 
 import SparkUtil from "./SparkUtil.js";
 
@@ -15,7 +15,9 @@ import CSSManager from "./CSSManager.js";
 
 import Cache from "./Cache.js";
 
-const WidgetOperate = {};
+const WidgetOperate = {
+  WidgetCache: Cache.WidgetCache,
+};
 /**
  * [clearWidget 删除清空组件]
  * @AuthorHTL

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spark.js - 轻量级声明式 JavaScript UI 库</title>
+  <meta name="description" content="Spark.js — 轻量级声明式 JavaScript UI 库，124KB 压缩体积，63 个内置组件，零依赖。用纯 JavaScript 构建完整 Web 页面。">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #4B95FF;
+      --accent: #7566F9;
+      --bg: #ffffff;
+      --bg-alt: #f8f9fc;
+      --text: #1a1a2e;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+      --radius: 12px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-2%, 2%); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    pre code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    }
+    .kw { color: #c084fc; }
+    .fn { color: #60a5fa; }
+    .str { color: #34d399; }
+    .cm { color: #64748b; }
+    .num { color: #fbbf24; }
+  </style>
+</head>
+<body>
+    <script src="../release/spark.min.js" defer></script>
+    <script src="js/index.js" defer></script>
+</body>
+</html>

@@ -2,7 +2,7 @@
  * [WidgetWatchParams 监听属性管理]
  * @type {Object}
  */
-import { D } from "./Common.js";
+import { D } from "./common.js";
 
 import SparkUtil from "./SparkUtil.js";
 
@@ -12,7 +12,7 @@ import GetAddressData from "./GetAddressData.js";
 
 export default {
   vif: function (oval, nval, obj) {
-    // var tempOld = oval;
+    if (obj._defining) return nval;
     if (oval === nval) return nval;
 
     if (!nval) {
@@ -27,7 +27,7 @@ export default {
           PW.after(obj);
         } else if (NW) {
           NW.before(obj);
-        } else if (W.child == 0) {
+        } else if (W && W.child == 0) {
           W.append(obj);
         }
       }
@@ -36,43 +36,67 @@ export default {
     return nval;
   },
   show: function (oval, nval, obj) {
+    if (obj._defining) {
+      if (!nval) {
+        var origInit = obj.$_init;
+        obj.$_init = function () {
+          origInit && origInit.call(obj);
+          if (obj.$el) obj.$el.style.display = "none";
+        };
+      }
+      return nval;
+    }
     var tempOld = oval;
     if (oval === nval) return nval;
 
     /*数据改变*/
     var aniSet = obj.hideAni;
-    if (!obj.$el) return nval;
+    if (!obj.$el) {
+      // Queue the show change for after render
+      var origInit = obj.$_init;
+      obj.$_init = function () {
+        origInit && origInit.call(obj);
+        if (!nval && obj.$el) {
+          obj.$el.style.display = "none";
+        }
+      };
+      return nval;
+    }
     if (!nval && aniSet && aniSet.ani) {
       obj.style = "animation:" + aniSet.ani;
       var removeTimer = setTimeout(function () {
         clearTimeout(removeTimer);
         obj.style = "animation:unset;";
-        obj.$el.style.display = "none";
+        if (obj.$el) obj.$el.style.display = "none";
       }, aniSet.time);
     } else if (nval && obj.showAni) {
       obj.style = "animation:" + obj.showAni.ani + ";";
-      obj.$el.style.display = "";
+      if (obj.$el) obj.$el.style.display = "";
     } else if (nval) {
-      obj.$el.style.display = "";
+      if (obj.$el) obj.$el.style.display = "";
     } else if (!nval) {
-      obj.$el.style.display = "none";
+      if (obj.$el) obj.$el.style.display = "none";
     }
     /*变化监听*/
-    obj.watch &&
-      obj.watch["show"] &&
-      obj.watch["show"].call(obj, tempOld, nval);
+    if (!obj._defining) {
+      obj.watch &&
+        obj.watch["show"] &&
+        obj.watch["show"].call(obj, tempOld, nval);
+    }
     return nval;
   },
   style: function (oval, nval, obj) {
     var tempOld = oval;
     if (typeof nval === "string") {
       nval = SparkUtil.trim(nval);
-      var tempNewVal = nval;
-      var newStyleObj = {};
       if (oval == nval) return nval;
+      var tempNewVal = nval;
       try {
-        newStyleObj = Object.assign(
-          CSSManager.cssParse.strStyleToObj(tempOld),
+        var oldObj = typeof tempOld === "string"
+          ? CSSManager.cssParse.strStyleToObj(tempOld)
+          : {};
+        var newStyleObj = Object.assign(
+          oldObj,
           CSSManager.cssParse.strStyleToObj(tempNewVal)
         );
 
@@ -84,13 +108,15 @@ export default {
 
         return nval;
       } catch (err) {
-        console.error("style is an object:" + oval.name);
+        console.error("Spark: style error on " + obj.name);
+        return nval;
       }
     } else {
       return nval;
     }
   },
   className: function (oval, nval, obj) {
+    if (obj._defining) return nval;
     var tempOld = oval;
     if (typeof nval === "string") {
       if (oval === nval) return nval;
@@ -103,14 +129,16 @@ export default {
           : nodeList[i].className + " " + nval;
       });
       /*变化监听*/
-      obj.watch &&
-        obj.watch["className"] &&
-        obj.watch["className"].call(obj, tempOld, nval);
-    } else {
-      return nval;
+      if (!obj._defining) {
+        obj.watch &&
+          obj.watch["className"] &&
+          obj.watch["className"].call(obj, tempOld, nval);
+      }
     }
+    return nval;
   },
   text: function (oval, nval, obj) {
+    if (obj._defining) return nval;
     var tempOld = oval;
     if (oval === nval) return nval;
 
@@ -121,12 +149,15 @@ export default {
     });
 
     /*变化监听*/
-    obj.watch &&
-      obj.watch["text"] &&
-      obj.watch["text"].call(obj, tempOld, nval);
+    if (!obj._defining) {
+      obj.watch &&
+        obj.watch["text"] &&
+        obj.watch["text"].call(obj, tempOld, nval);
+    }
     return nval;
   },
   child: function (oval, nval, obj) {
+    if (obj._defining) return nval;
     if (JSON.stringify(oval) === JSON.stringify(nval)) return nval;
     /*变化监听*/
     obj.watch && obj.watch["child"] && obj.watch["child"].call(obj, oval, nval);
@@ -135,14 +166,13 @@ export default {
   },
   value: function (oval, nval, obj) {
     var tempOld = oval;
-    // if (oval === nval) return nval;
 
     if (obj.type === "Input") {
       obj.placeholderEnable = nval == "";
       if (obj.isFocus) {
         obj.placeholderEnable = false;
       }
-      if (!obj.writing) {
+      if (!obj.writing && !obj._defining) {
         var nodeList = D.getElementsByClassName(obj.name);
         SparkUtil.traverse(nodeList.length, function (i, end) {
           nodeList[i].innerText = obj.placeholderEnable
@@ -152,14 +182,17 @@ export default {
       }
     }
 
-    /*变化监听*/
-    obj.watch &&
-      obj.watch["value"] &&
-      obj.watch["value"].call(obj, tempOld, nval);
+    /*变化监听 - skip during defineProperty initialization*/
+    if (!obj._defining) {
+      obj.watch &&
+        obj.watch["value"] &&
+        obj.watch["value"].call(obj, tempOld, nval);
+    }
 
     return nval;
   },
   enable: function (oval, nval, obj) {
+    if (obj._defining) return nval;
     var tempOld = oval;
     if (oval === nval) return nval;
 

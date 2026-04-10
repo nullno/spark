@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spark.js - 轻量级声明式 JavaScript UI 库</title>
+  <meta name="description" content="用纯 JavaScript 构建 Web 页面，无需 HTML 模板、无需打包工具、无需 CSS 类名。">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #4B95FF;
+      --primary-dark: #3a7de0;
+      --accent: #7566F9;
+      --bg: #ffffff;
+      --bg-alt: #f8f9fc;
+      --text: #1a1a2e;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+      --radius: 12px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow 0.3s;
+    }
+    .nav.scrolled { box-shadow: var(--shadow); }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--primary); }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--text);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-btn:hover { opacity: 0.85; }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      background: linear-gradient(160deg, #f0f4ff 0%, #ffffff 40%, #faf5ff 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 40%, rgba(75,149,255,0.06) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 60%, rgba(117,102,249,0.06) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-2%, 2%); }
+    }
+    .hero-content { position: relative; max-width: 800px; }
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(75,149,255,0.1);
+      color: var(--primary);
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(75,149,255,0.3);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 24px rgba(75,149,255,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Code Preview */
+    .hero-code {
+      margin-top: 60px;
+      background: var(--code-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      text-align: left;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-code-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .hero-code-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .hero-code-dot:nth-child(1) { background: #ff5f57; }
+    .hero-code-dot:nth-child(2) { background: #ffbd2e; }
+    .hero-code-dot:nth-child(3) { background: #28c841; }
+    .hero-code-header span {
+      margin-left: 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+    }
+    .hero-code pre {
+      padding: 24px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .hero-code code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      color: #e2e8f0;
+    }
+    .hero-code .kw { color: #c084fc; }
+    .hero-code .fn { color: #60a5fa; }
+    .hero-code .str { color: #34d399; }
+    .hero-code .cm { color: #64748b; }
+    .hero-code .num { color: #fbbf24; }
+
+    /* Features Section */
+    .section {
+      padding: 100px 24px;
+    }
+    .section-alt { background: var(--bg-alt); }
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .section-header h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .section-header p {
+      color: var(--text-secondary);
+      font-size: 17px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      padding: 32px;
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+    .feature-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+      transform: translateY(-4px);
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Demo Section */
+    .demo-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .demo-tab {
+      padding: 10px 20px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    .demo-tab:hover { border-color: var(--primary); color: var(--primary); }
+    .demo-tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .demo-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .demo-code {
+      background: var(--code-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .demo-code-header {
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 600;
+    }
+    .demo-code pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .demo-code code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      color: #e2e8f0;
+    }
+    .demo-preview {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      min-height: 300px;
+    }
+    .demo-preview-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    /* Comparison Section */
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+    .comparison-table th {
+      padding: 16px 24px;
+      background: var(--bg-alt);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .comparison-table td {
+      padding: 14px 24px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .comparison-table tr:last-child td { border-bottom: none; }
+    .comparison-table .check { color: #22c55e; font-weight: bold; }
+    .comparison-table .cross { color: #ef4444; }
+    .comparison-table .highlight-col {
+      background: rgba(75,149,255,0.04);
+    }
+    .comparison-table th.highlight-col {
+      background: rgba(75,149,255,0.1);
+      color: var(--primary);
+    }
+
+    /* Component Showcase */
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+    .component-card {
+      padding: 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-decoration: none;
+      display: block;
+    }
+    .component-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+      transform: translateY(-3px);
+      text-decoration: none;
+    }
+    .component-card code {
+      display: inline-block;
+      padding: 4px 10px;
+      background: var(--bg-alt);
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+    .component-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* CTA Section */
+    .cta {
+      text-align: center;
+      padding: 100px 24px;
+      background: linear-gradient(160deg, var(--primary), var(--accent));
+      color: #fff;
+    }
+    .cta h2 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .cta p {
+      font-size: 17px;
+      opacity: 0.9;
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+    .cta .btn-primary {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .cta .btn-primary:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+    }
+    .cta .btn-secondary {
+      background: transparent;
+      border-color: rgba(255,255,255,0.3);
+      color: #fff;
+    }
+    .cta .btn-secondary:hover {
+      border-color: #fff;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 48px 24px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .footer p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .demo-container { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 32px; }
+      .hero p { font-size: 16px; }
+      .section { padding: 60px 16px; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Animations */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">Spark<span>.js</span></a>
+      <div class="nav-links">
+        <a href="#features">特性</a>
+        <a href="#components">组件</a>
+        <a href="#demo">示例</a>
+        <a href="#comparison">对比</a>
+        <a href="components.html">组件文档</a>
+        <a class="nav-btn" href="https://github.com/nullno/spark" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">v1.0.0 &mdash; 正式发布</div>
+      <h1>用纯 JavaScript<br><span class="highlight">构建整个 Web 页面</span></h1>
+      <p>
+        Spark.js 是轻量级的声明式 UI 库。无需 HTML 模板、无需构建工具、无需管理 CSS 类名。<br>
+        引入一个脚本，即刻开始创造。
+      </p>
+      <div class="hero-actions">
+        <a href="#demo" class="btn btn-primary">查看示例</a>
+        <a href="https://github.com/nullno/spark" target="_blank" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="opacity:0.6"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+
+      <div class="hero-code">
+        <div class="hero-code-header">
+          <div class="hero-code-dot"></div>
+          <div class="hero-code-dot"></div>
+          <div class="hero-code-dot"></div>
+          <span>app.js</span>
+        </div>
+        <pre><code><span class="cm">// 一个脚本标签，构建完整页面</span>
+<span class="kw">var</span> hello = Spark.<span class="fn">Text</span>(<span class="str">'Hello Spark!'</span>, {
+  style: <span class="str">'font-size:48px;font-weight:bold;color:#4B95FF;'</span>
+});
+
+<span class="kw">var</span> counter = <span class="num">0</span>;
+<span class="kw">var</span> btn = Spark.<span class="fn">Button</span>(<span class="str">'点击计数: 0'</span>, {
+  on: {
+    <span class="fn">click</span>() {
+      btn.text = <span class="str">'点击计数: '</span> + (++counter);
+    }
+  }
+});
+
+Spark.<span class="fn">Page</span>({
+  link: { path: <span class="str">'/'</span> },
+  child: [hello, btn]
+});</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="section-inner">
+      <div class="section-header fade-up">
+        <h2>为什么选择 Spark.js？</h2>
+        <p>专为快速原型开发和轻量级 Web 应用打造</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:rgba(75,149,255,0.1);color:var(--primary);">⚡</div>
+          <h3>零配置启动</h3>
+          <p>引入一个 &lt;script&gt; 标签即可开始。无需 Node.js、无需 npm install、无需 webpack 配置。直接在浏览器中编写 JavaScript 构建页面。</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:rgba(117,102,249,0.1);color:var(--accent);">🎯</div>
+          <h3>声明式组件</h3>
+          <p>采用 Flutter/Dart 风格的声明式写法。每个 UI 元素都是一个组件对象，通过嵌套 child 构建组件树，代码即是设计。</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;">🔄</div>
+          <h3>响应式更新</h3>
+          <p>基于 Object.defineProperty 的属性监听。修改 text、style、show 等属性，DOM 自动同步更新。支持 watch 回调。</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:rgba(251,191,36,0.1);color:#f59e0b;">🗺️</div>
+          <h3>内置路由</h3>
+          <p>Hash 模式 SPA 路由，支持参数路由、查询参数、通配符（404）、编程导航、滚动位置记忆和 keepalive 页面缓存。</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:rgba(239,68,68,0.1);color:#ef4444;">📦</div>
+          <h3>丰富组件库</h3>
+          <p>40+ 内置组件：基础组件（Text、Box、Button、Input 等）+ 高级扩展（Card、Tabs、Modal、Drawer、Message 等），覆盖完整 UI 需求。</p>
+        </div>
+        <div class="feature-card fade-up">
+          <div class="feature-icon" style="background:rgba(6,182,212,0.1);color:#06b6d4;">🪶</div>
+          <h3>极致轻量</h3>
+          <p>核心库 ~30KB (min)，运行时零依赖。相比 Vue/React 的数百 KB 体积，Spark 是超轻量级的选择。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Components -->
+  <section class="section section-alt" id="components">
+    <div class="section-inner">
+      <div class="section-header fade-up">
+        <h2>内置组件</h2>
+        <p>开箱即用的完整组件体系</p>
+      </div>
+      <div class="component-grid fade-up">
+        <a class="component-card" href="components.html#comp-text">
+          <code>Spark.Text()</code>
+          <p>文本组件，响应式更新</p>
+        </a>
+        <a class="component-card" href="components.html#comp-box">
+          <code>Spark.Box()</code>
+          <p>通用容器，嵌套子组件</p>
+        </a>
+        <a class="component-card" href="components.html#comp-button">
+          <code>Spark.Button()</code>
+          <p>按钮组件，内置样式</p>
+        </a>
+        <a class="component-card" href="components.html#comp-input">
+          <code>Spark.Input()</code>
+          <p>输入框，丰富事件</p>
+        </a>
+        <a class="component-card" href="components.html#comp-switch">
+          <code>Spark.Switch()</code>
+          <p>开关切换组件</p>
+        </a>
+        <a class="component-card" href="components.html#comp-checkbox">
+          <code>Spark.Checkbox()</code>
+          <p>复选框组件</p>
+        </a>
+        <a class="component-card" href="components.html#comp-radio">
+          <code>Spark.Radio()</code>
+          <p>单选按钮/单选组</p>
+        </a>
+        <a class="component-card" href="components.html#comp-row">
+          <code>Spark.Row() / Col()</code>
+          <p>Flex 栅格布局</p>
+        </a>
+        <a class="component-card" href="components.html#comp-divider">
+          <code>Spark.Divider()</code>
+          <p>分割线</p>
+        </a>
+        <a class="component-card" href="components.html#comp-card">
+          <code>Spark.Card()</code>
+          <p>卡片容器</p>
+        </a>
+        <a class="component-card" href="components.html#comp-tabs">
+          <code>Spark.Tabs()</code>
+          <p>标签页切换</p>
+        </a>
+        <a class="component-card" href="components.html#comp-modal">
+          <code>Spark.Modal()</code>
+          <p>模态对话框</p>
+        </a>
+        <a class="component-card" href="components.html#comp-drawer">
+          <code>Spark.Drawer()</code>
+          <p>侧滑抽屉面板</p>
+        </a>
+        <a class="component-card" href="components.html#comp-message">
+          <code>Spark.Message</code>
+          <p>全局轻量提示</p>
+        </a>
+        <a class="component-card" href="components.html#comp-notification">
+          <code>Spark.Notification</code>
+          <p>通知提醒框</p>
+        </a>
+        <a class="component-card" href="components.html#comp-alert">
+          <code>Spark.Alert()</code>
+          <p>警告提示框</p>
+        </a>
+        <a class="component-card" href="components.html#comp-badge">
+          <code>Spark.Badge()</code>
+          <p>徽标数/小红点</p>
+        </a>
+        <a class="component-card" href="components.html#comp-tag">
+          <code>Spark.Tag()</code>
+          <p>彩色标签</p>
+        </a>
+        <a class="component-card" href="components.html#comp-progress">
+          <code>Spark.Progress()</code>
+          <p>进度条</p>
+        </a>
+        <a class="component-card" href="components.html#comp-steps">
+          <code>Spark.Steps()</code>
+          <p>步骤条导航</p>
+        </a>
+        <a class="component-card" href="components.html#comp-collapse">
+          <code>Spark.Collapse()</code>
+          <p>折叠面板/手风琴</p>
+        </a>
+        <a class="component-card" href="components.html#comp-avatar">
+          <code>Spark.Avatar()</code>
+          <p>头像展示</p>
+        </a>
+        <a class="component-card" href="components.html#comp-skeleton">
+          <code>Spark.Skeleton()</code>
+          <p>骨架屏加载</p>
+        </a>
+        <a class="component-card" href="components.html#comp-rate">
+          <code>Spark.Rate()</code>
+          <p>星级评分</p>
+        </a>
+        <a class="component-card" href="components.html#comp-slider">
+          <code>Spark.Slider()</code>
+          <p>滑动输入条</p>
+        </a>
+        <a class="component-card" href="components.html#comp-dropdown">
+          <code>Spark.Dropdown()</code>
+          <p>下拉菜单</p>
+        </a>
+        <a class="component-card" href="components.html#comp-tooltip">
+          <code>Spark.Tooltip()</code>
+          <p>文字提示气泡</p>
+        </a>
+        <a class="component-card" href="components.html#comp-breadcrumb">
+          <code>Spark.Breadcrumb()</code>
+          <p>面包屑导航</p>
+        </a>
+        <a class="component-card" href="components.html#comp-empty">
+          <code>Spark.Empty()</code>
+          <p>空状态占位</p>
+        </a>
+        <a class="component-card" href="components.html#comp-backtop">
+          <code>Spark.BackTop()</code>
+          <p>回到顶部</p>
+        </a>
+        <a class="component-card" href="components.html#comp-list">
+          <code>Spark.List()</code>
+          <p>列表渲染</p>
+        </a>
+        <a class="component-card" href="components.html#comp-drag">
+          <code>Spark.Drag()</code>
+          <p>可拖拽容器</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Section -->
+  <section class="section" id="demo">
+    <div class="section-inner">
+      <div class="section-header fade-up">
+        <h2>代码示例</h2>
+        <p>简洁直观的 API，几行代码即可实现丰富交互</p>
+      </div>
+
+      <div class="demo-tabs fade-up">
+        <button class="demo-tab active" data-demo="counter">计数器</button>
+        <button class="demo-tab" data-demo="todo">待办列表</button>
+        <button class="demo-tab" data-demo="router">路由</button>
+        <button class="demo-tab" data-demo="modal">模态框</button>
+      </div>
+
+      <div class="demo-container fade-up">
+        <div class="demo-code">
+          <div class="demo-code-header">JavaScript</div>
+          <pre id="demoCode"><code></code></pre>
+        </div>
+        <div class="demo-preview">
+          <div class="demo-preview-label">效果预览</div>
+          <div id="demoPreview"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section class="section section-alt" id="comparison">
+    <div class="section-inner">
+      <div class="section-header fade-up">
+        <h2>框架对比</h2>
+        <p>了解 Spark.js 的适用场景</p>
+      </div>
+      <div class="fade-up" style="overflow-x:auto;">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>特性</th>
+              <th class="highlight-col">Spark.js</th>
+              <th>Vue.js</th>
+              <th>React</th>
+              <th>jQuery</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>无需构建工具</td>
+              <td class="highlight-col"><span class="check">✓</span></td>
+              <td><span class="check">✓</span> (CDN)</td>
+              <td><span class="cross">✗</span> (JSX 需编译)</td>
+              <td><span class="check">✓</span></td>
+            </tr>
+            <tr>
+              <td>无需写 HTML</td>
+              <td class="highlight-col"><span class="check">✓</span></td>
+              <td><span class="cross">✗</span></td>
+              <td><span class="cross">✗</span> (JSX)</td>
+              <td><span class="cross">✗</span></td>
+            </tr>
+            <tr>
+              <td>声明式组件</td>
+              <td class="highlight-col"><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="cross">✗</span></td>
+            </tr>
+            <tr>
+              <td>内置路由</td>
+              <td class="highlight-col"><span class="check">✓</span></td>
+              <td><span class="cross">✗</span> (vue-router)</td>
+              <td><span class="cross">✗</span> (react-router)</td>
+              <td><span class="cross">✗</span></td>
+            </tr>
+            <tr>
+              <td>响应式更新</td>
+              <td class="highlight-col"><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="check">✓</span></td>
+              <td><span class="cross">✗</span></td>
+            </tr>
+            <tr>
+              <td>自动 CSS 前缀</td>
+              <td class="highlight-col"><span class="check">✓</span></td>
+              <td><span class="cross">✗</span> (PostCSS)</td>
+              <td><span class="cross">✗</span> (PostCSS)</td>
+              <td><span class="cross">✗</span></td>
+            </tr>
+            <tr>
+              <td>体积 (min)</td>
+              <td class="highlight-col"><strong>~30KB</strong></td>
+              <td>~63KB</td>
+              <td>~42KB</td>
+              <td>~87KB</td>
+            </tr>
+            <tr>
+              <td>学习曲线</td>
+              <td class="highlight-col"><strong>低</strong></td>
+              <td>中</td>
+              <td>高</td>
+              <td>低</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>开始使用 Spark.js</h2>
+    <p>只需一个脚本标签，即刻开始构建你的 Web 应用</p>
+    <div class="hero-actions">
+      <a href="https://github.com/nullno/spark" target="_blank" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        查看 GitHub
+      </a>
+      <a href="#demo" class="btn btn-secondary">查看文档</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      Spark.js &copy; 2024 &mdash; Made with ❤️ by <a href="https://github.com/nullno" target="_blank">nullno</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://github.com/nullno/spark" target="_blank">GitHub</a>
+      &nbsp;&middot;&nbsp;
+      MIT License
+    </p>
+  </footer>
+
+  <script>
+    // Nav scroll effect
+    var nav = document.getElementById('nav');
+    window.addEventListener('scroll', function() {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    });
+
+    // Scroll animations
+    var fadeEls = document.querySelectorAll('.fade-up');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    fadeEls.forEach(function(el) { observer.observe(el); });
+
+    // Demo code examples
+    var demos = {
+      counter: {
+        code:
+'<span class="kw">var</span> count = <span class="num">0</span>;\n\n' +
+'<span class="kw">var</span> display = Spark.<span class="fn">Text</span>(<span class="str">\'0\'</span>, {\n' +
+'  style: <span class="str">\'font-size:64px;font-weight:800;text-align:center;color:#4B95FF;\'</span>\n' +
+'});\n\n' +
+'<span class="kw">var</span> btn = Spark.<span class="fn">Button</span>(<span class="str">\'点击 +1\'</span>, {\n' +
+'  style: <span class="str">\'display:block;margin:20px auto;padding:12px 32px;\'</span>,\n' +
+'  on: {\n' +
+'    <span class="fn">click</span>() {\n' +
+'      display.text = String(++count);\n' +
+'    }\n' +
+'  }\n' +
+'});',
+        preview: '<div style="text-align:center;padding:40px 0;"><div id="counterDisplay" style="font-size:64px;font-weight:800;color:#4B95FF;">0</div><button id="counterBtn" style="margin-top:20px;padding:12px 32px;background:#4B95FF;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">点击 +1</button></div>'
+      },
+      todo: {
+        code:
+'<span class="kw">var</span> todos = [<span class="str">\'学习 Spark\'</span>, <span class="str">\'写个 Demo\'</span>];\n\n' +
+'<span class="kw">var</span> list = Spark.<span class="fn">List</span>({\n' +
+'  data: todos,\n' +
+'  <span class="fn">item</span>(text, i) {\n' +
+'    <span class="kw">return</span> Spark.<span class="fn">Box</span>({\n' +
+'      style: <span class="str">\'padding:12px;border-bottom:1px solid #eee;\'</span>,\n' +
+'      child: [Spark.<span class="fn">Text</span>((i+<span class="num">1</span>) + <span class="str">\'. \'</span> + text)]\n' +
+'    });\n' +
+'  }\n' +
+'});\n\n' +
+'<span class="cm">// 动态添加</span>\n' +
+'list.<span class="fn">insertLast</span>(<span class="str">\'分享给朋友\'</span>);\n\n' +
+'<span class="cm">// 动态删除</span>\n' +
+'list.<span class="fn">delete</span>(<span class="num">0</span>, <span class="num">1</span>);',
+        preview: '<div style="max-width:360px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;"><div style="padding:16px 20px;background:#f8f9fc;font-weight:700;font-size:15px;">待办列表</div><div style="padding:14px 20px;border-bottom:1px solid #eee;">1. 学习 Spark</div><div style="padding:14px 20px;border-bottom:1px solid #eee;">2. 写个 Demo</div><div style="padding:14px 20px;border-bottom:1px solid #eee;">3. 分享给朋友</div><div style="padding:14px 20px;color:#999;font-size:13px;">支持 insertFirst / insertLast / delete / update / clear</div></div>'
+      },
+      router: {
+        code:
+'<span class="kw">var</span> home = Spark.<span class="fn">Page</span>({\n' +
+'  link: { name: <span class="str">\'home\'</span>, path: <span class="str">\'/\'</span> },\n' +
+'  child: [\n' +
+'    Spark.<span class="fn">Text</span>(<span class="str">\'首页\'</span>, { style: <span class="str">\'font-size:24px;\'</span> }),\n' +
+'    Spark.<span class="fn">Button</span>(<span class="str">\'去关于页\'</span>, {\n' +
+'      on: { <span class="fn">click</span>() { Spark.router.<span class="fn">push</span>(<span class="str">\'/about\'</span>); } }\n' +
+'    })\n' +
+'  ]\n' +
+'});\n\n' +
+'<span class="kw">var</span> about = Spark.<span class="fn">Page</span>({\n' +
+'  link: { name: <span class="str">\'about\'</span>, path: <span class="str">\'/about\'</span> },\n' +
+'  child: [\n' +
+'    Spark.<span class="fn">Text</span>(<span class="str">\'关于\'</span>, { style: <span class="str">\'font-size:24px;\'</span> }),\n' +
+'    Spark.<span class="fn">Button</span>(<span class="str">\'返回首页\'</span>, {\n' +
+'      on: { <span class="fn">click</span>() { Spark.router.<span class="fn">push</span>(<span class="str">\'/\'</span>); } }\n' +
+'    })\n' +
+'  ]\n' +
+'});',
+        preview: '<div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;"><div style="padding:12px 20px;background:#f8f9fc;font-size:12px;color:#64748b;font-family:monospace;">#/ <span style="margin-left:12px;padding:2px 8px;background:#4B95FF;color:#fff;border-radius:4px;font-size:11px;">Active</span></div><div style="padding:32px;"><div style="font-size:24px;font-weight:700;margin-bottom:16px;">首页</div><button style="padding:10px 20px;background:#4B95FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;">去关于页 →</button><div style="margin-top:20px;padding:16px;background:#f0f4ff;border-radius:8px;font-size:13px;color:#64748b;">支持动态参数 <code>/detail/:id</code>、查询参数、通配符 404</div></div></div>'
+      },
+      modal: {
+        code:
+'<span class="kw">var</span> modal = Spark.<span class="fn">Modal</span>({\n' +
+'  bgShow: <span class="kw">true</span>,\n' +
+'  bgClose: <span class="kw">true</span>,\n' +
+'  position: <span class="str">\'center\'</span>,\n' +
+'  style: <span class="str">\'width:320px;padding:32px;background:#fff;\'</span>\n' +
+'    + <span class="str">\'border-radius:16px;text-align:center;\'</span>,\n' +
+'  showAni: { ani: <span class="str">\'fadeIn 0.3s ease\'</span> },\n' +
+'  hideAni: { ani: <span class="str">\'fadeOut 0.3s ease\'</span>, time: <span class="num">300</span> },\n' +
+'  child: [\n' +
+'    Spark.<span class="fn">Text</span>(<span class="str">\'提示\'</span>, {\n' +
+'      style: <span class="str">\'font-size:22px;font-weight:700;\'</span>\n' +
+'    }),\n' +
+'    Spark.<span class="fn">Text</span>(<span class="str">\'操作成功!\'</span>, {\n' +
+'      style: <span class="str">\'color:#666;margin:16px 0;\'</span>\n' +
+'    }),\n' +
+'    Spark.<span class="fn">Button</span>(<span class="str">\'关闭\'</span>, {\n' +
+'      on: { <span class="fn">click</span>() { modal.<span class="fn">close</span>(); } }\n' +
+'    })\n' +
+'  ]\n' +
+'});\n\n' +
+'modal.<span class="fn">open</span>();  <span class="cm">// 打开</span>',
+        preview: '<div style="position:relative;height:280px;background:#f8f9fc;border-radius:12px;display:flex;align-items:center;justify-content:center;"><div style="position:absolute;inset:0;background:rgba(0,0,0,0.3);border-radius:12px;"></div><div style="position:relative;width:280px;padding:32px;background:#fff;border-radius:16px;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,0.15);"><div style="font-size:22px;font-weight:700;margin-bottom:8px;">提示</div><div style="color:#666;margin-bottom:20px;">操作成功!</div><button style="padding:10px 28px;background:#4B95FF;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">关闭</button></div></div>'
+      }
+    };
+
+    // Demo tabs
+    var tabs = document.querySelectorAll('.demo-tab');
+    var codeEl = document.querySelector('#demoCode code');
+    var previewEl = document.getElementById('demoPreview');
+
+    function setDemo(name) {
+      codeEl.innerHTML = demos[name].code;
+      previewEl.innerHTML = demos[name].preview;
+      tabs.forEach(function(t) {
+        t.classList.toggle('active', t.getAttribute('data-demo') === name);
+      });
+    }
+
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        setDemo(this.getAttribute('data-demo'));
+      });
+    });
+
+    // Init counter demo interaction
+    setDemo('counter');
+
+    // Make counter interactive
+    setInterval(function() {
+      var btn = document.getElementById('counterBtn');
+      var display = document.getElementById('counterDisplay');
+      if (btn && !btn._bound) {
+        btn._bound = true;
+        var c = 0;
+        btn.addEventListener('click', function() {
+          c++;
+          display.textContent = c;
+        });
+      }
+    }, 500);
+  </script>
+</body>
+</html>

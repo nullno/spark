@@ -1,4 +1,4 @@
-import { _typeof, D } from "./Common.js";
+import { _typeof, D } from "./common.js";
 
 import SparkUtil from "./SparkUtil.js";
 
@@ -94,12 +94,32 @@ Router.prototype.Render = function (link) {
 Router.prototype.read = function (pageName) {
   var _this = this;
   this.timer && clearTimeout(this.timer);
-  if (!this.hash()) {
+  var currentHash = this.hash();
+  if (!currentHash) {
     this.hitHash = true;
     this.GoPage("/");
     return;
   }
+
+  // Anchor-only hash (doesn't start with /) is not a route
+  var isAnchor = currentHash.charAt(0) !== '/';
+
   var W = GetAddressData(pageName);
+
+  if (isAnchor) {
+    // Page already rendered — skip routing, let browser handle anchor
+    if (D.getElementsByClassName(W.name).length >= 1) {
+      this.hitHash = true;
+      return;
+    }
+    // Initial load with anchor hash — render the "/" page
+    W.link.address = pageName;
+    if (W.link.path === "/") {
+      this.hitHash = true;
+      this.Render(W.link);
+    }
+    return;
+  }
 
   if (D.getElementsByClassName(W.name).length >= 1) {
     W.link.scrollTop = SparkUtil.screen.scrollTop();

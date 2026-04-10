@@ -4,7 +4,7 @@
  * @DateTime  2020-09-21T15:23:23+0800
  * @return    {[type]}                 [description]
  */
-import { addEventListener, removeEventListener } from "./Common.js";
+import { addEventListener, removeEventListener } from "./common.js";
 
 import SparkUtil from "./SparkUtil.js";
 
