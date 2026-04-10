@@ -8,7 +8,7 @@
 
 **轻量级声明式 JavaScript UI 库** — 用纯 JavaScript 构建完整 Web 页面，无需 HTML 模板、无需打包工具、无需 CSS 类名。
 
-[在线文档](https://nullno.github.io/spark/) · [在线 Demo](https://nullno.github.io/spark/demo/) · [GitHub](https://github.com/nullno/spark)
+<font color=red>Spark.js</font> 是一个轻量级的 JavaScript 库，采用 dart 编写风格，它是一个三无产品：无需打包、无需思考 className、无需编写 html，你只需要专注于编写 js 脚本创建页面，内置数据绑定，事件监听，路由管理，网络请求等功能，未来会丰富更多组件功能；
 
 ---
 
