@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="version">
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="license">
-  <img src="https://img.shields.io/badge/size-~30KB-orange.svg" alt="size">
+  <img src="https://img.shields.io/badge/size-124KB%20min%20%7C%2032KB%20gzip-orange.svg" alt="size">
 </p>
 
 # Spark.js
@@ -18,12 +18,12 @@
 - **声明式组件**：Dart/Flutter 风格的组件声明方式
 - **响应式数据绑定**：修改属性自动更新 DOM
 - **内置路由系统**：Hash 模式 SPA 路由，支持参数路由、查询参数
-- **丰富的内置组件**：40+ 组件，含基础组件（Text、Box、Button、Input 等）和扩展组件（Card、Tabs、Modal、Drawer、Message 等）
+- **丰富的内置组件**：63 个组件，含基础组件（Text、Box、Button、Input 等）和扩展组件（Card、Tabs、Modal、Drawer、Table、Carousel、Tree 等）
 - **事件系统**：click、press、move、hover 等，自动适配移动端
 - **CSS 自动前缀**：内置 autoprefixer
-- **可扩展架构**：插件系统支持自定义组件
+- **可扩展架构**：支持 `Spark.component()` 注册自定义组件
 - **生命周期钩子**：init → created → activated → deactivated
-- **零依赖运行**（仅可选依赖 axios）
+- **零依赖运行**：内置 HTTP 请求工具、滚动工具与环境检测能力
 
 ---
 
@@ -40,7 +40,7 @@
   <title>Hello Spark</title>
 </head>
 <body>
-  <script src="https://unpkg.com/spark-widget/release/spark.min.js"></script>
+  <script src="https://unpkg.com/@nullno/spark-js/release/spark.min.js"></script>
   <script>
     // 应用配置
     Spark.setting({ name: 'myapp', title: 'My First Spark App' });
@@ -64,11 +64,11 @@
 ### NPM 安装
 
 ```bash
-npm install spark-widget
+npm install @nullno/spark-js
 ```
 
 ```javascript
-import Spark from 'spark-widget';
+import Spark from '@nullno/spark-js';
 
 Spark.setting({ name: 'myapp', title: 'My App' });
 
