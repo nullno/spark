@@ -252,9 +252,9 @@ var featuresSection = section("features", false, [
 
 var cdnCode =
   '<span class="cm">&lt;!-- 方式一：直接引入（推荐）--&gt;</span>\n' +
-  '&lt;<span class="kw">script</span> src=<span class="str">"https://unpkg.com/@nullno/spark-js/release/spark.min.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;\n\n' +
+  '&lt;<span class="kw">script</span> src=<span class="str">"https://unpkg.com/@weijundong/spark-js/release/spark.min.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;\n\n' +
   '<span class="cm">&lt;!-- 方式二：npm 安装 --&gt;</span>\n' +
-  '<span class="cm">npm install @nullno/spark-js</span>';
+  '<span class="cm">npm install @weijundong/spark-js</span>';
 
 var startCode =
   '<span class="cm">// 1. 基本设置</span>\n' +

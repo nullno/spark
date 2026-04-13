@@ -1,7 +1,7 @@
 {
-  "name": "@nullno/spark-js",
+  "name": "@weijundong/spark-js",
   "version": "1.0.0",
-  "description": "A lightweight declarative JavaScript UI library with 63 built-in components, SPA routing, and zero runtime dependencies",
+  "description": "A lightweight declarative JavaScript UI library components, SPA routing, and zero runtime dependencies",
   "main": "release/spark.min.js",
   "module": "src/index.js",
   "unpkg": "release/spark.min.js",
