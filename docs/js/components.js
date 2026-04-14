@@ -224,7 +224,7 @@ var topNav = Spark.Box({
     Spark.Link("Spark.js", { href: "index.html", style: "font-size:20px;font-weight:800;color:#4B95FF;margin-right:32px;" }),
     Spark.Text("组件文档", { style: "font-size:15px;font-weight:600;color:#1a1a2e;flex:1;" }),
     Spark.Link("首页", { href: "index.html", style: "color:#64748b;font-size:14px;margin-right:24px;" }),
-    Spark.Link("GitHub", { href: "https://github.com/nicx519y/spark", target: "_blank", style: "color:#64748b;font-size:14px;" }),
+    Spark.Link("GitHub", { href: "https://github.com/nullno/spark", target: "_blank", style: "color:#64748b;font-size:14px;" }),
   ],
 });
 
